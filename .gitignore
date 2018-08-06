@@ -1,0 +1,9 @@
+.DS_Store
+.idea
+.virtualenv
+*.pyc
+*.db
+*.sqlite
+*.sqlite3
+*.log
+.env*
