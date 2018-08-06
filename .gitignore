@@ -6,5 +6,6 @@
 *.sqlite
 *.sqlite3
 *.log
+*.sock
 .env*
 http_static
