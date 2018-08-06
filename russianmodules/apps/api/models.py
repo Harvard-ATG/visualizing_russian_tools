@@ -20,6 +20,9 @@ class Lemma(models.Model):
     aspect_counterpart = models.TextField()
     transitivity = models.TextField()
 
+    def __str__(self):
+        return "%s [%s:%s] " % (self.lemma, self.pos, self.id, )
+
     class Meta:
         managed = False
         db_table = 'lemma'
@@ -35,6 +38,9 @@ class Inflection(models.Model):
     category = models.TextField()
     description = models.TextField()
     frequency = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return "%s [%s:%s]" % (self.form, self.category, self.id)
 
     class Meta:
         managed = False
