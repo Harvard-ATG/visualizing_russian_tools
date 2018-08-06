@@ -17,9 +17,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 
+import russianmodules.apps.tools.views
+
 urlpatterns = [
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('admin/', admin.site.urls),
     path('api/', include(('russianmodules.apps.api.urls', 'api'))),
-    path('tools/', include(('russianmodules.apps.tools.urls', 'tools'))),
+    #path('tools/', include(('russianmodules.apps.tools.urls', 'tools'))),
+    path('text-parsing-analysis', russianmodules.apps.tools.views.text_parsing_analysis,  name='text_parsing_analysis')
 ]
