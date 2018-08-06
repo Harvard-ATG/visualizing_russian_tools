@@ -25,11 +25,11 @@
 <body class="{% block body_class %}{% endblock %}" id="{% block body_id %}{% endblock %}">
 
     {% block topbar_base %}
-    <nav class="navbar navbar-expand-md navbar-dark navbar-bg">
+    <nav class="navbar navbar-expand-md navbar-light navbar-bg">
         <div class="container-fluid">
             <div class="navbar-nav">
                 <a class="navbar-brand" href="/">Russian Modules</a>
-								<a class="nav-item nav-link {% block nav_class_home %}{% endblock %}" href="{% url 'tools:text_parsing_analysis' %}">Visible Vocabulary</a>
+                <a class="nav-item nav-link {% block nav_class_home %}{% endblock %}" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a>
             </div>
             <div class="navbar-nav navbar-right">
             {% if request.user.is_authenticated and request.user.is_staff %}
