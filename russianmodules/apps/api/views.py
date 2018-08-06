@@ -40,7 +40,7 @@ class LemmatizeView(View):
                     "gender": inflection.lemma.gender,
                     "pos": inflection.lemma.pos,
                     "level": inflection.lemma.level,
-                    "count": inflection.lemma.frequency,
+                    "count": inflection.lemma.count,
                     "rank": inflection.lemma.rank,
                     "animacy": inflection.lemma.animacy,
                     "label": inflection.lemma.lemma,

@@ -9,7 +9,7 @@ class Lemma(models.Model):
     pos = models.TextField()
     pos_subtype = models.TextField()
     rank = models.IntegerField()
-    frequency = models.FloatField(blank=True, null=True)
+    count = models.FloatField(blank=True, null=True)
     level = models.TextField()
     gender = models.TextField()
     animacy = models.TextField()
