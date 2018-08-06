@@ -151,23 +151,23 @@ LOGGING = {
     'loggers': {
         # Root level logger
         '': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'WARNING',
         },
         # Capture django-related logging
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
         'django.db': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': os.getenv('DB_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
         # Capture app-specific logging
         'russianmodules': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': os.getenv('LOG_LEVEL', 'INFO'),
             'propagate': False,
         }
