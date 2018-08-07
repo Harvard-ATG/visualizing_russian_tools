@@ -14,7 +14,7 @@ class InflectionAdmin(admin.ModelAdmin):
 @admin.register(Lemma)
 class LemmaAdmin(admin.ModelAdmin):
     list_display = ('id', 'external_id', 'lemma', 'translation', 'pos', 'pos_subtype', 'animacy', 'count','level', 'rank', 'aspect', 'transitivity')
-    list_filter = ('level', 'pos', 'pos_subtype', 'animacy', 'aspect', 'transitivity')
+    list_filter = ('level', 'pos', 'pos_subtype', 'gender', 'animacy', 'aspect', 'transitivity')
     search_fields = ['id', 'lemma', 'translation']
     ordering = ['-count', 'level']
     inlines = [InflectionInline, ]
