@@ -31,18 +31,18 @@ class LemmatizeView(View):
         for inflection in qs:
             details = {
                 "inflection": {
-                    "type": inflection.type.key,
+                    "type": inflection.type,
                     "label": inflection.form,
                     "stressed": inflection.stressed,
                 },
                 "lemma": {
                     "stressed": inflection.lemma.stressed,
-                    "gender": inflection.lemma.gender.key,
-                    "pos": inflection.lemma.pos.key,
-                    "level": inflection.lemma.level.key,
+                    "gender": inflection.lemma.gender,
+                    "pos": inflection.lemma.pos,
+                    "level": inflection.lemma.level,
                     "count": inflection.lemma.count,
                     "rank": inflection.lemma.rank,
-                    "animacy": inflection.lemma.animacy.key,
+                    "animacy": inflection.lemma.animacy,
                     "label": inflection.lemma.lemma,
                     "id": inflection.lemma.external_id,
                     "reverse": "",
