@@ -1,4 +1,4 @@
-RUSSIAN_TABLES = ('lemma', 'inflection')
+RUSSIAN_TABLES = ('lemma', 'inflection', 'animacy', 'aspect', 'level', 'transitivity', 'pos', 'gender', 'inflection_type')
 
 class RussianRouter(object): 
     def db_for_read(self, model, **hints):
