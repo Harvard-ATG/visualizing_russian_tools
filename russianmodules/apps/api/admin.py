@@ -6,8 +6,8 @@ class InflectionInline(admin.TabularInline):
 
 @admin.register(Inflection)
 class InflectionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'form', 'category', 'description')
-    list_filter = ('category',)
+    list_display = ('id', 'form', 'type')
+    list_filter = ('type',)
     autocomplete_fields = ('lemma', )
     search_fields = ['form']
 

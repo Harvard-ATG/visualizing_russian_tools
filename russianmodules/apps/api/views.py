@@ -31,7 +31,7 @@ class LemmatizeView(View):
         for inflection in qs:
             details = {
                 "inflection": {
-                    "type": inflection.category,
+                    "type": inflection.type,
                     "label": inflection.form,
                     "stressed": inflection.stressed,
                 },

@@ -35,12 +35,11 @@ class Inflection(models.Model):
     lemma = models.ForeignKey('Lemma', on_delete=models.CASCADE)
     form = models.TextField()
     stressed = models.TextField()
-    category = models.TextField()
-    description = models.TextField()
+    type = models.TextField()
     frequency = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        return "%s [%s:%s]" % (self.form, self.category, self.id)
+        return "%s [%s:%s]" % (self.form, self.type, self.id)
 
     class Meta:
         managed = False
