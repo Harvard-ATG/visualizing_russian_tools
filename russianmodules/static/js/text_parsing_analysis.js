@@ -30,8 +30,14 @@ function getTextInput(){
     return formatted;
 }
 
+function scrollToAnalysis() {
+	$([document.documentElement, document.body]).animate({
+        scrollTop: $("#analysis").offset().top
+    }, 1000);
+}
 
 function parse(){
+	scrollToAnalysis();
 
     var data = getTextInput();
     $('#parsed').html('');
@@ -94,12 +100,12 @@ function parse(){
         wordData.push({"id": $(y).attr("id"), "lexeme": $(y).attr("data-lexeme")});
     });
 
-        $.ajax ({
+	$.ajax ({
 		type: "POST",
 		url: "/api/lemmatize",
 		data: JSON.stringify(wordData),
 		dataType: "json",
-	        contentType: "application/json",
+		contentType: "application/json",
 		success: function(data){
 	            visualize(data);
 	        },
@@ -207,4 +213,15 @@ $(document).on('click', '.parsed', function(){
     $('#wordinfo').append("<h4 span='wordtitle inline'>Parts of Speech:</h4> <span class='numbers'>" + pos_ + "</span>");
     $('#wordinfo').append("<h4 span='wordtitle inline'>Levels:</h4> <span class='numbers'>" + levels_ + "</span>");
     $('#wordinfo').append("<h4 span='wordtitle inline'>Inflections:</h4> <span class='numbers'>" + types_ + "</span>");
+});
+
+
+$(document).on("scroll", function(e) {
+  var sidebar_left = $("#sidebar").offset().left;
+  if ($(document).scrollTop() > $("#parsed").offset().top) {
+    $("#sidebar").addClass("fix-sidebar").css("left", sidebar_left + "px");
+  } else {
+    $("#sidebar").removeClass("fix-sidebar").css("left", "");
+  }
+
 });

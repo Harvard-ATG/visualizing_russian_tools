@@ -1,9 +1,7 @@
 {% extends "theme_base.html" %}
 
 {% block content_base %}
-    <div class="col-md-12">
-        {% block body %}
-            {% block content %}{% endblock %}
-        {% endblock %}
-    </div>
+    {% block body %}
+        {% block content %}{% endblock %}
+    {% endblock %}
 {% endblock %}

@@ -40,14 +40,12 @@
     </nav>
     {% endblock %}
 
-    <div class="container-fluid">
+    <div class="container">
         {% block page_header_base %}
             {% block page_header %}{% endblock %}
         {% endblock %}
 
-        <div class="row">
-            {% block content_base %}{% endblock %}
-        </div>
+        {% block content_base %}{% endblock %}
     </div>
 
     {% block script_base %}

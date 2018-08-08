@@ -23,8 +23,10 @@
      font-family: 'Ubuntu Condensed', sans-serif;
      font-size: 18px;
      line-height: 125%;
+     /*
      max-height: 350px;
      overflow: scroll;
+     */
 }
  .underline {
      text-decoration: underline;
