@@ -30,15 +30,7 @@ function getTextInput(){
     return formatted;
 }
 
-function scrollToAnalysis() {
-	$([document.documentElement, document.body]).animate({
-        scrollTop: $("#analysis").offset().top
-    }, 1000);
-}
-
 function parse(){
-	scrollToAnalysis();
-
     var data = getTextInput();
     $('#parsed').html('');
 
@@ -182,9 +174,30 @@ function parse(){
         });
 
 	var wl = $('.word').length;
-	$('#textinfo').html('<h4 class="inline">Word Count:</h4><span class="numbers"> ' + wl + '</span><br/><br/><h4 class="inline">Unparsed Count:</h4><span class="numbers"> ' + counts[0] + '</span><br/><br/><h4 class="inline">L1 Count:</h4><span class="numbers"> ' + counts[1] + '</span><br/><br/><h4 class="inline">L2 Count:</h4><span class="numbers"> ' + counts[2] + '</span><br/><br/><h4 class="inline">L3 Count:</h4><span class="numbers"> ' + counts[3] + '</span><br/><br/><h4 class="inline">L4 Count:</h4><span class="numbers"> ' + counts[4] + '</br>');
+	$('#textinfo').html('<h4 class="inline">Word Count:</h4><span class="numbers"> ' + wl + '</span><br/><h4 class="inline">Unparsed Count:</h4><span class="numbers"> ' + counts[0] + '</span><br/><h4 class="inline">L1 Count:</h4><span class="numbers"> ' + counts[1] + '</span><br/><h4 class="inline">L2 Count:</h4><span class="numbers"> ' + counts[2] + '</span><br/><h4 class="inline">L3 Count:</h4><span class="numbers"> ' + counts[3] + '</span><br/><h4 class="inline">L4 Count:</h4><span class="numbers"> ' + counts[4] + '</br>');
 
-	}
+}
+
+function scrollToAnalysis() {
+	$([document.documentElement, document.body]).animate({
+        scrollTop: $("#analysis").offset().top
+    }, 1000);
+}
+
+
+$('#parsebtn').on('click', function(e) {
+   $("#analysis").removeClass('d-none');
+   scrollToAnalysis();
+   parse();
+   e.stopPropagation();
+   e.preventDefault();
+});
+
+$('#clearbtn').on('click', function(e) {
+   clearAll();
+   e.stopPropagation();
+   e.preventDefault();
+});
 
 $(document).on('click', '.toggle', function(){
     $('.multiple').toggleClass('underline');
@@ -215,13 +228,11 @@ $(document).on('click', '.parsed', function(){
     $('#wordinfo').append("<h4 span='wordtitle inline'>Inflections:</h4> <span class='numbers'>" + types_ + "</span>");
 });
 
-
 $(document).on("scroll", function(e) {
   var sidebar_left = $("#sidebar").offset().left;
   if ($(document).scrollTop() > $("#parsed").offset().top) {
-    $("#sidebar").addClass("fix-sidebar").css("left", sidebar_left + "px");
+    $("#sidebar").addClass("rus-sidebar-fixed").css("left", sidebar_left + "px");
   } else {
-    $("#sidebar").removeClass("fix-sidebar").css("left", "");
+    $("#sidebar").removeClass("rus-sidebar-fixed").css("left", "");
   }
-
 });
