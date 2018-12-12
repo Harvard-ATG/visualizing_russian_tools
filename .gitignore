@@ -9,3 +9,4 @@
 *.sock
 .env*
 http_static
+/docs
