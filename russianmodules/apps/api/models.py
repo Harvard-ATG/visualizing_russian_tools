@@ -29,6 +29,7 @@ class Lemma(models.Model):
         indexes = [
             models.Index(fields=['lemma'], name='lemma_lemma_index'),
         ]
+        ordering = ['rank'] # Order by more frequently occurring lemma
 
 class Inflection(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)

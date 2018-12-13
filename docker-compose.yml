@@ -11,4 +11,5 @@ services:
     environment:
       - DJANGO_LOG_LEVEL=DEBUG
       - LOG_LEVEL=DEBUG
+      - DB_LOG_LEVEL=DEBUG
 
