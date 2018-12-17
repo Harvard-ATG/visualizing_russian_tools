@@ -126,29 +126,24 @@ function parse(){
 			}
 		});
 
-		$('.word').each(function(c,d){
+		$(".word").each(function(c,d){
+		  var whichRank = 0, whichLevel = "";
+			var forms = $(d).data("form");
+			if(!forms || forms.length === 0) {
+			  return;
+      }
 
-			var whichRank = 0;
-			var whichLevel = "";
+      for(let i = 0; i < forms.length; i++) {
+        let f = forms[i];
+        if (whichRank === 0 || (f.lemma.level <= whichLevel && parseInt(f.lemma.rank) < whichRank)) {
+          whichRank = parseInt(f.lemma.rank);
+          whichLevel = f.lemma.level
+        }
+      }
 
-			if ( $(d).data("form") != undefined && $(d).data("form").length > 1 ){
+      $(d).attr('data-level', whichLevel);
+			if (forms.length > 1 ){
 				$(d).addClass("underline multiple");
-			}
-
-			if ( $(d).data("form") != undefined ){
-				var forms = $(d).data("form");
-				$(forms).each(function(e,f){
-					if (whichRank == 0){
-						whichRank = parseInt(f.lemma.rank);
-						whichLevel = f.lemma.level;
-					}
-					else {
-						if (parseInt(f.lemma.rank) < whichRank){
-							whichLevel = f.lemma.level
-						}
-					}
-				});
-				$(d).attr('data-level', whichLevel);
 			}
 		});
 

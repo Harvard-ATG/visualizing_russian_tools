@@ -48,3 +48,29 @@ class Inflection(models.Model):
         indexes = [
             models.Index(fields=['form'], name='inflection_form_index'),
         ]
+
+def lemmatize(forms):
+    lemmatized = {}
+    qs = Inflection.objects.filter(form__in=forms).select_related('lemma').order_by('lemma__level', '-lemma__count')
+    for inflection in qs:
+        details = {
+            "inflection": {
+                "type": inflection.type,
+                "label": inflection.form,
+                "stressed": inflection.stressed,
+            },
+            "lemma": {
+                "stressed": inflection.lemma.stressed,
+                "gender": inflection.lemma.gender,
+                "pos": inflection.lemma.pos,
+                "level": inflection.lemma.level,
+                "count": inflection.lemma.count,
+                "rank": inflection.lemma.rank,
+                "animacy": inflection.lemma.animacy,
+                "label": inflection.lemma.lemma,
+                "id": inflection.lemma.external_id,
+                "reverse": "",
+            }
+        }
+        lemmatized.setdefault(inflection.form, []).append(details)
+    return lemmatized

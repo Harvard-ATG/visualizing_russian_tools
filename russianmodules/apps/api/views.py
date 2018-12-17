@@ -3,9 +3,8 @@ from django.core.exceptions import SuspiciousOperation
 from django.views import View
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import F, Prefetch
 
-from .models import Lemma, Inflection
+from .models import lemmatize
 
 import json
 
@@ -25,31 +24,8 @@ class LemmatizeView(View):
         return JsonResponse(results, safe=False)
 
     def _parse(self, tokens):
-        lexemes = list(set([token['lexeme'] for token in tokens if token['lexeme'] != ""]))
-
-        lemmatized = {}
-        qs = Inflection.objects.filter(form__in=lexemes).select_related('lemma').order_by('lemma__level', 'lemma__rank')
-        for inflection in qs:
-            details = {
-                "inflection": {
-                    "type": inflection.type,
-                    "label": inflection.form,
-                    "stressed": inflection.stressed,
-                },
-                "lemma": {
-                    "stressed": inflection.lemma.stressed,
-                    "gender": inflection.lemma.gender,
-                    "pos": inflection.lemma.pos,
-                    "level": inflection.lemma.level,
-                    "count": inflection.lemma.count,
-                    "rank": inflection.lemma.rank,
-                    "animacy": inflection.lemma.animacy,
-                    "label": inflection.lemma.lemma,
-                    "id": inflection.lemma.external_id,
-                    "reverse": "",
-                }
-            }
-            lemmatized.setdefault(inflection.form, []).append(details)
+        forms = list(set([token['lexeme'] for token in tokens if token['lexeme'] != ""]))
+        lemmatized = lemmatize(forms)
 
         results = []
         for token in tokens:
