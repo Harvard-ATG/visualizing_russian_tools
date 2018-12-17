@@ -29,7 +29,7 @@ class Lemma(models.Model):
         indexes = [
             models.Index(fields=['lemma'], name='lemma_lemma_index'),
         ]
-        ordering = ['rank'] # Order by more frequently occurring lemma
+        ordering = ['level', 'rank'] # Order by hand-picked levels and then by more frequently occurring lemma
 
 class Inflection(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)
@@ -51,7 +51,7 @@ class Inflection(models.Model):
 
 def lemmatize(forms):
     lemmatized = {}
-    qs = Inflection.objects.filter(form__in=forms).select_related('lemma').order_by('lemma__rank', 'lemma__level')
+    qs = Inflection.objects.filter(form__in=forms).select_related('lemma').order_by('lemma__level', 'lemma__rank')
     for inflection in qs:
         details = {
             "inflection": {

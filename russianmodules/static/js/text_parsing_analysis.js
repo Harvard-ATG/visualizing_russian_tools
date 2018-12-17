@@ -135,7 +135,7 @@ function parse(){
 
       for(let i = 0; i < forms.length; i++) {
         let f = forms[i];
-        if (whichRank === 0 || (parseInt(f.lemma.rank) <= whichRank) && f.lemma.level <= whichLevel) {
+        if (whichRank === 0 || (f.lemma.level <= whichLevel && parseInt(f.lemma.rank) <= whichRank)) {
           whichRank = parseInt(f.lemma.rank);
           whichLevel = f.lemma.level
         }
