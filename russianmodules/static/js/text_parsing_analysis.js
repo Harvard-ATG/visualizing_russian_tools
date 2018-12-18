@@ -53,21 +53,21 @@ function parse(){
         // CHECK IF WORD CONTAINS A HYPHEN, IN WHICH CASE BREAK IT INTO TWO WORDS TO BE
         // PARSED SEPARATELY, EXCEPT IN THE CASE OF "по-" BECAUSE THE DATABASE HAS
         // SEPARATE ENTRIES FOR WORDS THAT BEGIN WITH "по-"
-        if ( word.indexOf("-") !== -1 && word.indexOf("по-") == -1){
-          var splitword = word.split("-");
+        if ( word.indexOf("-") !== -1 && word.length > 1 && word.indexOf("по-") == -1){
+          var splitword = word.split("-").filter(function(str) {
+            return str != "";
+          });
           for (var f=0; f < splitword.length; f++){
+            var uuid = next_word_id();
             if (f == 0){
               $('#parsed').append("<span class='word rnopadding' id=" + uuid + " data-lexeme=" + splitword[f] + ">" + l.split("-")[f] + "-</span>");
             }
             else if (f > 0 && f < word.split("-").length - 1){
-              var uuid = next_word_id();
               $('#parsed').append("<span class='word lnopadding rnopadding' id=" + uuid + " data-lexeme=" + splitword[f] + ">" + l.split("-")[f] + "-</span>");
             }
             else {
-              var uuid = next_word_id();
               $('#parsed').append("<span class='word lnopadding' id=" + uuid + " data-lexeme=" + splitword[f] + ">" + l.split("-")[f] + "</span> ");
             }
-
           }
         }
 
@@ -75,16 +75,14 @@ function parse(){
         // SEPARATELY BEFORE BRINGING IT ALL BACK TOGETHER
         else if (word.indexOf("|") !== -1){
           for (var f=0; f < word.split("|").length; f++){
+            var uuid = next_word_id();
             if (f == 0){
-                            var uuid = next_word_id();
               $('#parsed').append("<span class='word rnopadding' id=" + uuid + " data-lexeme=" + word.split("|")[f] + ">" + l.split("|")[f] + "|</span>");
             }
             else if (f > 0 && f < word.split("|").length - 1){
-              var uuid = next_word_id();
               $('#parsed').append("<span class='word lnopadding rnopadding' id=" + uuid + " data-lexeme=" + word.split("|")[f] + ">" + l.split("|")[f] + "|</span>");
             }
             else {
-              var uuid = next_word_id();
               $('#parsed').append("<span class='word lnopadding' id=" + uuid + " data-lexeme=" + word.split("|")[f] + ">" + l.split("|")[f] + "</span> ");
             }
           }
