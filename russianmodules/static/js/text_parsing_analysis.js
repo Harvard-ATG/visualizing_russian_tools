@@ -38,9 +38,12 @@ function parse(){
     console.log("parse", data);
     $(data).each(function(index,l){
         // Render whitespace in the parsed output
-        if((l.match(/\s+/g)||[]).length > 0) {
+        var matchwhitespace = l.match(/^\s+$/g) || [];
+        if(matchwhitespace.length > 0) {
             var whitespace = l.replace(/[\n\r]/g, "<br>").replace(/[\t]/g, '<i class="tabspace">&emsp;</i>');
-            $("#parsed").append(whitespace);
+            if(whitespace.length > l.length) {
+              $("#parsed").append(whitespace);
+            }
             return;
         }
 
