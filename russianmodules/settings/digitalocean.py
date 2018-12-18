@@ -19,4 +19,4 @@ DATABASES = {
 
 DATABASE_ROUTERS = ['russianmodules.database_routers.RussianRouter']
 
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
