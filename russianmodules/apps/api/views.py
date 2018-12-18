@@ -24,8 +24,8 @@ class LemmatizeView(View):
         return JsonResponse(results, safe=False)
 
     def _parse(self, tokens):
-        forms = list(set([token['lexeme'] for token in tokens if token['lexeme'] != ""]))
-        lemmatized = lemmatize(forms)
+        forms = [token['lexeme'] for token in tokens if token['lexeme'] != ""]
+        lemmatized = lemmatize(list(set(forms)))
 
         results = []
         for token in tokens:

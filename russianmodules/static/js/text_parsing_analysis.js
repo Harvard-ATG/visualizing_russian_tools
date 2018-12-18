@@ -199,28 +199,34 @@ $(document).on('click', '.toggle', function(){
 });
 
 $(document).on('click', '.parsed', function(){
-    $('#wordinfo').html('');
-    $('#wordinfo').append('<h3 span="wordtitle inline">'+$(this).data('lexeme')+'</h3>');
-
-    var forminfo = $(this).data("form");
     var lemmas = [];
     var pos = [];
     var levels = [];
     var types = [];
-    $(forminfo).each(function(x,y){
-        pos.push(y.lemma.pos);
-        lemmas.push(y.lemma.label);
-        levels.push(y.lemma.level);
-        types.push(y.inflection.type);
+    var forms = $(this).data("form") || [];
+    $(forms).each(function(x,y){
+        if(typeof y.lemma.pos != "undefined" && pos.indexOf(y.lemma.pos) == -1) {
+          pos.push(y.lemma.pos);
+        }
+        if(typeof y.lemma.label  != "undefined" && lemmas.indexOf(y.lemma.label) == -1) {
+          lemmas.push(y.lemma.label);
+        }
+        if(typeof y.lemma.level  != "undefined" && levels.indexOf(y.lemma.level) == -1) {
+          levels.push(y.lemma.level);
+        }
+        if(typeof y.inflection.type  != "undefined" && types.indexOf(y.inflection.type) == -1) {
+          types.push(y.inflection.type);
+        }
     });
-    var lemmas_ = lemmas.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);
-    var pos_ = pos.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);
-    var levels_ = levels.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);
-    var types_ = types.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);
-    $('#wordinfo').append("<h4 span='wordtitle inline'>Lemma:</h4> <span class='numbers'>" + lemmas_ + "</span>");
-    $('#wordinfo').append("<h4 span='wordtitle inline'>Parts of Speech:</h4> <span class='numbers'>" + pos_ + "</span>");
-    $('#wordinfo').append("<h4 span='wordtitle inline'>Levels:</h4> <span class='numbers'>" + levels_ + "</span>");
-    $('#wordinfo').append("<h4 span='wordtitle inline'>Inflections:</h4> <span class='numbers'>" + types_ + "</span>");
+
+    $('#wordinfo').html('');
+    $('#wordinfo').append('<h3 span="wordtitle inline">'+$(this).data('lexeme')+'</h3>');
+    if(lemmas.length > 0) {
+      $('#wordinfo').append("<h4 span='wordtitle inline'>Lemma:</h4> <span class='numbers'>" + lemmas + "</span>");
+    }
+    $('#wordinfo').append("<h4 span='wordtitle inline'>Parts of Speech:</h4> <span class='numbers'>" + pos + "</span>");
+    $('#wordinfo').append("<h4 span='wordtitle inline'>Levels:</h4> <span class='numbers'>" + levels + "</span>");
+    $('#wordinfo').append("<h4 span='wordtitle inline'>Inflections:</h4> <span class='numbers'>" + types + "</span>");
 });
 
 $(document).on("scroll", function(e) {
