@@ -1,6 +1,6 @@
 from .local import *
 
-DEBUG = True
+DEBUG = False
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'uGACpvzrJxtkJnxz7HaRYnHnANwHudehmQeDAgcrw8uk2vtBZu8bY4HtMeTqtD8Q')
 
