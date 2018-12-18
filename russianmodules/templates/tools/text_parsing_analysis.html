@@ -11,31 +11,21 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/text_parsing_analysis.css' %}" />
 
 <style>
-#textinput {
+.container {
     font-family: 'Libre Baskerville';
-    min-height: 250px;
 }
-.rus-col {
-    padding: 36px 36px 36px 36px;
+.parser-dark {
     background-color: #f7f7f7;
     border-top: 5px solid #777777;
 }
-.rus-row {
-    font-weight: 400;
-    font-family: 'Libre Baskerville';
-    background-color: #fff;
+.parser-box {
+    padding: 36px 36px 36px 36px;
 }
-.rus-header {
+.parser-widget {
+    padding: 18px;
+}
+.parser-header {
     color: #777777;
-    font-size: 17px;
-    margin: 18px 0 0;
-    line-height: 1.75;
-}
-.rus-sidebar-fixed {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    overflow-y: auto;
 }
 </style>
 {% endblock %}
@@ -46,48 +36,41 @@
 
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12 rus-col">
-        <div class="row mb-2">
-            <p class="rus-header">Input Russian Text:</p>
-            <textarea id="textinput" class="form-control" rows="5"  ></textarea>
+<div id="parsetext" class="mb-4 parser-dark parser-box">
+    <div class="row mb-2">
+        <div class="col">
+            <h2 class="parser-header">Input Russian Text:</h2>
+            <textarea id="textinput" class="form-control" rows="5" style="height:300px;"></textarea>
         </div>
-        <div class="row justify-content-between">
-            <button type="button" align="left" class="btn btn-dark" id="parsebtn">PARSE</button>
-            <button type="button" align="left" class="btn btn-dark" id="clearbtn">CLEAR</button>
-        </div>
+    </div>
+    <div class="d-flex justify-content-between">
+        <button type="button" align="left" class="btn btn-dark" id="parsebtn">PARSE</button>
+        <button type="button" align="left" class="btn btn-dark" id="clearbtn">CLEAR</button>
     </div>
 </div>
 <div id="analysis" class="d-none">
-    <div class="row justifyt-content-around rus-row">
-        <div class="col rus-col">
-            <p class="rus-header">Text Info:</p>
-            <div id="textinfo"></div>
-        </div>
-        <div class="col rus-col">
-            <p class="rus-header">Difficulty Levels:</p>
-            <div id="levels"></div>
-        </div>
-        <div class="col rus-col"></div>
-    </div>
-    <div class="row justifyt-content-between mb-5 ">
-        <div class="col-md-8 mt-3 mb">
-            <div class="row justify-content-between">
-                <div class="col-md-11">
-                    <p class="rus-header">Parsed Text Analysis</p>
-                </div>
-                <div class="col-md-1">
-                    <div class="toggle">U</div>
-                </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between">
+                <h2 class="parser-header">Parsed Text Analysis </h2>
+                <div><span class="toggle">U</span></div>
             </div>
+
             <div id="parsed"></div>
         </div>
-        <div class="col-md-4 mt-3" id="sidebar">
-            <div class="row">
-                <div class="col">
-                    <p class="rus-header">Word Info:</p>
-                    <div id="wordinfo">Click on a word.</div>
-                </div>
+
+        <div class="col-md-4" id="sidebar">
+            <div class="parser-widget parser-dark mb-2">
+                <h2 class="parser-header">Word Info:</h2>
+                <div id="wordinfo">Click on a word.</div>
+            </div>
+            <div class="parser-widget parser-dark mb-2">
+                <h3 class="parser-header">Difficulty Levels:</h3>
+                <div id="levels"></div>
+            </div>
+            <div class="parser-widget parser-dark mb-2">
+                <h3 class="parser-header">Text Info:</h3>
+                <div id="textinfo"></div>
             </div>
         </div>
     </div>

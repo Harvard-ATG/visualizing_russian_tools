@@ -28,6 +28,7 @@ function getTextInput(){
 
 function clearTextInput(){
   $("#textinput").val('');
+  $("#textinput").height(100);
 }
 
 function clearParsed(){
@@ -48,7 +49,7 @@ function parse(){
         // Handle whitespace - do not mark as a word to be lemmatized
         var matchwhitespace = l.match(/^\s+$/g) || [];
         if(matchwhitespace.length > 0) {
-            var whitespace = l.replace(/[\n\r]/g, "<br>").replace(/[\t]/g, '<i class="tabspace">&emsp;</i>');
+            var whitespace = l.replace(/[\n\r]/g, "<br>").replace(/[\t]/g, '<i class="tabchar">&emsp;</i>');
             if(whitespace.length > l.length) {
               $("#parsed").append(whitespace);
             }
@@ -191,7 +192,7 @@ function parse(){
         });
 
 	var wl = $('.word').length;
-	$('#textinfo').html('<h4 class="inline">Word Count:</h4><span class="numbers"> ' + wl + '</span><br/><h4 class="inline">Unparsed Count:</h4><span class="numbers"> ' + counts[0] + '</span><br/><h4 class="inline">L1 Count:</h4><span class="numbers"> ' + counts[1] + '</span><br/><h4 class="inline">L2 Count:</h4><span class="numbers"> ' + counts[2] + '</span><br/><h4 class="inline">L3 Count:</h4><span class="numbers"> ' + counts[3] + '</span><br/><h4 class="inline">L4 Count:</h4><span class="numbers"> ' + counts[4] + '</br>');
+	$('#textinfo').html('<b>Word Count:</b><span class="numbers"> ' + wl + '</span><br/><b class="inline">Unparsed Count:</b><span class="numbers"> ' + counts[0] + '</span><br/><b class="inline">L1 Count:</b><span class="numbers"> ' + counts[1] + '</span><br/><b class="inline">L2 Count:</b><span class="numbers"> ' + counts[2] + '</span><br/><b class="inline">L3 Count:</b><span class="numbers"> ' + counts[3] + '</span><br/><b class="inline">L4 Count:</b><span class="numbers"> ' + counts[4] + '</br>');
 
 }
 
@@ -201,10 +202,9 @@ function scrollToAnalysis() {
     }, 1000);
 }
 
-
 $('#parsebtn').on('click', function(e) {
    $("#analysis").removeClass('d-none');
-   scrollToAnalysis();
+   //scrollToAnalysis();
    parse();
    e.stopPropagation();
    e.preventDefault();
@@ -220,12 +220,22 @@ $(document).on('click', '.toggle', function(){
     $('.multiple').toggleClass('underline');
 });
 
-$(document).on('click', '.parsed', function(){
-    var lemmas = [];
-    var pos = [];
-    var levels = [];
-    var types = [];
-    var forms = $(this).data("form") || [];
+$(document).on('click', '.parsed', function(e){
+    if($(this).hasClass("highlight")) {
+      $(this).removeClass("highlight");
+      $("#wordinfo").html("Click on a word.");
+    } else {
+      $(".word.highlight").removeClass("highlight");
+      $(this).addClass("highlight");
+      $("#wordinfo").html(getWordInfoForElement(this));
+    }
+    return false;
+});
+
+function getWordInfoForElement(wordElement) {
+    var lemmas = [], pos = [], levels = [], types = [];
+    var forms = $(wordElement).data("form") || [];
+    var lexeme = $(wordElement).data("lexeme");
     $(forms).each(function(x,y){
         if(typeof y.lemma.pos != "undefined" && pos.indexOf(y.lemma.pos) == -1) {
           pos.push(y.lemma.pos);
@@ -241,16 +251,17 @@ $(document).on('click', '.parsed', function(){
         }
     });
 
-    $('#wordinfo').html('');
-    $('#wordinfo').append('<h3 span="wordtitle inline">'+$(this).data('lexeme')+'</h3>');
+    var html = '<h3 span="wordtitle inline">'+lexeme+'</h3>';
     if(lemmas.length > 0) {
-      $('#wordinfo').append("<h4 span='wordtitle inline'>Lemma:</h4> <span class='numbers'>" + lemmas + "</span>");
+      html += '<h4>Lemma:</h4></div> <span class="numbers">' + lemmas + "</span><br>";
     }
-    $('#wordinfo').append("<h4 span='wordtitle inline'>Parts of Speech:</h4> <span class='numbers'>" + pos + "</span>");
-    $('#wordinfo').append("<h4 span='wordtitle inline'>Levels:</h4> <span class='numbers'>" + levels + "</span>");
-    $('#wordinfo').append("<h4 span='wordtitle inline'>Inflections:</h4> <span class='numbers'>" + types + "</span>");
-});
+    html += '<h4>Parts of Speech:</h4></div> <span class="numbers">' + pos + "</span><br>";
+    html += '<h4>Levels:</h4></dt> <span class="numbers">' + levels + "</span><br>";
+    html += '<h4>Inflections:</h4></dt> <span class="numbers">' + types + "</span><br>";
+    return html;
+}
 
+/*
 $(document).on("scroll", function(e) {
   var sidebar_left = $("#sidebar").offset().left;
   if ($(document).scrollTop() > $("#parsed").offset().top) {
@@ -259,3 +270,4 @@ $(document).on("scroll", function(e) {
     $("#sidebar").removeClass("rus-sidebar-fixed").css("left", "");
   }
 });
+*/

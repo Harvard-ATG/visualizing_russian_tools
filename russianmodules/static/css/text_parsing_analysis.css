@@ -17,7 +17,7 @@
      color: black !important;
 }
  #textinput {
-     min-height: 300px;
+     min-height: 50px;
 }
  #parsed {
      font-family: 'Ubuntu Condensed', sans-serif;
@@ -35,13 +35,10 @@
      background-color: #990000;
      color: #DEDEDE;
      font-weight: bold;
-     top: 5px;
-     right: 0px;
      padding-left: 5px;
      padding-right: 5px;
      padding-top: 3px;
      padding-bottom: 3px;
-     position: absolute;
 }
  .toggle:hover{
      background-color: teal;
@@ -57,10 +54,13 @@
      padding: 3px;
      color: #333;
 }
- .word:hover {
+ .word.parsed:hover {
      background-color: yellow;
      cursor: pointer;
 }
+ .word.parsed.highlight {
+     background-color: yellow;
+ }
  .lnopadding {
      padding-left: 0px !important;
 }
@@ -72,9 +72,15 @@
 }
  .numbers {
      color: #990000;
-     font-size: 21px;
      font-weight: bold;
 }
- .tabspace {
+ .tabchar {
      margin-left: 3em;
  }
+ /* resize heading elements inside the container */
+.container h1 { font-size: 2rem; }
+.container h2 { font-size: 1.75rem; }
+.container h3 { font-size: 1.5rem; }
+.container h4 { font-size: 1.25rem; }
+.container h5 { font-size: 1rem; }
+.container h6 { font-size: .75rem; }
