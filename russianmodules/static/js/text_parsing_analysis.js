@@ -30,14 +30,22 @@ function clearTextInput(){
   $("#textinput").val('');
 }
 
-function parse(){
-    var data = getTextInput();
-    clearTextInput();
+function clearParsed(){
+  $("#parsed").html('');
+}
 
-    $('#parsed').html('');
+function parse(){
+    var ONLY_PUNCT_RE = /^[.\…,\/\«\»\—\„\—\#\!\?\$\%\^\&\*\;\:\{\}\=\_\`\~\[\]\(\)\"]+$/g;
+    var MATCH_PUNCT_RE = /[.\…,\/\«\»\—\„\—\#\!\?\$\%\^\&\*\;\:\{\}\=\_\`\~\[\]\(\)\"]/g;
+
+    var data = getTextInput();
     console.log("parse", data);
+
+    clearTextInput();
+    clearParsed();
+
     $(data).each(function(index,l){
-        // Render whitespace in the parsed output
+        // Handle whitespace - do not mark as a word to be lemmatized
         var matchwhitespace = l.match(/^\s+$/g) || [];
         if(matchwhitespace.length > 0) {
             var whitespace = l.replace(/[\n\r]/g, "<br>").replace(/[\t]/g, '<i class="tabspace">&emsp;</i>');
@@ -47,8 +55,15 @@ function parse(){
             return;
         }
 
+        // Handle punctuation - but do not mark as a word to be lemmatized
+        var matchpunct = ONLY_PUNCT_RE.exec(l) || [];
+        if(matchpunct.length > 0) {
+          $("#parsed").append(l);
+          return;
+        }
+
         // Normalize the word token
-        var word = l.toLowerCase().replace(/[.\…,\/\«\»\—\„\—\#\!\?\$\%\^\&\*\;\:\{\}\=\_\`\~\[\]\(\)\"]/g,"").replace('а́', 'а').replace('е́', 'е').replace('и́', 'и').replace('о́', 'о').replace('у́', 'у').replace('ы́', 'ы').replace('э́', 'э').replace('ю́', 'ю').replace('я́', 'я').replace('ё', 'е');
+        var word = l.toLowerCase().replace(MATCH_PUNCT_RE,"").replace('а́', 'а').replace('е́', 'е').replace('и́', 'и').replace('о́', 'о').replace('у́', 'у').replace('ы́', 'ы').replace('э́', 'э').replace('ю́', 'ю').replace('я́', 'я').replace('ё', 'е');
 
         // CHECK IF WORD CONTAINS A HYPHEN, IN WHICH CASE BREAK IT INTO TWO WORDS TO BE
         // PARSED SEPARATELY, EXCEPT IN THE CASE OF "по-" BECAUSE THE DATABASE HAS
