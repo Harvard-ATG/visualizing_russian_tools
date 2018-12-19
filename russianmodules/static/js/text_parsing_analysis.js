@@ -261,11 +261,11 @@ function getWordInfoForElement(wordElement) {
 
     var html = '<h3 class="wordtitle inline d-block">'+lexeme+'</h3>';
     if(lemmas.length > 0) {
-      html += '<span>Lemma:</span> <span class="numbers">' + lemmas + "</span><br>";
+      html += '<span>Lemma:</span> <span class="numbers">' + lemmas.join(", ") + "</span><br>";
     }
-    html += '<span>Parts of Speech:</span> <span class="numbers">' + pos + "</span><br>";
-    html += '<span>Levels:</span> <span class="numbers">' + levels + "</span><br>";
-    html += '<span>Inflections:</span> <span class="numbers">' + types + "</span><br>";
+    html += '<span>Parts of Speech:</span> <span class="numbers">' + pos.join(", ") + "</span><br>";
+    html += '<span>Levels:</span> <span class="numbers">' + levels.join(", ") + "</span><br>";
+    html += '<span>Inflections:</span> <span class="numbers">' + types.join(", ") + "</span><br>";
     return html;
 }
 
