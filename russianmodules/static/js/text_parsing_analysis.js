@@ -192,7 +192,14 @@ function parse(){
         });
 
 	var wl = $('.word').length;
-	$('#textinfo').html('<b>Word Count:</b><span class="numbers"> ' + wl + '</span><br/><b class="inline">Unparsed Count:</b><span class="numbers"> ' + counts[0] + '</span><br/><b class="inline">L1 Count:</b><span class="numbers"> ' + counts[1] + '</span><br/><b class="inline">L2 Count:</b><span class="numbers"> ' + counts[2] + '</span><br/><b class="inline">L3 Count:</b><span class="numbers"> ' + counts[3] + '</span><br/><b class="inline">L4 Count:</b><span class="numbers"> ' + counts[4] + '</br>');
+	var html = "";
+	html += '<span>Word Count:</span><span class="numbers"> ' + wl + '</span><br/>';
+	html += '<span class="inline">Unparsed Count:</span><span class="numbers"> ' + counts[0] + '</span><br>';
+	html += '<span class="inline">L1 Count:</span><span class="numbers"> ' + counts[1] + '</span><br>';
+	html += '<span class="inline">L2 Count:</span><span class="numbers"> ' + counts[2] + '</span><br>';
+	html += '<span class="inline">L3 Count:</span><span class="numbers"> ' + counts[3] + '</span><br>';
+	html += '<span class="inline">L4 Count:</span><span class="numbers"> ' + counts[4] + '<br>';
+	$('#textinfo').html(html);
 
 }
 
@@ -216,7 +223,8 @@ $('#clearbtn').on('click', function(e) {
    e.preventDefault();
 });
 
-$(document).on('click', '.toggle', function(){
+
+$(document).on('click', '.underline-toggle', function(){
     $('.multiple').toggleClass('underline');
 });
 
@@ -251,13 +259,13 @@ function getWordInfoForElement(wordElement) {
         }
     });
 
-    var html = '<h3 span="wordtitle inline">'+lexeme+'</h3>';
+    var html = '<h3 class="wordtitle inline d-block">'+lexeme+'</h3>';
     if(lemmas.length > 0) {
-      html += '<h4>Lemma:</h4></div> <span class="numbers">' + lemmas + "</span><br>";
+      html += '<span>Lemma:</span> <span class="numbers">' + lemmas + "</span><br>";
     }
-    html += '<h4>Parts of Speech:</h4></div> <span class="numbers">' + pos + "</span><br>";
-    html += '<h4>Levels:</h4></dt> <span class="numbers">' + levels + "</span><br>";
-    html += '<h4>Inflections:</h4></dt> <span class="numbers">' + types + "</span><br>";
+    html += '<span>Parts of Speech:</span> <span class="numbers">' + pos + "</span><br>";
+    html += '<span>Levels:</span> <span class="numbers">' + levels + "</span><br>";
+    html += '<span>Inflections:</span> <span class="numbers">' + types + "</span><br>";
     return html;
 }
 

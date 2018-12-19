@@ -31,25 +31,19 @@
  .underline {
      text-decoration: underline;
 }
- .toggle {
+ .btn-red {
      background-color: #990000;
      color: #DEDEDE;
      font-weight: bold;
-     padding-left: 5px;
-     padding-right: 5px;
-     padding-top: 3px;
-     padding-bottom: 3px;
-}
- .toggle:hover{
-     background-color: teal;
-     color: #FFF;
-     cursor: pointer;
-     text-decoration: none;
-}
- .toggle:active{
+ }
+ .btn-red:hover {
      background-color: #DEDEDE;
      color: #990000;
-}
+ }
+ .btn-red:active {
+     background-color: #DEDEDE;
+     color: #990000;
+ }
  .word {
      padding: 3px;
      color: #333;

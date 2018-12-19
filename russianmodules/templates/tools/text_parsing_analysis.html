@@ -36,7 +36,7 @@
 
 
 {% block content %}
-<div id="parsetext" class="mb-4 parser-dark parser-box">
+<div id="inputrussiantext" class="mb-4 parser-dark parser-box">
     <div class="row mb-2">
         <div class="col">
             <h2 class="parser-header">Input Russian Text:</h2>
@@ -51,9 +51,10 @@
 <div id="analysis" class="d-none">
     <div class="row">
         <div class="col-md-8">
+
             <div class="d-flex justify-content-between">
                 <h2 class="parser-header">Parsed Text Analysis </h2>
-                <div><span class="toggle">U</span></div>
+                <button class="btn btn-red underline-toggle" title="Toggle Underlined Words">U</button>
             </div>
 
             <div id="parsed"></div>
@@ -61,7 +62,7 @@
 
         <div class="col-md-4" id="sidebar">
             <div class="parser-widget parser-dark mb-2">
-                <h2 class="parser-header">Word Info:</h2>
+                <h3 class="parser-header">Word Info:</h3>
                 <div id="wordinfo">Click on a word.</div>
             </div>
             <div class="parser-widget parser-dark mb-2">
