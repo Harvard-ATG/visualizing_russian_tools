@@ -1,18 +1,23 @@
-var model = (function() {
+var app = (function() {
   "use strict";
 
-  var ONLY_PUNCT_RE = /^[.\…,\/\«\»\—\„\—\#\!\?\$\%\^\&\*\;\:\{\}\=\_\`\~\[\]\(\)\"]+$/g;
-  var MATCH_PUNCT_RE = /[.\…,\/\«\»\—\„\—\#\!\?\$\%\^\&\*\;\:\{\}\=\_\`\~\[\]\(\)\"]/g;
+  var PUNCT = '.…,/«»–—„#!?$%^&*;:{}=_`~[]()"'; // includes en-dash and em-dash, but not hyphen-minus intentionally
+  var PUNCT_ESCAPED = PUNCT.replace('[', '\\[').replace(']', '\\]');
+  var REGEX_IS_PUNCT = new RegExp("^[" + PUNCT_ESCAPED + "-" + "]+$", "g");
+  var REGEX_STRIP_PUNCT = new RegExp("[" + PUNCT_ESCAPED + "]", "g");
 
-  var Word = function (text) {
+
+  // --------------------------------------------------
+  // Word object that implements some convenience methods
+  var Word = function (text, id) {
     this.text = text || "";
-    this.id = null;
+    this.id = id;
+  };
+  Word.prototype.startsWith = function(prefix) {
+    return this.text.substring(0, prefix.length) === prefix;
   };
   Word.prototype.isHyphenated = function() {
     return this.text.indexOf("-") !== -1 && this.text.length > 1;
-  };
-  Word.prototype.isSpecialHyphenated = function() {
-    return this.text.indexOf("по-") !== -1;
   };
   Word.prototype.isBarSeparated = function() {
     return this.text.indexOf("|") !== -1 && this.text.length > 1;
@@ -21,13 +26,17 @@ var model = (function() {
     var m = this.text.match(/^\s+$/g) || [];
     return m.length > 0;
   };
-  Word.prototype.isPunct = function() {
-    var m = ONLY_PUNCT_RE.exec(this.text) || [];
+  Word.prototype.isNumber = function() {
+    var m = this.normalizeText().match(/^\d+$/g) || [];
     return m.length > 0;
   };
-  Word.prototype.normalized = function() {
+  Word.prototype.isPunct = function() {
+    var m = REGEX_IS_PUNCT.exec(this.text) || [];
+    return m.length > 0;
+  };
+  Word.prototype.normalizeText = function() {
     var result = this.text.toLowerCase()
-      .replace(MATCH_PUNCT_RE,"")
+      .replace(REGEX_STRIP_PUNCT,"")
       .replace('а́', 'а')
       .replace('е́', 'е')
       .replace('и́', 'и')
@@ -40,27 +49,35 @@ var model = (function() {
       .replace('ё', 'е');
     return result;
   };
-  Word.prototype.split = function(separator) {
+  Word.prototype.split = function(separator, options) {
+    options = options || {};
     if(typeof separator !== "string" || separator === "") {
       separator = "-";
     }
-    return this.text.split(separator).filter(function(s) { return s !== ""; });
+    var text = this.text;
+    if(options.normalize) {
+      text = this.normalizeText();
+    }
+    return text.split(separator).filter(function(s) { return s !== ""; });
   };
 
 
-  var Tokenizer = function () {};
-  Tokenizer.prototype.tokenize = function(text) {
+  // --------------------------------------------------
+  // Tokenizes the text into simple text tokens separated by whitespace
+  // Note: captures the whitespace too, so that tabs and newlines can be rendered appropriately
+  var tokenize = function(text) {
     return text.split(/(\s+)/g).filter(function(s) {
       return s != "";
     });
   };
 
-  var Parser = function () {};
-  Parser.prototype.parse = function(text) {
-    var tokenizer = new Tokenizer();
-    var tokens = tokenizer.tokenize(text);
+
+  // --------------------------------------------------
+  // Parse the text into word objects
+  var parse = function(text) {
+    var tokens = tokenize(text);
     var words = [], word;
-    for(var i = 0; i < tokens.length; i++) {
+    for(var i = 0, len = tokens.length; i < len; i++) {
       word = new Word(tokens[i]);
       word.id = i;
       words.push(word);
@@ -68,15 +85,169 @@ var model = (function() {
     return words;
   };
 
+
+  // --------------------------------------------------
+  // Lemmatizes the word data by quering the database with a list of the lexemes/word forms
+  var lemmatize = function(wordData) {
+    return $.ajax ({
+      type: "POST",
+      url: "/api/lemmatize",
+      data: JSON.stringify(wordData),
+      dataType: "json",
+      contentType: "application/json"
+    });
+  };
+
+
+  // --------------------------------------------------
+  // Renders the parsed text
+  var ParsedView = function(options) {
+    options = options || {};
+    this.$el = $(options.selector);
+  };
+  ParsedView.prototype.render = function(words) {
+    this.$el.html("");
+    for(var i = 0, len = words.length; i < len; i++) {
+      var word = words[i];
+      if(word.isWhitespace()) {
+        this.renderWhitespace(word.text);
+      } else if(word.isPunct()) {
+        this.renderPlain(word.text);
+      } else if(word.isHyphenated() && !word.startsWith("по-")) {
+        // Break hyphenated words to be parsed separately, except in the case of "по-" because the database
+        // has separate entries for those words.
+        this.renderSplitLexeme(word, "-");
+      } else if(word.isBarSeparated()) {
+        // Break words separated by a vertical bar so they are parsed separately
+        this.renderSplitLexeme(word, "|");
+      } else {
+        this.renderLexeme(word.normalizeText(), word.text, word.id);
+      }
+    }
+    return this;
+  };
+  ParsedView.prototype.renderPlain = function(text) {
+    this.$el.append(text);
+  };
+  ParsedView.prototype.renderWhitespace = function(text) {
+    var html = text.replace(/[\n\r]/g, "<br>")
+      .replace(/[\t]/g, '<i class="tabchar">&emsp;</i>');
+    if(html.length > text) {
+      this.$el.append(html);
+    }
+  };
+  ParsedView.prototype.renderLexeme = function(lexeme, text, id, extraCls) {
+    extraCls = extraCls || "";
+    var span = document.createElement("span");
+    span.id = "word" + id;
+    span.className = "word" + (extraCls?" " + extraCls:"");
+    span.dataset.lexeme = lexeme;
+    span.appendChild(document.createTextNode(text));
+    this.$el.append(span);
+  };
+  ParsedView.prototype.renderSplitLexeme = function(word, sep) {
+    var lexemes = word.split(sep, {normalize: true });
+    var texts = word.split(sep, {normalize: false });
+    var text, id, extraCls;
+    for(var i = 0; i < lexemes.length; i++) {
+      id = word.id + "-" + i;
+      if(i === 0) {
+        text = texts[i] + sep;
+        extraCls = "rnopadding";
+      } else if(i > 0 && i < lexemes.length-1) {
+        text = texts[i] + sep;
+        extraCls = "lnopadding rnopadding";
+      } else {
+        text = texts[i];
+        extraCls = "lnopadding";
+      }
+      this.renderLexeme(lexemes[i], text, id, extraCls);
+    }
+  };
+  ParsedView.prototype.getRenderedLexemes = function() {
+    var wordData = [];
+    this.$el.find('.word').each(function(index, element){
+      wordData.push({
+        "id": $(element).attr("id"),
+        "lexeme": $(element).attr("data-lexeme")
+      });
+    });
+    return wordData;
+  };
+  ParsedView.prototype.error = function(err) {
+    err = err || "";
+    var msgText = "Parsing error: " + err;
+    this.$el.html('<div class="alert alert-danger">' + msgText + '</div>');
+  };
+  ParsedView.prototype.visualize = function(data) {
+    this.setWordData(data);
+    this.setWordLevels();
+  };
+  ParsedView.prototype.setWordData = function(data) {
+    var item, $word, form, forms;
+    for(var i = 0; i < data.length; i++) {
+      item = data[i];
+      $word = $("#" + item.element);
+      form = {lemma: item.lemma, inflection: item.inflection};
+      forms = $word.data("form");
+      if (forms === undefined){
+        $word.data("form", [form]);
+      } else {
+        $word.data("form").push(form);
+        if(forms.length > 1) {
+          $word.addClass("underline multiple");
+        }
+      }
+      $word.addClass("parsed");
+    }
+  };
+  ParsedView.prototype.setWordLevels = function() {
+    this.$el.find(".word").each(function(index, element){
+      var whichRank = 0;
+      var whichLevel = "";
+      var forms = $(element).data("form");
+      if(forms) {
+        for (var i = 0; i < forms.length; i++) {
+          var f = forms[i];
+          if (whichRank === 0 || (f.lemma.level <= whichLevel && parseInt(f.lemma.rank) <= whichRank)) {
+            whichRank = parseInt(f.lemma.rank);
+            whichLevel = f.lemma.level
+          }
+        }
+      }
+      $(element).attr('data-level', whichLevel);
+    });
+  };
+  ParsedView.prototype.getCountData = function() {
+    var counts = [0,0,0,0,0,0,0];
+    var $parsed = $('.parsed');
+    var $words = $('.word');
+    $parsed.each(function(index, element){
+      var level = parseInt($(element).attr("data-level")[0]);
+      counts[level] += 1;
+    });
+    counts[0] =  $words.length - $parsed.length;
+    return {
+      "total": $words.length,
+      "parsed": $parsed.length,
+      "unparsed": $words.length - $parsed.length,
+      "levels": counts
+    };
+  };
+
+  // --------------------------------------------------
+  // Export objects and functions
   return {
     Word: Word,
-    Tokenizer: Tokenizer,
-    Parser: Parser
+    ParsedView: ParsedView,
+    tokenize: tokenize,
+    parse: parse,
+    lemmatize: lemmatize
   };
 })();
 
 
-// ---------------------------------------------------
+
 function clearAll(){
     $('#parsed').html('');
     $('#textinput').val('');
@@ -84,214 +255,54 @@ function clearAll(){
     $('#textinfo').html('');
     $('#wordinfo').html('');
 }
-function getTextInput(){
-    var $input = $("#textinput");
-    var text = $input.val();
-    return text;
-}
-function clearTextInput(){
-  $("#textinput").val('');
-  $("#textinput").height(100);
-}
-function clearParsed(){
-  $("#parsed").html('');
-}
-
-function renderWord(lexeme, text, id, extraCls) {
-  extraCls = extraCls || "";
-  var span = document.createElement("span");
-  var tn = document.createTextNode(text);
-  span.dataset.lexeme = lexeme;
-  span.id = "word" + id;
-  span.className = "word " + extraCls;
-  span.appendChild(tn);
-  document.getElementById("parsed").appendChild(span);
-}
-function renderText(text) {
-  $('#parsed').append(text);
-}
-function renderWhitespace(text) {
-  var html = text.replace(/[\n\r]/g, "<br>").replace(/[\t]/g, '<i class="tabchar">&emsp;</i>');
-  if(html.length > text) {
-    $('#parsed').append(html);
-  }
-}
-function renderSplit(word, sep) {
-  var lexemes = word.normalized().split(sep);
-  var texts = word.split(sep);
-  var text, id, extraCls;
-  for(var i = 0; i < lexemes.length; i++) {
-    id = word.id + "-" + i;
-    if(i === 0) {
-      text = word.text + sep;
-      extraCls = "rnopadding";
-    } else if(i > 0 && i < lexemes.length-1) {
-      text = word.text + sep;
-      extraCls = "lnopadding rnopadding";
-    } else {
-      text = word.text;
-      extraCls = "lnpadding";
-    }
-    renderWord(lexemes[i], texts[i], id, extraCls);
-  }
-}
 
 function parse(){
-    var text = getTextInput();
-    clearTextInput();
-    clearParsed();
+    var text = $("#textinput").val();
+    $("#textinput").val('');
+    $("#textinput").height(100);
 
-    var parser = new model.Parser();
-    var words = parser.parse(text);
-    for(var i = 0; i < words.length; i++) {
-      var word = words[i];
-      if(word.isWhitespace()) {
-        renderWhitespace(word.text);
-      } else if(word.isPunct()) {
-        renderText(word.text);
-      } else if(word.isHyphenated() && !word.isSpecialHyphenated()) {
-        // CHECK IF WORD CONTAINS A HYPHEN, IN WHICH CASE BREAK IT INTO TWO WORDS TO BE
-        // PARSED SEPARATELY, EXCEPT IN THE CASE OF "по-" BECAUSE THE DATABASE HAS
-        // SEPARATE ENTRIES FOR WORDS THAT BEGIN WITH "по-"
-        renderSplit(word, "-");
-      } else if(word.isBarSeparated()) {
-        // ALSO CHECK FOR THE PRESENCE OF A VERTICAL BAR AND PARSE EACH WORD
-        // SEPARATELY BEFORE BRINGING IT ALL BACK TOGETHER
-        renderSplit(word, "|");
-      } else {
-        renderWord(word.normalized(), word.text, word.id);
-      }
-    }
+    var words = app.parse(text);
+    var parsedView = new app.ParsedView({selector: "#parsed"});
+    parsedView.render(words);
 
-    var wordData = [];
-    $('.word').each(function(x,y){
-        wordData.push({"id": $(y).attr("id"), "lexeme": $(y).attr("data-lexeme")});
-    });
+    var wordData = parsedView.getRenderedLexemes();
+    var jqXhr = app.lemmatize(wordData);
 
-    return $.ajax ({
-      type: "POST",
-      url: "/api/lemmatize",
-      data: JSON.stringify(wordData),
-      dataType: "json",
-      contentType: "application/json",
-      success: function(data){
-        visualize(data);
-      },
-      failure: function(err){
-        console.log(err);
-      }
+    jqXhr.done(function(data) {
+      parsedView.visualize(data);
+      var counts = parsedView.getCountData();
+      showcounts(counts.total, counts.levels);
+    }).fail(function(err) {
+      console.error(err);
+      parsedView.error(err);
     });
 }
 
-	function visualize(data){
-
-		$(data).each(function(a,b){
-			var element = "#" + b.element;
-                        $(element).addClass("parsed");
-			var inflection = b.inflection;
-			var lemma = b.lemma;
-			var form = {
-				lemma: lemma,
-				inflection: inflection
-			};
-			if ( $(element).data("form") === undefined){
-				$(element).data("form", [ form ]);
-			}
-			else {
-				$(element).data("form").push(form);
-			}
-		});
-
-		$(".word").each(function(c,d){
-		  var whichRank = 0, whichLevel = "";
-			var forms = $(d).data("form");
-			if(!forms || forms.length === 0) {
-			  return;
+function showcounts(total, levels){
+  var chart = c3.generate({
+      bindto: '#levels',
+      data: {
+          columns: [
+              ['L_', levels[0]],
+              ['L1', levels[1]],
+              ['L2', levels[2]],
+              ['L3', levels[3]],
+              ['L4', levels[4]]
+          ],
+          type: 'pie',
+          colors: { L_: '#333333', L1: 'green', L2: 'blue', L3: '#8000ff' , L4: 'orange' }
       }
+  });
 
-      for(let i = 0; i < forms.length; i++) {
-        let f = forms[i];
-        if (whichRank === 0 || (f.lemma.level <= whichLevel && parseInt(f.lemma.rank) <= whichRank)) {
-          whichRank = parseInt(f.lemma.rank);
-          whichLevel = f.lemma.level
-        }
-      }
-
-      $(d).attr('data-level', whichLevel);
-			if (forms.length > 1 ){
-				$(d).addClass("underline multiple");
-			}
-		});
-
-        $('.parsedui').append('<span class="toggle">U</span>');
-        var counts = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0};
-        $('.parsed').each(function(x,y){
-            counts[parseInt($(y).attr("data-level")[0])] += 1;
-        });
-        counts[0] = $('.word').length - $('.parsed').length;
-        var chart = c3.generate({
-            bindto: '#levels',
-            data: {
-                columns: [
-                    ['L_', counts[0]],
-                    ['L1', counts[1]],
-                    ['L2', counts[2]],
-                    ['L3', counts[3]],
-                    ['L4', counts[4]]
-                ],
-                type: 'pie',
-                colors: { L_: '#333333', L1: 'green', L2: 'blue', L3: '#8000ff' , L4: 'orange' }
-            }
-        });
-
-	var wl = $('.word').length;
 	var html = "";
-	html += '<span>Word Count:</span><span class="numbers"> ' + wl + '</span><br/>';
-	html += '<span class="inline">Unparsed Count:</span><span class="numbers"> ' + counts[0] + '</span><br>';
-	html += '<span class="inline">L1 Count:</span><span class="numbers"> ' + counts[1] + '</span><br>';
-	html += '<span class="inline">L2 Count:</span><span class="numbers"> ' + counts[2] + '</span><br>';
-	html += '<span class="inline">L3 Count:</span><span class="numbers"> ' + counts[3] + '</span><br>';
-	html += '<span class="inline">L4 Count:</span><span class="numbers"> ' + counts[4] + '<br>';
+	html += '<span>Word Count:</span><span class="numbers"> ' + total + '</span><br/>';
+	html += '<span class="inline">Unparsed Count:</span><span class="numbers"> ' + levels[0] + '</span><br>';
+	html += '<span class="inline">L1 Count:</span><span class="numbers"> ' + levels[1] + '</span><br>';
+	html += '<span class="inline">L2 Count:</span><span class="numbers"> ' + levels[2] + '</span><br>';
+	html += '<span class="inline">L3 Count:</span><span class="numbers"> ' + levels[3] + '</span><br>';
+	html += '<span class="inline">L4 Count:</span><span class="numbers"> ' + levels[4] + '<br>';
 	$('#textinfo').html(html);
-
 }
-
-function scrollToAnalysis() {
-	$([document.documentElement, document.body]).animate({
-        scrollTop: $("#analysis").offset().top
-    }, 1000);
-}
-
-$('#parsebtn').on('click', function(e) {
-   $("#analysis").removeClass('d-none');
-   //scrollToAnalysis();
-   parse();
-   e.stopPropagation();
-   e.preventDefault();
-});
-
-$('#clearbtn').on('click', function(e) {
-   clearAll();
-   e.stopPropagation();
-   e.preventDefault();
-});
-
-
-$(document).on('click', '.underline-toggle', function(){
-    $('.multiple').toggleClass('underline');
-});
-
-$(document).on('click', '.parsed', function(e){
-    if($(this).hasClass("highlight")) {
-      $(this).removeClass("highlight");
-      $("#wordinfo").html("Click on a word.");
-    } else {
-      $(".word.highlight").removeClass("highlight");
-      $(this).addClass("highlight");
-      $("#wordinfo").html(getWordInfoForElement(this));
-    }
-    return false;
-});
 
 function getWordInfoForElement(wordElement) {
     var lemmas = [], pos = [], levels = [], types = [];
@@ -321,6 +332,42 @@ function getWordInfoForElement(wordElement) {
     html += '<span>Inflections:</span> <span class="numbers">' + types.join(", ") + "</span><br>";
     return html;
 }
+
+function scrollToAnalysis() {
+	$([document.documentElement, document.body]).animate({
+        scrollTop: $("#analysis").offset().top
+    }, 1000);
+}
+
+$('#parsebtn').on('click', function(e) {
+   $("#analysis").removeClass('d-none');
+   //scrollToAnalysis();
+   parse();
+   e.stopPropagation();
+   e.preventDefault();
+});
+
+$('#clearbtn').on('click', function(e) {
+   clearAll();
+   e.stopPropagation();
+   e.preventDefault();
+});
+
+$(document).on('click', '.underline-toggle', function(){
+    $('.multiple').toggleClass('underline');
+});
+
+$(document).on('click', '.parsed', function(e){
+    if($(this).hasClass("highlight")) {
+      $(this).removeClass("highlight");
+      $("#wordinfo").html("Click on a word.");
+    } else {
+      $(".word.highlight").removeClass("highlight");
+      $(this).addClass("highlight");
+      $("#wordinfo").html(getWordInfoForElement(this));
+    }
+    return false;
+});
 
 /*
 $(document).on("scroll", function(e) {
