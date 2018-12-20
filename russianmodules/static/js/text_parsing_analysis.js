@@ -1,4 +1,82 @@
-// RESET THE PARSER, RUNS WHEN NEW QUERY IS SUBMITTED
+var model = (function() {
+  "use strict";
+
+  var ONLY_PUNCT_RE = /^[.\…,\/\«\»\—\„\—\#\!\?\$\%\^\&\*\;\:\{\}\=\_\`\~\[\]\(\)\"]+$/g;
+  var MATCH_PUNCT_RE = /[.\…,\/\«\»\—\„\—\#\!\?\$\%\^\&\*\;\:\{\}\=\_\`\~\[\]\(\)\"]/g;
+
+  var Word = function (text) {
+    this.text = text || "";
+    this.id = null;
+  };
+  Word.prototype.isHyphenated = function() {
+    return this.text.indexOf("-") !== -1 && this.text.length > 1;
+  };
+  Word.prototype.isSpecialHyphenated = function() {
+    return this.text.indexOf("по-") !== -1;
+  };
+  Word.prototype.isBarSeparated = function() {
+    return this.text.indexOf("|") !== -1 && this.text.length > 1;
+  };
+  Word.prototype.isWhitespace = function() {
+    var m = this.text.match(/^\s+$/g) || [];
+    return m.length > 0;
+  };
+  Word.prototype.isPunct = function() {
+    var m = ONLY_PUNCT_RE.exec(this.text) || [];
+    return m.length > 0;
+  };
+  Word.prototype.normalized = function() {
+    var result = this.text.toLowerCase()
+      .replace(MATCH_PUNCT_RE,"")
+      .replace('а́', 'а')
+      .replace('е́', 'е')
+      .replace('и́', 'и')
+      .replace('о́', 'о')
+      .replace('у́', 'у')
+      .replace('ы́', 'ы')
+      .replace('э́', 'э')
+      .replace('ю́', 'ю')
+      .replace('я́', 'я')
+      .replace('ё', 'е');
+    return result;
+  };
+  Word.prototype.split = function(separator) {
+    if(typeof separator !== "string" || separator === "") {
+      separator = "-";
+    }
+    return this.text.split(separator).filter(function(s) { return s !== ""; });
+  };
+
+
+  var Tokenizer = function () {};
+  Tokenizer.prototype.tokenize = function(text) {
+    return text.split(/(\s+)/g).filter(function(s) {
+      return s != "";
+    });
+  };
+
+  var Parser = function () {};
+  Parser.prototype.parse = function(text) {
+    var tokenizer = new Tokenizer();
+    var tokens = tokenizer.tokenize(text);
+    var words = [], word;
+    for(var i = 0; i < tokens.length; i++) {
+      word = new Word(tokens[i]);
+      word.id = i;
+      words.push(word);
+    }
+    return words;
+  };
+
+  return {
+    Word: Word,
+    Tokenizer: Tokenizer,
+    Parser: Parser
+  };
+})();
+
+
+// ---------------------------------------------------
 function clearAll(){
     $('#parsed').html('');
     $('#textinput').val('');
@@ -6,129 +84,104 @@ function clearAll(){
     $('#textinfo').html('');
     $('#wordinfo').html('');
 }
-
-// CREATE UNIQUE IDENTIFIER FOR EACH WORD
-var next_word_id = (function() {
-  var _SEQ = 0;
-  return function() {
-    var word_id = "word" + _SEQ.toString(10);
-    _SEQ++;
-    return word_id;
-  };
-})(0);
-
-// GET THE VALUE OF ALL TEXT ENTERED BY THE USER
 function getTextInput(){
     var $input = $("#textinput");
     var text = $input.val();
-    return text.split(/(\s+)/g).filter(function(str) {
-      return str != "";
-    });
+    return text;
 }
-
 function clearTextInput(){
   $("#textinput").val('');
   $("#textinput").height(100);
 }
-
 function clearParsed(){
   $("#parsed").html('');
 }
 
+function renderWord(lexeme, text, id, extraCls) {
+  extraCls = extraCls || "";
+  var span = document.createElement("span");
+  var tn = document.createTextNode(text);
+  span.dataset.lexeme = lexeme;
+  span.id = "word" + id;
+  span.className = "word " + extraCls;
+  span.appendChild(tn);
+  document.getElementById("parsed").appendChild(span);
+}
+function renderText(text) {
+  $('#parsed').append(text);
+}
+function renderWhitespace(text) {
+  var html = text.replace(/[\n\r]/g, "<br>").replace(/[\t]/g, '<i class="tabchar">&emsp;</i>');
+  if(html.length > text) {
+    $('#parsed').append(html);
+  }
+}
+function renderSplit(word, sep) {
+  var lexemes = word.normalized().split(sep);
+  var texts = word.split(sep);
+  var text, id, extraCls;
+  for(var i = 0; i < lexemes.length; i++) {
+    id = word.id + "-" + i;
+    if(i === 0) {
+      text = word.text + sep;
+      extraCls = "rnopadding";
+    } else if(i > 0 && i < lexemes.length-1) {
+      text = word.text + sep;
+      extraCls = "lnopadding rnopadding";
+    } else {
+      text = word.text;
+      extraCls = "lnpadding";
+    }
+    renderWord(lexemes[i], texts[i], id, extraCls);
+  }
+}
+
 function parse(){
-    var ONLY_PUNCT_RE = /^[.\…,\/\«\»\—\„\—\#\!\?\$\%\^\&\*\;\:\{\}\=\_\`\~\[\]\(\)\"]+$/g;
-    var MATCH_PUNCT_RE = /[.\…,\/\«\»\—\„\—\#\!\?\$\%\^\&\*\;\:\{\}\=\_\`\~\[\]\(\)\"]/g;
-
-    var data = getTextInput();
-    console.log("parse", data);
-
+    var text = getTextInput();
     clearTextInput();
     clearParsed();
 
-    $(data).each(function(index,l){
-        // Handle whitespace - do not mark as a word to be lemmatized
-        var matchwhitespace = l.match(/^\s+$/g) || [];
-        if(matchwhitespace.length > 0) {
-            var whitespace = l.replace(/[\n\r]/g, "<br>").replace(/[\t]/g, '<i class="tabchar">&emsp;</i>');
-            if(whitespace.length > l.length) {
-              $("#parsed").append(whitespace);
-            }
-            return;
-        }
-
-        // Handle punctuation - but do not mark as a word to be lemmatized
-        var matchpunct = ONLY_PUNCT_RE.exec(l) || [];
-        if(matchpunct.length > 0) {
-          $("#parsed").append(l);
-          return;
-        }
-
-        // Normalize the word token
-        var word = l.toLowerCase().replace(MATCH_PUNCT_RE,"").replace('а́', 'а').replace('е́', 'е').replace('и́', 'и').replace('о́', 'о').replace('у́', 'у').replace('ы́', 'ы').replace('э́', 'э').replace('ю́', 'ю').replace('я́', 'я').replace('ё', 'е');
-
+    var parser = new model.Parser();
+    var words = parser.parse(text);
+    for(var i = 0; i < words.length; i++) {
+      var word = words[i];
+      if(word.isWhitespace()) {
+        renderWhitespace(word.text);
+      } else if(word.isPunct()) {
+        renderText(word.text);
+      } else if(word.isHyphenated() && !word.isSpecialHyphenated()) {
         // CHECK IF WORD CONTAINS A HYPHEN, IN WHICH CASE BREAK IT INTO TWO WORDS TO BE
         // PARSED SEPARATELY, EXCEPT IN THE CASE OF "по-" BECAUSE THE DATABASE HAS
         // SEPARATE ENTRIES FOR WORDS THAT BEGIN WITH "по-"
-        if ( word.indexOf("-") !== -1 && word.length > 1 && word.indexOf("по-") == -1){
-          var splitword = word.split("-").filter(function(str) {
-            return str != "";
-          });
-          for (var f=0; f < splitword.length; f++){
-            var uuid = next_word_id();
-            if (f == 0){
-              $('#parsed').append("<span class='word rnopadding' id=" + uuid + " data-lexeme=" + splitword[f] + ">" + l.split("-")[f] + "-</span>");
-            }
-            else if (f > 0 && f < word.split("-").length - 1){
-              $('#parsed').append("<span class='word lnopadding rnopadding' id=" + uuid + " data-lexeme=" + splitword[f] + ">" + l.split("-")[f] + "-</span>");
-            }
-            else {
-              $('#parsed').append("<span class='word lnopadding' id=" + uuid + " data-lexeme=" + splitword[f] + ">" + l.split("-")[f] + "</span> ");
-            }
-          }
-        }
-
+        renderSplit(word, "-");
+      } else if(word.isBarSeparated()) {
         // ALSO CHECK FOR THE PRESENCE OF A VERTICAL BAR AND PARSE EACH WORD
         // SEPARATELY BEFORE BRINGING IT ALL BACK TOGETHER
-        else if (word.indexOf("|") !== -1){
-          for (var f=0; f < word.split("|").length; f++){
-            var uuid = next_word_id();
-            if (f == 0){
-              $('#parsed').append("<span class='word rnopadding' id=" + uuid + " data-lexeme=" + word.split("|")[f] + ">" + l.split("|")[f] + "|</span>");
-            }
-            else if (f > 0 && f < word.split("|").length - 1){
-              $('#parsed').append("<span class='word lnopadding rnopadding' id=" + uuid + " data-lexeme=" + word.split("|")[f] + ">" + l.split("|")[f] + "|</span>");
-            }
-            else {
-              $('#parsed').append("<span class='word lnopadding' id=" + uuid + " data-lexeme=" + word.split("|")[f] + ">" + l.split("|")[f] + "</span> ");
-            }
-          }
-        }
-        else {
-          var uuid = next_word_id();
-          $('#parsed').append("<span class='word' id=" + uuid + " data-lexeme=" + word + ">" + l + "</span> ");
-        }
-    });
+        renderSplit(word, "|");
+      } else {
+        renderWord(word.normalized(), word.text, word.id);
+      }
+    }
 
-    var words = $('.word');
     var wordData = [];
-    $(words).each(function(x,y){
+    $('.word').each(function(x,y){
         wordData.push({"id": $(y).attr("id"), "lexeme": $(y).attr("data-lexeme")});
     });
 
-	$.ajax ({
-		type: "POST",
-		url: "/api/lemmatize",
-		data: JSON.stringify(wordData),
-		dataType: "json",
-		contentType: "application/json",
-		success: function(data){
-	            visualize(data);
-	        },
-		failure: function(err){
-			console.log(err);
-		}
-	});
-	}
+    return $.ajax ({
+      type: "POST",
+      url: "/api/lemmatize",
+      data: JSON.stringify(wordData),
+      dataType: "json",
+      contentType: "application/json",
+      success: function(data){
+        visualize(data);
+      },
+      failure: function(err){
+        console.log(err);
+      }
+    });
+}
 
 	function visualize(data){
 
