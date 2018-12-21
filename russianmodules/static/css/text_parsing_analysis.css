@@ -68,7 +68,7 @@
      color: #990000;
      font-weight: bold;
 }
- .tabchar {
+ .indent {
      margin-left: 3em;
  }
  /* resize heading elements inside the container */

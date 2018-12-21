@@ -88,25 +88,51 @@ var app = (function() {
 
   // --------------------------------------------------
   // Lemmatizes the word data by quering the database with a list of the lexemes/word forms
-  var lemmatize = function(wordData) {
-    return $.ajax ({
+
+  var Lemmatizer = function(model) {
+    this.model = model;
+    this.processData = this.processData.bind(this);
+  };
+  Lemmatizer.prototype.lemmatize =  function(wordData) {
+    var jqXhr = $.ajax ({
       type: "POST",
       url: "/api/lemmatize",
       data: JSON.stringify(wordData),
       dataType: "json",
       contentType: "application/json"
     });
+    jqXhr.done(this.processData);
+    return jqXhr;
+  };
+  Lemmatizer.prototype.processData = function(data) {
+    var item, form;
+
+    this.model.responseData = data;
+    this.model.formData = {};
+
+    for(var i = 0; i < data.length; i++) {
+      item = data[i];
+      form = {lemma: item.lemma, inflection: item.inflection};
+      if(this.model.formData.hasOwnProperty(item.element)) {
+        this.model.formData[item.element].push(form);
+      } else {
+        this.model.formData[item.element] = [form];
+      }
+    }
+
+    return this;
   };
 
 
   // --------------------------------------------------
   // Renders the parsed text
-  var ParsedView = function(options) {
-    options = options || {};
-    this.$el = $(options.selector);
+
+  var View = function() {
+    this.el = document.createDocumentFragment();
+    this.renderedWords = [];
   };
-  ParsedView.prototype.render = function(words) {
-    this.$el.html("");
+  View.prototype.render = function(words) {
+    this.el.innerHTML = "";
     for(var i = 0, len = words.length; i < len; i++) {
       var word = words[i];
       if(word.isWhitespace()) {
@@ -126,26 +152,26 @@ var app = (function() {
     }
     return this;
   };
-  ParsedView.prototype.renderPlain = function(text) {
-    this.$el.append(text);
+  View.prototype.renderPlain = function(text) {
+    this.el.appendChild(document.createTextNode(text));
   };
-  ParsedView.prototype.renderWhitespace = function(text) {
-    var html = text.replace(/[\n\r]/g, "<br>")
-      .replace(/[\t]/g, '<i class="tabchar">&emsp;</i>');
-    if(html.length > text) {
-      this.$el.append(html);
+  View.prototype.renderWhitespace = function(text) {
+    var m = text.match(/[\n\r\t]+/g) || [];
+    for(var i = 0; i < m.length; i++) {
+      switch(m[i]) {
+        case "\n":
+        case "\r":
+          this.el.appendChild(document.createElement("br"));
+          break;
+        case "\t":
+          var indent = document.createElement("i");
+          indent.className = "indent";
+          this.el.appendChild(indent);
+          break;
+      }
     }
   };
-  ParsedView.prototype.renderLexeme = function(lexeme, text, id, extraCls) {
-    extraCls = extraCls || "";
-    var span = document.createElement("span");
-    span.id = "word" + id;
-    span.className = "word" + (extraCls?" " + extraCls:"");
-    span.dataset.lexeme = lexeme;
-    span.appendChild(document.createTextNode(text));
-    this.$el.append(span);
-  };
-  ParsedView.prototype.renderSplitLexeme = function(word, sep) {
+  View.prototype.renderSplitLexeme = function(word, sep) {
     var lexemes = word.split(sep, {normalize: true });
     var texts = word.split(sep, {normalize: false });
     var text, id, extraCls;
@@ -164,85 +190,69 @@ var app = (function() {
       this.renderLexeme(lexemes[i], text, id, extraCls);
     }
   };
-  ParsedView.prototype.getRenderedLexemes = function() {
-    var wordData = [];
-    this.$el.find('.word').each(function(index, element){
-      wordData.push({
-        "id": $(element).attr("id"),
-        "lexeme": $(element).attr("data-lexeme")
-      });
-    });
-    return wordData;
+  View.prototype.renderLexeme = function(lexeme, text, id, extraCls) {
+    extraCls = extraCls || "";
+    var span = document.createElement("span");
+    span.id = "word" + id;
+    span.className = "word" + (extraCls?" " + extraCls:"");
+    span.dataset.lexeme = lexeme;
+    span.appendChild(document.createTextNode(text));
+    this.el.appendChild(span);
+    this.el.appendChild(document.createTextNode(" "));
+    this.renderedWords.push({ id: span.id, lexeme: lexeme });
   };
-  ParsedView.prototype.error = function(err) {
-    err = err || "";
-    var msgText = "Parsing error: " + err;
-    this.$el.html('<div class="alert alert-danger">' + msgText + '</div>');
-  };
-  ParsedView.prototype.visualize = function(data) {
-    this.setWordData(data);
-    this.setWordLevels();
-  };
-  ParsedView.prototype.setWordData = function(data) {
-    var item, $word, form, forms;
-    for(var i = 0; i < data.length; i++) {
-      item = data[i];
-      $word = $("#" + item.element);
-      form = {lemma: item.lemma, inflection: item.inflection};
-      forms = $word.data("form");
-      if (forms === undefined){
-        $word.data("form", [form]);
-      } else {
-        $word.data("form").push(form);
-        if(forms.length > 1) {
-          $word.addClass("underline multiple");
+  View.prototype.visualize = function(model) {
+    var countLevels = [0,0,0,0,0,0,0];
+    var countWords = 0;
+    var countParsed = 0;
+
+    this.el.querySelectorAll(".word").forEach(function(el, index) {
+      var f = null, rank = 0, level = "";
+      var forms = model.formData[el.id];
+      if (forms) {
+        if (forms.length > 0) {
+          el.classList.add("parsed");
+          countParsed++;
         }
-      }
-      $word.addClass("parsed");
-    }
-  };
-  ParsedView.prototype.setWordLevels = function() {
-    this.$el.find(".word").each(function(index, element){
-      var whichRank = 0;
-      var whichLevel = "";
-      var forms = $(element).data("form");
-      if(forms) {
+        if (forms.length > 1) {
+          el.classList.add("multiple", "underline");
+        }
         for (var i = 0; i < forms.length; i++) {
-          var f = forms[i];
-          if (whichRank === 0 || (f.lemma.level <= whichLevel && parseInt(f.lemma.rank) <= whichRank)) {
-            whichRank = parseInt(f.lemma.rank);
-            whichLevel = f.lemma.level
+          f = forms[i];
+          if (rank === 0 || (f.lemma.level <= level && parseInt(f.lemma.rank) <= rank)) {
+            rank = parseInt(f.lemma.rank);
+            level = f.lemma.level
           }
         }
+        el.dataset.level = level;
+        el.dataset.rank = rank;
+        countLevels[parseInt(level[0])] += 1;
+        countWords++;
       }
-      $(element).attr('data-level', whichLevel);
     });
-  };
-  ParsedView.prototype.getCountData = function() {
-    var counts = [0,0,0,0,0,0,0];
-    var $parsed = $('.parsed');
-    var $words = $('.word');
-    $parsed.each(function(index, element){
-      var level = parseInt($(element).attr("data-level")[0]);
-      counts[level] += 1;
-    });
-    counts[0] =  $words.length - $parsed.length;
+
+    countLevels[0] = countWords - countParsed; // No level because unparsed
     return {
-      "total": $words.length,
-      "parsed": $parsed.length,
-      "unparsed": $words.length - $parsed.length,
-      "levels": counts
+      total: countWords,
+      parsed: countParsed,
+      levels: countLevels
     };
+  };
+  View.prototype.error = function(err) {
+    err = err || "";
+    var msgText = "Parsing error: " + err;
+    this.el.innerHTML = '<div class="alert alert-danger">' + msgText + '</div>';
   };
 
   // --------------------------------------------------
   // Export objects and functions
   return {
     Word: Word,
-    ParsedView: ParsedView,
+    View: View,
+    Lemmatizer: Lemmatizer,
+    model: {},
     tokenize: tokenize,
-    parse: parse,
-    lemmatize: lemmatize
+    parse: parse
   };
 })();
 
@@ -261,20 +271,19 @@ function parse(){
     $("#textinput").val('');
     $("#textinput").height(100);
 
+    var model = app.model;
+    var lemmatizer = new app.Lemmatizer(model);
+    var view = new app.View();
     var words = app.parse(text);
-    var parsedView = new app.ParsedView({selector: "#parsed"});
-    parsedView.render(words);
+    view.render(words);
 
-    var wordData = parsedView.getRenderedLexemes();
-    var jqXhr = app.lemmatize(wordData);
-
-    jqXhr.done(function(data) {
-      parsedView.visualize(data);
-      var counts = parsedView.getCountData();
+    lemmatizer.lemmatize(view.renderedWords).done(function() {
+      var counts = view.visualize(model );
+      document.getElementById("parsed").appendChild(view.el);
       showcounts(counts.total, counts.levels);
     }).fail(function(err) {
       console.error(err);
-      parsedView.error(err);
+      view.error(err);
     });
 }
 
@@ -306,8 +315,8 @@ function showcounts(total, levels){
 
 function getWordInfoForElement(wordElement) {
     var lemmas = [], pos = [], levels = [], types = [];
-    var forms = $(wordElement).data("form") || [];
     var lexeme = $(wordElement).data("lexeme");
+    var forms = app.model.formData[wordElement.id] || [];
     $(forms).each(function(x,y){
         if(typeof y.lemma.pos != "undefined" && pos.indexOf(y.lemma.pos) == -1) {
           pos.push(y.lemma.pos);
