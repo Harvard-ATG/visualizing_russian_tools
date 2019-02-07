@@ -96,7 +96,7 @@ var app = (function() {
   Lemmatizer.prototype.lemmatize =  function(wordData) {
     var jqXhr = $.ajax ({
       type: "POST",
-      url: "/api/lemmatize",
+      url: "/lemmatize",
       data: JSON.stringify(wordData),
       dataType: "json",
       contentType: "application/json"

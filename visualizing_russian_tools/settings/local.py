@@ -9,12 +9,12 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'VUBevwwnHxXKG3UaGpxac795KpWhsP
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'database', 'default.sqlite3'),
+        'NAME': os.path.join(ROOT_DIR, 'default.sqlite3'),
     },
-    'russian': {
+    'clancy_database': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'database', 'russian.sqlite3'),
+        'NAME': os.path.join(ROOT_DIR, 'clancy_database', 'russian.sqlite3'),
     }
 }
 
-DATABASE_ROUTERS = ['russianmodules.database_routers.RussianRouter']
+DATABASE_ROUTERS = ['visualizing_russian_tools.database_routers.DatabaseRouter']

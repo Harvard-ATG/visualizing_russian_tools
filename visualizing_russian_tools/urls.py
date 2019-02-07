@@ -1,0 +1,15 @@
+"""URL Configuration"""
+from django.contrib import admin
+from django.urls import path, include
+from django.views.generic import TemplateView
+
+import parser.views
+import lemmatization.views
+
+urlpatterns = [
+    path('', TemplateView.as_view(template_name='homepage.html'), name='home'),
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
+    path('admin/', admin.site.urls),
+    path('text-parsing-analysis', parser.views.text_parsing_analysis,  name='text_parsing_analysis'),
+    path('lemmatize', lemmatization.views.lemmatize_view, name='lemmatize'),
+]

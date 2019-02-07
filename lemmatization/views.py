@@ -4,13 +4,9 @@ from django.views import View
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import lemmatize
+from .lemmatize import lemmatize
 
 import json
-
-class ApiView(View):
-    def get(self, request):
-        return JsonResponse({"lemmatize": reverse('api:lemmatize') })
 
 class LemmatizeView(View):
     def post(self, request):
@@ -38,5 +34,4 @@ class LemmatizeView(View):
 
         return results
 
-api_view = ApiView.as_view()
 lemmatize_view = csrf_exempt(LemmatizeView.as_view())
