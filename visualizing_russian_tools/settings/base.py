@@ -41,7 +41,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'clancy_database',
     'lemmatization',
-    'parser',
+    'parser_tool',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
