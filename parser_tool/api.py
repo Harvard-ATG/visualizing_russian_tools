@@ -8,7 +8,7 @@ from .lemmatize import lemmatize
 
 import json
 
-class LemmatizeView(View):
+class LemmatizeAPIView(View):
     def post(self, request):
         if request.content_type != 'application/json':
             raise HttpResponseBadRequest
@@ -34,4 +34,4 @@ class LemmatizeView(View):
 
         return results
 
-lemmatize_view = csrf_exempt(LemmatizeView.as_view())
+lemmatize_api_view = csrf_exempt(LemmatizeAPIView.as_view())
