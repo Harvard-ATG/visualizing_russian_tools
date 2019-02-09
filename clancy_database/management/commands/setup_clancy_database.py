@@ -13,8 +13,6 @@ class Command(BaseCommand):
         app_dir = os.path.dirname(clancy_database.__file__)
         dbfile = settings.DATABASES['default']['NAME']
         sqlfile = os.path.join(app_dir, 'fixtures', 'russian.sql.gz')
-        if os.path.exists(dbfile):
-            os.remove(dbfile)
         cmd = "gunzip -c {sqlfile} | sqlite3 {dbfile}".format(sqlfile=sqlfile, dbfile=dbfile)
         subprocess.run(cmd, shell=True)
         self.stdout.write("Database file loaded: %s" % dbfile)
