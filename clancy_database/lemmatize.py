@@ -1,4 +1,4 @@
-from clancy_database.models import Inflection
+from .models import Inflection
 
 def lemmatize(forms):
     qs = Inflection.objects.filter(form__in=forms).select_related('lemma').order_by('lemma__level', 'lemma__rank')

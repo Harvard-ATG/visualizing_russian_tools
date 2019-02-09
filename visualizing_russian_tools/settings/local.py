@@ -11,10 +11,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(ROOT_DIR, 'default.sqlite3'),
     },
-    'clancy_database': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(ROOT_DIR, 'clancy_database', 'russian.sqlite3'),
-    }
+    #'clancy_database': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': os.path.join(ROOT_DIR, 'clancy_database', 'russian.sqlite3'),
+    #}
 }
 
-DATABASE_ROUTERS = ['visualizing_russian_tools.database_routers.DatabaseRouter']
+#DATABASE_ROUTERS = ['visualizing_russian_tools.database_routers.DatabaseRouter']

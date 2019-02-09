@@ -4,7 +4,7 @@ from django.views import View
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from .lemmatize import lemmatize
+from clancy_database.lemmatize import lemmatize
 
 import json
 
