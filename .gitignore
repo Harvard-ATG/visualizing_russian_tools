@@ -11,3 +11,5 @@
 .env*
 http_static
 /docs
+NewVisualizingRussian*.csv
+NewVisualizingRussian*.xslx
