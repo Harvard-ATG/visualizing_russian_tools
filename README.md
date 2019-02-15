@@ -26,7 +26,7 @@ Or with docker-compose:
 docker-compose up
 ```
 
-## Converting Spreadsheet
+## Spreadsheet Import
 
 Given that the lemma and word form data for this project is sourced from Steven Clancy's spreadsheet, the following tools can be used to extract the data from spreadsheet and populate a database. The conversion process produces a SQLite database, which can either be used directly by django, or dumped into a SQL file that can then be loaded into another database.
 
