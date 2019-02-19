@@ -10,6 +10,7 @@ python_version = "3.6"
 django = "*"
 requests = "*"
 django-dotenv = "*"
+gunicorn = "*"
 
 [dev-packages]
 "flake8" = "*"
