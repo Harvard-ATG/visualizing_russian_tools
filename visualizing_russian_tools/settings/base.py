@@ -174,12 +174,7 @@ LOGGING = {
             'level': os.getenv('LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
-        'lemmatization': {
-            'handlers': ['console'],
-            'level': os.getenv('LOG_LEVEL', 'INFO'),
-            'propagate': False,
-        },
-        'text_parsing_analysis': {
+        'parser_tool': {
             'handlers': ['console'],
             'level': os.getenv('LOG_LEVEL', 'INFO'),
             'propagate': False,
