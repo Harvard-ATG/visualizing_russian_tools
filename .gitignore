@@ -1,6 +1,7 @@
 .DS_Store
 .idea
 .virtualenv
+.venv
 .vscode
 *.pyc
 *.db
