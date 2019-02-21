@@ -1,3 +1,3 @@
 #!/bin/bash -ex
-sudo service nginx stop
-sudo service gunicorn stop
+service nginx stop
+service gunicorn stop

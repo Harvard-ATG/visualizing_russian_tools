@@ -1,3 +1,4 @@
 #!/bin/bash -ex
-sudo service gunicorn start
-sudo service nginx start
+service gunicorn start
+sleep 1
+service nginx start
