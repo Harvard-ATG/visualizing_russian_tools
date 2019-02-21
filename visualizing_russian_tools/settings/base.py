@@ -132,33 +132,33 @@ LOGGING = {
     'loggers': {
         # Root level logger
         '': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': 'WARNING',
         },
         # Capture django-related logging
         'django': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
         'django.db': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': os.getenv('DB_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
         # Capture app-specific logging
         'visualizing_russian_tools': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': os.getenv('LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
         'clancy_database': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': os.getenv('LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
         'parser_tool': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': os.getenv('LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
