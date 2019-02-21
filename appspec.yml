@@ -1,0 +1,34 @@
+---
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/sites/visualizing_russian_tools
+permissions:
+  - object: /home/ubuntu/sites/visualizing_russian_tools
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+hooks:
+  BeforeInstall:
+    - location: .codedeploy/clean_instance.sh
+      timeout: 60
+      runas: ubuntu
+  AfterInstall:
+    - location: .codedeploy/install_python_dependencies.sh
+      timeout: 600
+      runas: ubuntu
+    - location: .codedeploy/migrate.sh
+      timeout: 600
+      runas: ubuntu
+    - location: .codedeploy/collectstatic.sh
+      timeout: 60
+      runas: ubuntu
+  ApplicationStart:
+    - location: .codedeploy/start_application.sh
+      timeout: 120
+      runas: ubuntu
+  ApplicationStop:
+    - location: .codedeploy/stop_application.sh
+      timeout: 120
+      runas: ubuntu
