@@ -156,7 +156,7 @@ var app = (function() {
     this.el.appendChild(document.createTextNode(text));
   };
   View.prototype.renderWhitespace = function(text) {
-    var m = text.match(/[\n\r\t]+/g) || [];
+    var m = text.match(/[\n\r\t]/g) || [];
     for(var i = 0; i < m.length; i++) {
       switch(m[i]) {
         case "\n":
@@ -266,7 +266,7 @@ function clearAll(){
     $('#wordinfo').html('');
 }
 
-function parse(){
+function handleParse(){
     var text = $("#textinput").val();
     $("#textinput").val('');
     $("#textinput").height(100);
@@ -351,7 +351,7 @@ function scrollToAnalysis() {
 $('#parsebtn').on('click', function(e) {
    $("#analysis").removeClass('d-none');
    //scrollToAnalysis();
-   parse();
+   handleParse();
    e.stopPropagation();
    e.preventDefault();
 });
@@ -365,6 +365,29 @@ $('#clearbtn').on('click', function(e) {
 $(document).on('click', '.underline-toggle', function(){
     $('.multiple').toggleClass('underline');
 });
+
+(function() {
+  var showLemmatized = false;
+  $(document).on('click', '.lemma-toggle', function(){
+    showLemmatized = !showLemmatized;
+    var elementId, el, forms, lemma;
+    for(elementId in app.model.formData) {
+      el = document.getElementById(elementId);
+      if(!el) { 
+        continue; 
+      }
+      forms = app.model.formData[elementId];
+      lemma = forms[0].lemma.label;
+      if(!("lemma" in el.dataset)) {
+        el.dataset.lemma = lemma;
+      }
+      el.innerText = (showLemmatized ? el.dataset.lemma  : el.dataset.lexeme);
+    }
+    
+    document.getElementById("lemma-toggle").innerText = (showLemmatized ? "Original Text" : "Lemmatized Text");
+  });
+})();
+
 
 $(document).on('click', '.parsed', function(e){
     if($(this).hasClass("highlight")) {
