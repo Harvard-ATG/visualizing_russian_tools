@@ -22,6 +22,21 @@ class Lemma(models.Model):
 
     def __str__(self):
         return "%s [%s:%s] " % (self.lemma, self.pos, self.id, )
+    
+    def to_dict(self):
+        data = {
+            "id": self.external_id,
+            "label": self.lemma,
+            "stressed": self.stressed,
+            "gender": self.gender,
+            "pos": self.pos,
+            "level": self.level,
+            "count": self.count,
+            "rank": self.rank,
+            "animacy": self.animacy,
+            "reverse": "",
+        }
+        return data
 
     class Meta:
         managed = False
@@ -41,28 +56,21 @@ class Inflection(models.Model):
 
     def __str__(self):
         return "%s [%s:%s]" % (self.form, self.type, self.id)
-
-    def lemma_dict(self):
-        result = {
-            "inflection": {
-                "type": self.type,
-                "label": self.form,
-                "stressed": self.stressed,
-            },
-            "lemma": {
-                "stressed": self.lemma.stressed,
-                "gender": self.lemma.gender,
-                "pos": self.lemma.pos,
-                "level": self.lemma.level,
-                "count": self.lemma.count,
-                "rank": self.lemma.rank,
-                "animacy": self.lemma.animacy,
-                "label": self.lemma.lemma,
-                "id": self.lemma.external_id,
-                "reverse": "",
-            }
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "type": self.type,
+            "label": self.form,
+            "stressed": self.stressed,
+            "frequency": self.frequency,
+            "lemma_id": self.lemma_id,
         }
-        return result
+
+    def lemmatize(self):
+        data = self.to_dict()
+        data["lemma"] = self.lemma.to_dict()
+        return data
 
     class Meta:
         managed = False

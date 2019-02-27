@@ -1,37 +1,38 @@
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 from django.core.exceptions import SuspiciousOperation
 from django.views import View
 from django.urls import reverse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-
-from clancy_database.lemmatize import lemmatize
-
 import json
 
-class LemmatizeAPIView(View):
+from visualizing_russian_tools.exceptions import JsonBadRequest
+from . import textparser, htmlgenerator
+
+class TextParserAPIView(View):
     def post(self, request):
-        if request.content_type != 'application/json':
-            raise HttpResponseBadRequest
+        if request.content_type != "application/json":
+            raise JsonBadRequest("Expected JSON accept or content type header")
         try:
-            tokens = json.loads(request.body.decode('utf-8'))
+            text = json.loads(request.body.decode('utf-8'))
         except ValueError:
-            raise SuspiciousOperation('Invalid JSON')
-        results = self._parse(tokens)
-        return JsonResponse(results, safe=False)
+            raise JsonBadRequest('Invalid JSON')
 
-    def _parse(self, tokens):
-        forms = [token['lexeme'] for token in tokens if token['lexeme'] != ""]
-        lemmatized = lemmatize(list(set(forms)))
+        # Set upper bound on maximum length of the text
+        if len(text) > 10000:
+            raise JsonBadRequest("Submitted text is too large (maximum 10,000 characters).")
 
-        results = []
-        for token in tokens:
-            lexeme = token['lexeme']
-            if lexeme in lemmatized:
-                for item in lemmatized[lexeme]:
-                    result = item.copy()
-                    result['element'] = token['id']
-                    results.append(result)
+        # Parse the submitted text
+        parsed_data = self._parse(text)
 
-        return results
+        # Include rendered HTML in the JSON response if requested
+        render_html = request.GET.get('html', 'n') != 'n'
+        if render_html:
+            parsed_data["html"] = htmlgenerator.tokens2html(tokens=parsed_data["tokens"])
 
-lemmatize_api_view = csrf_exempt(LemmatizeAPIView.as_view())
+        return JsonResponse(parsed_data, safe=False)
+
+    def _parse(self, text):
+        return textparser.parse(text)
+
+text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())

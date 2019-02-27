@@ -1,0 +1,2 @@
+class JsonBadRequest(Exception):
+    pass

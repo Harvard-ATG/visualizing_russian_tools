@@ -7,7 +7,12 @@
 {% block nav_class_about %}active{% endblock %}
 
 {% block content %}
-<div class="col-md-10 offset-md-1">
-Placeholder for the front page.
+<div class="col-md-12">
+    <div class="card" style="width: 36rem;">
+        <div class="card-body">
+            <p class="card-text">Visualize the relative difficulty of a Russian text based on core, foundation, expansion, and specialization vocabulary. Words are colorized according to their level.</p>
+            <a href="{% url 'text_parsing_analysis' %}" class="btn btn-primary">Visible Vocabulary</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

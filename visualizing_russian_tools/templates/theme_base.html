@@ -12,9 +12,10 @@
 
     {% block style_base %}
         <link rel="stylesheet" type="text/css" href="{% static 'vendor/bootstrap-4.0.0/css/bootstrap.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="{% static 'vendor/c3/c3.min.css' %}"/>
+        <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
         {% block extra_style %}{% endblock %}
     {% endblock %}
 
@@ -29,14 +30,14 @@
         <div class="container-fluid">
             <div class="navbar-nav">
                 <a class="navbar-brand" href="/">Russian Modules</a>
-                <a class="nav-item nav-link {% block nav_class_home %}{% endblock %}" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a>
+                <a class="nav-item nav-link {% block nav_class_parser %}{% endblock %}" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a>
             </div>
             <div class="navbar-nav navbar-right">
             {% if request.user.is_authenticated and request.user.is_staff %}
                 <a class="nav-item nav-link" href="{% url 'admin:index' %}">Admin</a>
             {% endif %}
           </div>
-     </div>
+        </div>
     </nav>
     {% endblock %}
 

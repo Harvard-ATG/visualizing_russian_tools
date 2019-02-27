@@ -1,32 +1,35 @@
-[data-level='1E'] {
-     color: green !important;
+.word.level1, [data-level='1E'] {
+     color: green;
 }
- [data-level='2I'] {
-     color: blue !important;
+.word.level2, [data-level='2I'] {
+     color: blue;
 }
- [data-level='3A'], [data-level='3AU'] {
-     color: #8000ff !important;
+.word.level3, [data-level='3A'], [data-level='3AU'] {
+     color: #8000ff;
 }
- [data-level='4S'], [data-level='4SU'] {
-     color: orange !important;
+.word.level4, [data-level='4S'], [data-level='4SU'] {
+     color: orange;
 }
- [data-level='5U'] {
-     color: orange !important;
+.word.level5, [data-level='5U'] {
+     color: orange;
 }
- [data-level='6U'] {
-     color: black !important;
+.word.level6, [data-level='6U'] {
+     color: black;
 }
- #textinput {
-     min-height: 50px;
+.word.masklevel {
+    color: inherit !important;
 }
  #parsed {
-     font-family: 'Ubuntu Condensed', sans-serif;
+     position: relative;
      font-size: 18px;
      line-height: 125%;
-     /*
-     max-height: 350px;
-     overflow: scroll;
-     */
+}
+#textinfo {
+    font-size: 125%;
+    margin: 18px 0;
+}
+#wordinfo {
+    position: relative;
 }
  .underline {
      text-decoration: underline;
@@ -55,15 +58,6 @@
  .word.parsed.highlight {
      background-color: yellow;
  }
- .lnopadding {
-     padding-left: 0px !important;
-}
- .rnopadding {
-     padding-right: 0px !important;
-}
- .inline {
-     display: inline;
-}
  .numbers {
      color: #990000;
      font-weight: bold;
@@ -71,6 +65,7 @@
  .indent {
      margin-left: 3em;
  }
+
  /* resize heading elements inside the container */
 .container h1 { font-size: 2rem; }
 .container h2 { font-size: 1.75rem; }

@@ -45,6 +45,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.gzip.GZipMiddleware',
+    'visualizing_russian_tools.middleware.JsonExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'visualizing_russian_tools.urls'
@@ -133,7 +134,7 @@ LOGGING = {
         # Root level logger
         '': {
             'handlers': ['console', 'file'],
-            'level': 'WARNING',
+            'level': 'INFO',
         },
         # Capture django-related logging
         'django': {
@@ -159,7 +160,7 @@ LOGGING = {
         },
         'parser_tool': {
             'handlers': ['console', 'file'],
-            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'level': os.getenv('LOG_LEVEL', 'DEBUG'),
             'propagate': False,
         },
     }

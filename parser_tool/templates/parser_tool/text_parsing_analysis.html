@@ -4,26 +4,15 @@
 {% block head_title %}Visible Vocabulary{% endblock %}
 {% block body_id %}visible-vocabulary-page{% endblock %}
 {% block body_class %}{% endblock %}
-{% block nav_class_about %}active{% endblock %}
+{% block nav_class_parser %}active{% endblock %}
 
 {% block extra_style %}
     {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'css/text_parsing_analysis.css' %}" />
-
 <style>
-.container,
-.container-fluid {
-    font-family: 'Libre Baskerville';
-}
-.parser-dark {
+.parser-input {
+    padding: 36px 0 0 0;
     background-color: #f7f7f7;
-    border-top: 5px solid #777777;
-}
-.parser-box {
-    padding: 36px 36px 36px 36px;
-}
-.parser-widget {
-    padding: 18px;
 }
 .parser-header {
     color: #777777;
@@ -32,51 +21,51 @@
 {% endblock %}
 
 {% block extra_script %}
-    <script type="text/javascript" src="{% static 'js/text_parsing_analysis_v2.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/text_parsing_analysis.js' %}"></script>
 {% endblock %}
 
 
 {% block content %}
-<div id="inputrussiantext" class="mb-4 parser-dark parser-box">
-    <div class="row mb-2">
-        <div class="col">
-            <h2 class="parser-header">Input Russian Text:</h2>
-            <textarea id="textinput" class="form-control" rows="5" style="height:300px;"></textarea>
-        </div>
-    </div>
-    <div class="d-flex justify-content-between">
-        <button type="button" align="left" class="btn btn-dark" id="parsebtn">PARSE</button>
-        <button type="button" align="left" class="btn btn-dark" id="clearbtn">CLEAR</button>
-    </div>
-</div>
-<div id="analysis" class="d-none">
-    <div class="row">
-        <div class="col-md-8">
-
-            <div class="d-flex justify-content-between">
-                <h2 class="parser-header">Parsed Text Analysis </h2>
-                <div>
-                    <button class="btn btn-red underline-toggle" title="Toggle underlined words with multiple forms or lemmas">Multiple</button>
-                    <button id="lemma-toggle" class="btn btn-red lemma-toggle" title="Toggle lemmas for words">Lemmatized Text</button>
+<div class="row parser-container parser-input">
+    <div class="col-md-9 offset-1">
+        <div class="mb-4">
+            <div class="row mb-2">
+                <div class="col">
+                    <h2 class="parser-header">Input Russian Text:</h2>
+                    <textarea id="textinput" class="form-control" style="min-height:150px;"></textarea>
                 </div>
             </div>
-
+            <div class="d-flex justify-content-between" style="margin-bottom: 1em;">
+                <button type="button" align="left" class="btn btn-lg btn-primary" id="parsebtn">Parse Text</button>
+                <button type="button" align="left" class="btn btn-lg btn-dark" id="clearbtn">Clear</button>
+            </div>
+            <div id="parser-error" class="alert alert-danger d-none"></div>
+        </div>
+    </div>
+</div>
+<div id="analysis" class="d-none" style="margin-bottom: 200px; border-top: 2px solid #efefef; ">
+    <div class="row" style="border-bottom: 2px solid #efefef;">
+        <div class="col-md-3 offset-1">
+            <div id="levels" class="mb-2" style="height: 300px;"></div>
+        </div>
+        <div class="col-md-6">
+            <div id="textinfo" class="text-muted"></div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-6 offset-1">
+            <div class="d-flex justify-content-between">
+                <h2 class="parser-header">Parsed Text </h2>
+                <div>
+                    <button class="btn btn-red underline-toggle" title="Toggle underlined words with multiple forms or lemmas">U</button>
+                    <button id="lemma-toggle" class="btn btn-red lemma-toggle" title="Toggle lemmas for words">Lemmas</button>
+                </div>
+            </div>
             <div id="parsed"></div>
         </div>
-
-        <div class="col-md-4" id="sidebar">
-            <div class="parser-widget parser-dark mb-2">
-                <h3 class="parser-header">Word Info:</h3>
-                <div id="wordinfo">Click on a word.</div>
-            </div>
-            <div class="parser-widget parser-dark mb-2">
-                <h3 class="parser-header">Text Info:</h3>
-                <div id="textinfo"></div>
-            </div>
-            <div class="parser-widget parser-dark mb-2">
-                <h3 class="parser-header">Difficulty Levels:</h3>
-                <div id="levels"></div>
-            </div>
+        <div class="col-md-3">
+            <h3 class="parser-header">Word Info</h3>
+            <div id="wordinfo" class="mb-2"></div>
         </div>
     </div>
 </div>
