@@ -10,6 +10,7 @@ from visualizing_russian_tools.exceptions import JsonBadRequest
 from . import textparser, htmlgenerator
 
 class TextParserAPIView(View):
+    MAX_TEXT_LENGTH = 10000
     def post(self, request):
         if request.content_type != "application/json":
             raise JsonBadRequest("Expected JSON accept or content type header")
@@ -19,8 +20,8 @@ class TextParserAPIView(View):
             raise JsonBadRequest('Invalid JSON')
 
         # Set upper bound on maximum length of the text
-        if len(text) > 100:
-            raise ValueError("Submitted text is too large (maximum 10,000 characters).")
+        if len(text) > self.MAX_TEXT_LENGTH:
+            raise ValueError("Submitted text is too large (maximum {max_text_length:,} characters).".format(max_text_length=self.MAX_TEXT_LENGTH))
 
         # Parse the submitted text
         parsed_data = self._parse(text)
