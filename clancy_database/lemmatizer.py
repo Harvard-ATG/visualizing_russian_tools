@@ -1,19 +1,31 @@
+from django.db.models.functions import Lower
+
 from .models import Inflection, Lemma
 
 
 def makelookup(forms=None):
     """
-    Given a list of forms, returns a lookup table using foreign keys to index into separate tables 
-    containing details of forms and lemmas.
+    Given a list of forms (assume lowercase), returns a normalized lookup table for forms, inflections, and lemmas.
     """
     table = {"forms": {}, "lemmas": {}, "lookup": {}}
     lemma_ids = set()
-    for inflection in Inflection.objects.filter(form__in=forms):
-        table["lookup"].setdefault(inflection.form, []).append(inflection.id)
+
+    # Ensure that we match capitalized forms in the DB for some entries (e.g. России).
+    # Sqlite doesn't work well with the annotated filter, so using this to cheat a bit.
+    # Migrating to postgres should make this hack unnecessary.
+    forms = list(forms) + [s.capitalize() for s in forms] 
+
+    # Query database for set of matching forms
+    queryset = Inflection.objects.annotate(formlower=Lower('form')).filter(formlower__in=forms)
+
+    for inflection in queryset:
+        table["lookup"].setdefault(inflection.form.lower(), []).append(inflection.id)
         table["forms"][inflection.id] = inflection.to_dict()
         lemma_ids.add(inflection.lemma_id)
+
     for lemma in Lemma.objects.filter(id__in=list(lemma_ids)):
         table["lemmas"][lemma.id] = lemma.to_dict()
+
     return table
 
 
