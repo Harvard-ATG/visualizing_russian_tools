@@ -19,8 +19,8 @@ class TextParserAPIView(View):
             raise JsonBadRequest('Invalid JSON')
 
         # Set upper bound on maximum length of the text
-        if len(text) > 10000:
-            raise JsonBadRequest("Submitted text is too large (maximum 10,000 characters).")
+        if len(text) > 100:
+            raise ValueError("Submitted text is too large (maximum 10,000 characters).")
 
         # Parse the submitted text
         parsed_data = self._parse(text)

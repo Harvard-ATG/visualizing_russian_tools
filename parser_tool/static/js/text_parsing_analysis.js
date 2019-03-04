@@ -43,19 +43,16 @@
       }.bind(this);
 
       var handleError = function(jqXhr, textStatus, errorThrown) {
-        var error, res;
+        var error, res, reason, traceback;
         console.log("parse error: ", textStatus, errorThrown);
         try {
-          var res = JSON.parse(jqXhr.responseText);
-          error = {
-            "reason": res.reason || "Unknown error [1]", 
-            "traceback": res.traceback || ""
-          };
+          res = JSON.parse(jqXhr.responseText);
+          reason = (res.error && res.error.reason) || "Unknown error [1] - response did not provide error details";
+          traceback = (res.error && res.error.traceback) || "";
+          error = {"reason": reason, "traceback": traceback};
         } catch(caughtError) {
           console.log(caughtError);
-          error = {
-            "reason": "Unknown error [2]"
-          };
+          error = {"reason": "Unknown error [2] - failed to parse error response"};
         }
         this.data = null;
         this.error = error;
