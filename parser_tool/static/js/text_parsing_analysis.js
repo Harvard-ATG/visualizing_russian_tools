@@ -235,7 +235,7 @@
     },
     template: function(word_info) {
       var form = word_info.forms[0].label;
-      var lemmas = word_info.lemmas.map(function(lemma) { return lemma.label; });
+      var lemmas = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.label; }));
       var pos = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.pos; }));
       var levels = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.level; }));
       var types = utils.unique(word_info.forms.map(function(form) { return form.type; }));
