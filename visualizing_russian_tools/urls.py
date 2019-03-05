@@ -11,5 +11,6 @@ urlpatterns = [
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('admin/', admin.site.urls),
     path('text-parsing-analysis', parser_tool.views.text_parsing_analysis,  name='text_parsing_analysis'),
-    path('api/parsetext', parser_tool.api.text_parser_api_view, name='parse-text')
+    path('api/parsetext', parser_tool.api.text_parser_api_view, name='api-parse-text'),
+    path('api/lemmatize', parser_tool.api.lemmatize_api_view, name='api-lemmatize'),
 ]

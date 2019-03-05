@@ -3,13 +3,7 @@ from django.db.models.functions import Lower
 from .models import Inflection, Lemma
 
 
-def makelookup(forms=None):
-    """
-    Given a list of forms (assume lowercase), returns a normalized lookup table for forms, inflections, and lemmas.
-    """
-    table = {"forms": {}, "lemmas": {}, "lookup": {}}
-    lemma_ids = set()
-
+def get_inflections_queryset(forms):
     # Ensure that we match capitalized forms in the DB for some entries (e.g. России).
     # Sqlite doesn't work well with the annotated filter, so using this to cheat a bit.
     # Migrating to postgres should make this hack unnecessary.
@@ -18,6 +12,16 @@ def makelookup(forms=None):
     # Query database for set of matching forms
     queryset = Inflection.objects.annotate(formlower=Lower('form')).filter(formlower__in=forms)
 
+    return queryset
+
+def makelookup(forms=None):
+    """
+    Given a list of forms (assume lowercase), returns a normalized lookup table for forms, inflections, and lemmas.
+    """
+    table = {"forms": {}, "lemmas": {}, "lookup": {}}
+    lemma_ids = set()
+
+    queryet = get_inflections_queryset(forms)
     for inflection in queryset:
         table["lookup"].setdefault(inflection.form.lower(), []).append(inflection.id)
         table["forms"][inflection.id] = inflection.to_dict()
@@ -29,15 +33,16 @@ def makelookup(forms=None):
     return table
 
 
-def lemmatize(forms=None):
+def lemmatize(forms):
     """
-    Given a list of forms, returns a dictionary that maps a form directly linking to all possible lemmatized forms.
+    Lemmatizes multiple forms. 
+    Returns a dictionary that maps each form to its lemmatization.
     """
-    if forms is None:
-        return []
-    qs = Inflection.objects.filter(form__in=forms).select_related('lemma').order_by('lemma__level', 'lemma__rank')
+    if isinstance(forms, str):
+        forms = list(forms)
+    queryset = get_inflections_queryset(forms)
+    queryset = queryset.select_related('lemma').order_by('lemma__level', 'lemma__rank')
     data = {}
-    for inflection in qs:
-        lemma_details = inflection.lemmatize()
-        data.setdefault(inflection.form, []).append(lemma_details)
+    for inflection in queryset:
+        data.setdefault(inflection.form.lower(), []).append(inflection.lemmatize())
     return data

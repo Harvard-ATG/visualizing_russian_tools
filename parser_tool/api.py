@@ -7,7 +7,27 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 from visualizing_russian_tools.exceptions import JsonBadRequest
-from . import textparser, htmlgenerator
+from . import tokenizer, textparser, htmlgenerator
+from clancy_database import lemmatizer
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class LemmatizeAPIView(View):
+    def get(self, request):
+        word = request.GET.get("word", None)
+        word = tokenizer.canonical(word)
+        data = {}
+        data["result"] = None
+        data["query"] = {"word": word}
+        if word:
+            logger.debug("calling lemmatize with word: %s" % word)
+            lemmatized = lemmatizer.lemmatize([word])
+            logger.debug("after lemmatize: %s" % lemmatized)
+            data["result"] = lemmatized.get(word)
+        return JsonResponse(data, safe=False)
 
 class TextParserAPIView(View):
     MAX_TEXT_LENGTH = 10000
@@ -37,3 +57,4 @@ class TextParserAPIView(View):
         return textparser.parse(text)
 
 text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())
+lemmatize_api_view = csrf_exempt(LemmatizeAPIView.as_view())
