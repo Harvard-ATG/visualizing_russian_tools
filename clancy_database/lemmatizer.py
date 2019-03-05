@@ -21,7 +21,7 @@ def makelookup(forms=None):
     table = {"forms": {}, "lemmas": {}, "lookup": {}}
     lemma_ids = set()
 
-    queryet = get_inflections_queryset(forms)
+    queryset = get_inflections_queryset(forms)
     for inflection in queryset:
         table["lookup"].setdefault(inflection.form.lower(), []).append(inflection.id)
         table["forms"][inflection.id] = inflection.to_dict()
