@@ -122,6 +122,8 @@ def split_punctuation(tokens, punct=RUS_PUNCT, hyphen_char=HYPHEN_CHAR):
     ['фрукты', '=', 'яблоко', '|', 'вишня']
     >>> split_punctuation(["(13  мая  1876)"])
     ['(', '13  мая  1876', ')']
+    >>> split_punctuation(["(Students", " ", "and", "Faculty)."])
+    ['(', 'Students', ' ', 'and', 'Faculty', ').']
     """
     punct = punct.replace(hyphen_char, '') # hyphens should be handled separately
     punct = punct.replace('[', '\\[').replace(']', '\\]') # escaping for regex char class
@@ -133,7 +135,8 @@ def split_punctuation(tokens, punct=RUS_PUNCT, hyphen_char=HYPHEN_CHAR):
                 if t != "":
                     new_tokens.append(t)
         else:
-            new_tokens.append(token)
+            if token != "":
+                new_tokens.append(token)
     return new_tokens
 
 def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_WORDS):
@@ -142,6 +145,8 @@ def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_
     ['по-весеннему']
     >>> split_hyphenated(['француженкою-гувернанткой'])
     ['француженкою', '-', 'гувернанткой']
+    >>> split_hyphenated(['seventeen-year-old'])
+    ['seventeen', '-', 'year', '-', 'old']
     """
     new_tokens = []
     for token in tokens:
@@ -151,7 +156,8 @@ def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_
                 if t != "":
                     new_tokens.append(t)
         else:
-            new_tokens.append(token)
+            if token != "":
+                new_tokens.append(token)
     return new_tokens
 
 def merge_multiwordexpr(tokens):
