@@ -109,14 +109,15 @@ def tokenize(text):
     ['A', ' ', 'typical', ' ', 'seventeen', '-', 'year', '-', 'old', ' ', 'первоку́рсник', ' ', '|', ' ', 'первоку́рсница', ' ', '(', 'first', '-', 'year', ' ', 'student', ')', ' ', 'in', ' ', 'the', ' ', 'филологи́ческий', ' ', 'факульте́т', ' ', '(', 'филфа́к', ')', ' ', '(', 'Philology', ' ', 'Faculty', ')', ' ', 'has', ' ', '23', ' ', 'па́ры']
     """
     tokens = re.split(r'(\s+)', text)
-    tokens = split_punctuation(tokens)
+    tokens = split_punctuation(tokens) 
     tokens = split_hyphenated(tokens)
     tokens = merge_multiwordexpr(tokens)
     return tokens
 
 def split_punctuation(tokens, punct=RUS_PUNCT, hyphen_char=HYPHEN_CHAR):
     """
-    Splits punctuation **exception
+    Splits punctuation except for hyphens, which require special treatment.
+
     >>> split_punctuation(["фрукты=яблоко|вишня"])
     ['фрукты', '=', 'яблоко', '|', 'вишня']
     >>> split_punctuation(["(13  мая  1876)"])
