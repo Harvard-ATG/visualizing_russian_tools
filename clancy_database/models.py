@@ -29,12 +29,16 @@ class Lemma(models.Model):
             "external_id": self.external_id,
             "label": self.lemma,
             "stressed": self.stressed,
+            "translation": self.translation,
             "gender": self.gender,
             "pos": self.pos,
             "level": self.level,
             "count": self.count,
             "rank": self.rank,
             "animacy": self.animacy,
+            "aspect": self.aspect,
+            "aspect_counterpart": self.aspect_counterpart,
+            "transitivity": self.transitivity,
             "reverse": "",
         }
         return data

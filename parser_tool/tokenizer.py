@@ -54,7 +54,7 @@ QUOTE_RAISED_LEFT = '\u201e'
 QUOTE_RAISED_RIGHT = '\u201c'
 
 # Punctuation list
-RUS_PUNCT = string.punctuation + QUOTE_ANGLE_LEFT + QUOTE_ANGLE_RIGHT + QUOTE_RAISED_LEFT + QUOTE_RAISED_RIGHT + EN_DASH_CHAR + EM_DASH_CHAR
+RUS_PUNCT = '.…,/#!?$%^&*;:{}=_`~[]()"|' + QUOTE_ANGLE_LEFT + QUOTE_ANGLE_RIGHT + QUOTE_RAISED_LEFT + QUOTE_RAISED_RIGHT + EN_DASH_CHAR + EM_DASH_CHAR + HYPHEN_CHAR 
 
 # Diacritics
 COMBINING_ACCENT_CHAR = '\u0301'   # Diacritic used to mark stress on russian words
@@ -94,30 +94,61 @@ TRANSLATOR_DIACRITICS_REMOVE = str.maketrans('', '', COMBINING_ACCENT_CHAR)
 RE_MATCH_DIGITS_ONLY = re.compile(r'^\d+$')
 RE_MATCH_WHITESPACE_ONLY = re.compile(r'^\s+$')
 
-def tokenize(text, whitespace=True):
+
+def tokenize(text):
     """
     Returns a list of tokens.
 
     >>> tokenize("«Ко двору, — думает он. — Ко двору!»")
-    ['«Ко', ' ', 'двору,', ' ', '—', ' ', 'думает', ' ', 'он.', ' ', '—', ' ', 'Ко', ' ', 'двору!»']
-    >>> tokenize("«Ко двору, — думает он. — Ко двору!»", whitespace=False)
-    ['«Ко', 'двору,', '—', 'думает', 'он.', '—', 'Ко', 'двору!»']
+    ['«', 'Ко', ' ', 'двору', ',', ' ', '—', ' ', 'думает', ' ', 'он', '.', ' ', '—', ' ', 'Ко', ' ', 'двору', '!»']
     >>> tokenize("В не́которых ру́сских деревня́х по э́той техноло́гии вручну́ю де́лают матрёшек и сего́дня.")
-    ['В', ' ', 'не́которых', ' ', 'ру́сских', ' ', 'деревня́х', ' ', 'по', ' ', 'э́той', ' ', 'техноло́гии', ' ', 'вручну́ю', ' ', 'де́лают', ' ', 'матрёшек', ' ', 'и', ' ', 'сего́дня.']
+    ['В', ' ', 'не́которых', ' ', 'ру́сских', ' ', 'деревня́х', ' ', 'по', ' ', 'э́той', ' ', 'техноло́гии', ' ', 'вручну́ю', ' ', 'де́лают', ' ', 'матрёшек', ' ', 'и', ' ', 'сего́дня', '.']
+    >>> tokenize("в день по-весеннему свежий и по-летнему теплый…")
+    ['в', ' ', 'день', ' ', 'по-весеннему', ' ', 'свежий', ' ', 'и', ' ', 'по-летнему', ' ', 'теплый', '…']
+    >>> tokenize("A typical seventeen-year-old первоку́рсник | первоку́рсница (first-year student) in the филологи́ческий факульте́т (филфа́к) (Philology Faculty) has 23 па́ры")
+    ['A', ' ', 'typical', ' ', 'seventeen', '-', 'year', '-', 'old', ' ', 'первоку́рсник', ' ', '|', ' ', 'первоку́рсница', ' ', '(', 'first', '-', 'year', ' ', 'student', ')', ' ', 'in', ' ', 'the', ' ', 'филологи́ческий', ' ', 'факульте́т', ' ', '(', 'филфа́к', ')', ' ', '(', 'Philology', ' ', 'Faculty', ')', ' ', 'has', ' ', '23', ' ', 'па́ры']
     """
-    pattern = r'(\s+)' if whitespace else r'\s+'
-    tokens = re.split(pattern, normalize_hyphens(text))
+    tokens = re.split(r'(\s+)', text)
+    tokens = split_punctuation(tokens)
     tokens = split_hyphenated(tokens)
     tokens = merge_multiwordexpr(tokens)
     return tokens
 
-def split_hyphenated(tokens):
+def split_punctuation(tokens, punct=RUS_PUNCT, hyphen_char=HYPHEN_CHAR):
+    """
+    Splits punctuation **exception
+    >>> split_punctuation(["фрукты=яблоко|вишня"])
+    ['фрукты', '=', 'яблоко', '|', 'вишня']
+    >>> split_punctuation(["(13  мая  1876)"])
+    ['(', '13  мая  1876', ')']
+    """
+    punct = punct.replace(hyphen_char, '') # hyphens should be handled separately
+    punct = punct.replace('[', '\\[').replace(']', '\\]') # escaping for regex char class
+    re_punct = re.compile('([%s]+)' % punct)
+    new_tokens = []
+    for token in tokens:
+        if re_punct.search(token) is not None:
+            for t in re_punct.split(token):
+                if t != "":
+                    new_tokens.append(t)
+        else:
+            new_tokens.append(token)
+    return new_tokens
+
+def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_WORDS):
+    """
+    >>> split_hyphenated(['по-весеннему'])
+    ['по-весеннему']
+    >>> split_hyphenated(['француженкою-гувернанткой'])
+    ['француженкою', '-', 'гувернанткой']
+    """
     new_tokens = []
     for token in tokens:
         # split hyphenated unless it's a special case like "по-" words (DB entries for those)
-        if HYPHEN_CHAR in token and not token.startswith("по-") and token not in HYPHENATED_WORDS:
-            for t in re.split(r'(-)', token):
-                new_tokens.append(t)
+        if hyphen_char in token and not token.startswith("по-") and token not in reserved_words:
+            for t in re.split(r'(%s)' % hyphen_char, token):
+                if t != "":
+                    new_tokens.append(t)
         else:
             new_tokens.append(token)
     return new_tokens
@@ -165,7 +196,7 @@ def unicode_compose(token):
 
 def strip_punctuation(token):
     """
-    Removes punctuation from text.
+    Removes all punctuation from text.
     """
     return token.translate(TRANSLATOR_PUNCT_REMOVE)
 
@@ -181,20 +212,12 @@ def strip_diacritics(token):
 def canonical(token):
     """
     Returns the canonical text stripped of all punctuation and diacritics.
+    Assumes that the token has already been stripped of non-essential puncutation.
     This is intended to be used for doing lookups against the database.
     """
-    # Strip diacritics
+    # Strip diacritics and lowercaes the token
     token = unicode_compose(strip_diacritics(unicode_decompose(normalize_hyphens(token))))
-
-    # Strip punctunation, handling some special cases where punctuation should be preserved
-    if token.startswith("по-"):
-        token = token[0:len("по-")] + strip_punctuation(token[len("по-"):])
-    elif token not in HYPHENATED_WORDS:
-        token = strip_punctuation(token)
-    
-    # Change to lowercase
     token = token.lower()
-
     return token
 
 
@@ -206,18 +229,16 @@ TOKEN_RUS = "RUS"
 
 def tokentype(text):
     """
-    Returns the type of text contained in a token:
-        NUM: number
-        PUNCT: punctuation
-        RUS: russian
-        SPACE: whitespace 
-        WORD: word
+    Classifies a token as whitespace (SPACE), punctuation (PUNCT), numeric (NUM), 
+    word (WORD), or a russian word (RUS). Note that the difference between a word
+    and a russian word is merely the alphabet used. This is a simple heuristic to
+    to guide lemmatization.
 
-    >>> tokentype('«Ко')
-    'RUS'
     >>> tokentype('—')
     'PUNCT'
-    >>> tokentype("hello") 
+    >>> tokentype('123')
+    'NUM'
+    >>> tokentype("find") 
     'WORD'
     >>> tokentype("найти")
     'RUS'

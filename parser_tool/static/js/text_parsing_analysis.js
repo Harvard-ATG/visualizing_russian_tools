@@ -188,10 +188,15 @@
       $(".word.parsed").each(function(idx, el) {
         var form_ids = self.getElementDataFormIds(el);
         var word_info = parseService.getWordInfo(form_ids);
+        var form, lemma, is_capitalized;
         if(word_info) {
           if(self.showLemmas) {
-            $(el).data("form", $(el).html());
-            $(el).html(word_info.lemmas[0].label);
+            form = $(el).html();
+            is_capitalized = (form.charAt(0) == form.charAt(0).toUpperCase());
+            lemma = word_info.lemmas[0].label;
+            lemma = (is_capitalized ? lemma.charAt(0).toUpperCase() + lemma.substr(1) : lemma);
+            $(el).data("form", form);
+            $(el).html(lemma);
           } else {
             $(el).html($(el).data("form"));
           }
@@ -236,6 +241,7 @@
     template: function(word_info) {
       var form = word_info.forms[0].label;
       var lemmas = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.label; }));
+      var translations = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.translation; }));
       var pos = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.pos; }));
       var levels = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.level; }));
       var types = utils.unique(word_info.forms.map(function(form) { return form.type; }));
@@ -247,6 +253,7 @@
       html += '<span>Parts of Speech:</span> <span class="numbers">' + pos.join(", ") + "</span><br>";
       html += '<span>Levels:</span> <span class="numbers">' + levels.join(", ") + "</span><br>";
       html += '<span>Inflections:</span> <span class="numbers">' + types.join(", ") + "</span><br>";
+      html += '<span>Translation:</span> <span class="numbers">' + translations.join(", ") + "</span><br>";
       return html;
     }
   };

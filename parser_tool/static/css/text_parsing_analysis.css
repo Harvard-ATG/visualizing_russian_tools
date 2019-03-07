@@ -22,7 +22,8 @@
  #parsed {
      position: relative;
      font-size: 18px;
-     line-height: 125%;
+     line-height: 1.5em;
+     white-space: pre-wrap; /* Note: this seems to help with copy & paste to word... */
 }
 #textinfo {
     font-size: 125%;
@@ -46,9 +47,6 @@
  .btn-red:active {
      background-color: #DEDEDE;
      color: #990000;
- }
- .words {
-     line-height: 1.5em;
  }
  .word {
      color: #333;
