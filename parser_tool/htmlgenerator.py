@@ -28,8 +28,6 @@ def tokens2html(tokens=None, **options):
     prev_el = None
     for token in tokens:
         rendered = render_token(token)
-        print(rendered)
-        #logger.debug(rendered)
         if rendered['node_type'] == ELEMENT_NODE:
             container_el.append(rendered['element'])
             prev_el = rendered['element']
