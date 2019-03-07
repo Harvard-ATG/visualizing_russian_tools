@@ -89,12 +89,15 @@
       console.log("parse text: ", text);
       domCtrl.clearAnalysis();
       domCtrl.clearError();
+      domCtrl.showLoadingIndicator();
 
       parseService.parse(text).then(function() {
         parsedTextCtrl.render(parseService.data);
         textInfoCtrl.render(parseService.data);
+        domCtrl.hideLoadingIndicator();
         utils.scrollTo("#analysis");
       }, function(jqXhr, textStatus) {
+        domCtrl.hideLoadingIndicator();
         domCtrl.error(parseService.error);
       });
     },
@@ -146,6 +149,12 @@
     getInputText: function() {
       var text = $('#textinput').val().replace(/\s+$/g, '');
       return text;
+    },
+    showLoadingIndicator: function() {
+      $("#parsespinner").removeClass("d-none");
+    },
+    hideLoadingIndicator: function() {
+      $("#parsespinner").addClass("d-none");
     },
     error: function(error) {
       var html = '<h4 class="alert-heading">Parse Text Error</h4>';
