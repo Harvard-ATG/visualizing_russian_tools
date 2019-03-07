@@ -166,6 +166,7 @@
     render: function(data) {
       $("#analysis").removeClass("d-none");
       $("#parsed").html(data.html);
+      this.updateWordsWithMultiple();
     },
     reset: function() {
       $('#parsed').html('');
@@ -197,12 +198,12 @@
         }
       });
     },
-    underlineMultiple: function() {
+    updateWordsWithMultiple: function() {
       var self = this;
       $(".word.parsed").each(function(idx, el) {
         var form_ids = self.getElementDataFormIds(el);
         if(form_ids.length > 1) {
-          $(el).addClass("underline multiple");
+          $(el).addClass("multiple");
         }
       });
     }
