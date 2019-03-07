@@ -198,10 +198,11 @@ def canonical(token):
     return token
 
 
-TOKEN_RUS = "RUS"
 TOKEN_PUNCT = "PUNCT"
 TOKEN_SPACE = "SPACE"
 TOKEN_NUM = "NUM"
+TOKEN_WORD = "WORD"
+TOKEN_RUS = "RUS"
 
 def tokentype(text):
     """
@@ -210,13 +211,14 @@ def tokentype(text):
         PUNCT: punctuation
         RUS: russian
         SPACE: whitespace 
+        WORD: word
 
     >>> tokentype('«Ко')
     'RUS'
     >>> tokentype('—')
     'PUNCT'
-    >>> tokentype("hello") is None
-    True
+    >>> tokentype("hello") 
+    'WORD'
     >>> tokentype("найти")
     'RUS'
     """
@@ -231,13 +233,15 @@ def tokentype(text):
             tokentype = TOKEN_RUS
         elif is_numeric(canonical_text):
             tokentype = TOKEN_NUM
+        else:
+            tokentype = TOKEN_WORD
     return tokentype
 
 def is_russian(token):
     """
     Returns true if the token contains only russian characters or punctuation, otherwise false.
     """
-    return token[0] in RUS_ALPHABET_SET
+    return any([c in RUS_ALPHABET_SET for c in token])
 
 def is_punctuation(token):
     return all([c in RUS_PUNCT for c in token])

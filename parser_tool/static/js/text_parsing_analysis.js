@@ -166,7 +166,6 @@
     render: function(data) {
       $("#analysis").removeClass("d-none");
       $("#parsed").html(data.html);
-      this.underlineMultiple();
     },
     reset: function() {
       $('#parsed').html('');
@@ -264,10 +263,10 @@
     },
     getCounts: function() {
       var counts = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0};
-      $('.parsed').each(function(index, el) {
+      $('.word[data-level]').each(function(index, el) {
           counts[parseInt($(el).attr("data-level")[0])] += 1;
       });
-      counts[0] = $('.word').length - $('.parsed').length;
+      counts[0] = $('.word').length - $('.word[data-level]').length;
       return counts;
     },
     generateChart: function(counts) {

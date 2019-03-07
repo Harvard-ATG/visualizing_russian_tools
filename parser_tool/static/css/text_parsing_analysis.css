@@ -47,8 +47,10 @@
      background-color: #DEDEDE;
      color: #990000;
  }
+ .words {
+     line-height: 1.5em;
+ }
  .word {
-     padding: 3px;
      color: #333;
 }
  .word.parsed:hover {

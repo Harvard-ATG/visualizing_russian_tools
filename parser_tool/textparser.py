@@ -42,8 +42,6 @@ def parse(text):
                 token_data["level"] = lemma["level"]
                 token_data["form_ids"] = form_ids
                 token_data["canonical"] = tokencanonical
-        elif tokentype == tokenizer.TOKEN_NUM:
-            token_data["level"] = "1E"
         
         tokens_with_forms.append(token_data)
 
