@@ -54,7 +54,7 @@ QUOTE_RAISED_LEFT = '\u201e'
 QUOTE_RAISED_RIGHT = '\u201c'
 
 # Punctuation list
-RUS_PUNCT = '.…,/#!?$%^&*;:{}=_`~[]()"|' + QUOTE_ANGLE_LEFT + QUOTE_ANGLE_RIGHT + QUOTE_RAISED_LEFT + QUOTE_RAISED_RIGHT + EN_DASH_CHAR + EM_DASH_CHAR + HYPHEN_CHAR 
+RUS_PUNCT = '.…,/#!?$%^&*;:{}=_`~[]()‘’“”\'"|' + QUOTE_ANGLE_LEFT + QUOTE_ANGLE_RIGHT + QUOTE_RAISED_LEFT + QUOTE_RAISED_RIGHT + EN_DASH_CHAR + EM_DASH_CHAR + HYPHEN_CHAR 
 
 # Diacritics
 COMBINING_ACCENT_CHAR = '\u0301'   # Diacritic used to mark stress on russian words
