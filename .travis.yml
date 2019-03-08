@@ -1,0 +1,11 @@
+sudo: false
+language: python
+python:
+- '3.6'
+env:
+- DJANGO_SETTINGS_MODULE="visualizing_russian_tools.settings.local" BOTO_CONFIG=/dev/null
+install:
+- pipenv install
+script:
+- python manage.py migrate --noinput
+- python manage.py test
