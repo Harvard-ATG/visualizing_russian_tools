@@ -21,6 +21,11 @@
 {% endblock %}
 
 {% block extra_script %}
+    <script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
     <script type="text/javascript" src="{% static 'js/text_parsing_analysis.js' %}"></script>
 {% endblock %}
 
@@ -57,8 +62,8 @@
             <div class="d-flex justify-content-between">
                 <h2 class="parser-header">Parsed Text </h2>
                 <div>
-                    <button class="btn btn-red underline-toggle" title="Toggle underlined words with multiple forms or lemmas">U</button>
-                    <button id="lemma-toggle" class="btn btn-red lemma-toggle" title="Toggle lemmas for words">Lemmas</button>
+                    <button class="btn btn-red underline-toggle" data-toggle="tooltip" title="Reveal ambiguous forms">U</button>
+                    <button id="lemma-toggle" class="btn btn-red lemma-toggle" data-toggle="tooltip" title="Show lemmatization">Lemmas</button>
                 </div>
             </div>
             <div id="parsed"></div>

@@ -1,5 +1,9 @@
 (function($) {
+  "use strict";
 
+  /**
+   * Utilities
+   */
   var utils = {
     htmlEntities: function(str) {
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -7,14 +11,14 @@
     unique: function(arr) {
       var onlyUnique = function(value, index, self) { 
         return self.indexOf(value) === index;
-      }
+      };
       return arr.filter(onlyUnique);
     },
     logEvent: function(fn) {
       return function(e) {
         console.log("event: ", e.type, e.target, e);
         return fn(e);
-      }
+      };
     },
     scrollTo: function(selector) {
       var scrollTop = $(selector).offset().top;
@@ -23,6 +27,12 @@
   };
   
 
+  /**
+   * Parse Service
+   * 
+   * Responsible for submitting parse requests to the backend, storing data,
+   * and querying the returned data.
+   */
   var parseService = {
     url: "/api/parsetext?html=y",
     data: null,
@@ -80,97 +90,12 @@
       return word_info;
     }
   };
-  
-  
 
-  var domCtrl = {
-    onClickParse: function(e) {
-      var text = domCtrl.getInputText();
-      console.log("parse text: ", text);
-      domCtrl.clearAnalysis();
-      domCtrl.clearError();
-      domCtrl.showLoadingIndicator();
-
-      parseService.parse(text).then(function() {
-        parsedTextCtrl.render(parseService.data);
-        textInfoCtrl.render(parseService.data);
-        domCtrl.hideLoadingIndicator();
-        utils.scrollTo("#analysis");
-      }, function(jqXhr, textStatus) {
-        domCtrl.hideLoadingIndicator();
-        domCtrl.error(parseService.error);
-      });
-    },
-    onClickClear: function(e) {
-      domCtrl.clearAll();
-    },
-    onClickWord: function(e) {
-      var $el = $(e.target);
-      if($el.hasClass("highlight")) {
-        $el.removeClass("highlight");
-        wordInfoCtrl.reset();
-      } else {
-        $(".word.highlight").removeClass("highlight");
-        $el.addClass("highlight");
-        var form_ids = parsedTextCtrl.getElementDataFormIds($el);
-        wordInfoCtrl.render({form_ids: form_ids});
-        wordInfoCtrl.setPosition({top: $el.position().top });
-      }
-      return false;
-    },
-    onClickUnderlineToggle: function(e) {
-      parsedTextCtrl.toggleMultiple();
-    },
-    onClickLemmaToggle: function(e) {
-      parsedTextCtrl.toggleLemmas();
-    },
-    clearAll: function() {
-      this.clearInputForm();
-      this.clearAnalysis();
-      this.clearError();
-      return this;
-    },
-    clearAnalysis: function() {
-      parsedTextCtrl.reset();
-      textInfoCtrl.reset();
-      wordInfoCtrl.reset();
-      $("#analysis").addClass("d-none");
-      return this;
-    },
-    clearError: function() {
-      $("#parser-error").addClass('d-none').html('');
-      return this;
-    },
-    clearInputForm: function() {
-      $('#textinput').val('');
-      this.clearError();
-      return this;
-    },
-    getInputText: function() {
-      var text = $('#textinput').val().replace(/\s+$/g, '');
-      return text;
-    },
-    showLoadingIndicator: function() {
-      $("#parsespinner").removeClass("d-none");
-    },
-    hideLoadingIndicator: function() {
-      $("#parsespinner").addClass("d-none");
-    },
-    error: function(error) {
-      var html = '<h4 class="alert-heading">Parse Text Error</h4>';
-      html += 'There was a problem parsing the text.<br>';
-      if(error.reason) {
-        html += '<b>Reason:</b> '+utils.htmlEntities(error.reason)+'<br>';
-      }
-      if(error.traceback) {
-        html += '<hr><pre>' + utils.htmlEntities(error.traceback)+'</pre>';
-      }
-      $("#parser-error").html(html).removeClass('d-none');
-      return this;
-    }
-  };
-
-
+  /**
+   * Parsed Text Controller
+   * 
+   * Responsible for rendering and manipulating the parsed text.
+   */
   var parsedTextCtrl = {
     render: function(data) {
       $("#analysis").removeClass("d-none");
@@ -223,12 +148,18 @@
     }
   };
 
-
+  /**
+   * Word Info Controller
+   * 
+   * Responsible for rendering word information alongside the parsed text.
+   */
   var wordInfoCtrl = {
     render: function(data) {
-      var form_ids = data.form_ids, word_info = null, html = '';
+      var form_ids = data.form_ids;
+      var word_info = null;
+      var html = '';
       if(form_ids) {
-        var word_info = parseService.getWordInfo(form_ids);
+        word_info = parseService.getWordInfo(form_ids);
         if(word_info) {
           html = this.template(word_info);
         }
@@ -239,7 +170,7 @@
     setPosition: function(position) {
       var top = parseInt(position.top, 10);
       if(top) {
-        $("#wordinfo").css({"top": top+"px"})
+        $("#wordinfo").css({"top": top+"px"});
       } else {
         $("#wordinfo").css({"top": ""});
       }
@@ -267,7 +198,11 @@
     }
   };
 
-
+  /**
+   * Text Info Controller
+   * 
+   * Responsible for displaying and manipulating statistics about the parsed text.
+   */
   var textInfoCtrl = {
     render: function(data) {
       var counts = this.getCounts();
@@ -339,13 +274,115 @@
     }
   };
 
+  /**
+   * Input Text Controller
+   * 
+   * Responsible for managing the input text and showing error messages.
+   */
+  var inputTextCtrl = {
+    getInputText: function() {
+      var text = $('#textinput').val().replace(/\s+$/g, '');
+      return text;
+    },
+    error: function(error) {
+      var html = '<h4 class="alert-heading">Parse Text Error</h4>';
+      html += 'There was a problem parsing the text.<br>';
+      if(error.reason) {
+        html += '<b>Reason:</b> '+utils.htmlEntities(error.reason)+'<br>';
+      }
+      if(error.traceback) {
+        html += '<hr><pre>' + utils.htmlEntities(error.traceback)+'</pre>';
+      }
+      $("#parser-error").html(html).removeClass('d-none');
+      return this;
+    },
+    clearError: function() {
+      $("#parser-error").addClass('d-none').html('');
+      return this;
+    },
+    clearInput: function() {
+      $('#textinput').val('');
+      return this;
+    },
+    showLoadingIndicator: function() {
+      $("#parsespinner").removeClass("d-none");
+    },
+    hideLoadingIndicator: function() {
+      $("#parsespinner").addClass("d-none");
+    },
+    reset: function() {
+      this.clearError();
+      this.clearInput();
+      this.hideLoadingIndicator();
+    }
+  };
+
+  /**
+   * Main Controller
+   * 
+   * Responsible for handling page-level actions/events and delegating to controllers 
+   * for further processing and rendering as appropriate.
+   */
+  var mainCtrl = {
+    onClickParse: function(e) {
+      var text = inputTextCtrl.getInputText();
+      console.log("parse text: ", text);
+
+      mainCtrl.clearAnalysis();
+      inputTextCtrl.clearError();
+      inputTextCtrl.showLoadingIndicator();      
+
+      parseService.parse(text).then(function() {
+        parsedTextCtrl.render(parseService.data);
+        textInfoCtrl.render(parseService.data);
+        inputTextCtrl.hideLoadingIndicator();
+        utils.scrollTo("#analysis");
+      }, function(jqXhr, textStatus) {
+        inputTextCtrl.hideLoadingIndicator();
+        inputTextCtrl.error(parseService.error);
+      });
+    },
+    onClickClear: function(e) {
+      mainCtrl.clearAnalysis();
+      inputTextCtrl.reset();
+    },
+    onClickWord: function(e) {
+      var $el = $(e.target);
+      if($el.hasClass("highlight")) {
+        $el.removeClass("highlight");
+        wordInfoCtrl.reset();
+      } else {
+        $(".word.highlight").removeClass("highlight");
+        $el.addClass("highlight");
+        var form_ids = parsedTextCtrl.getElementDataFormIds($el);
+        wordInfoCtrl.render({form_ids: form_ids});
+        wordInfoCtrl.setPosition({top: $el.position().top });
+      }
+      return false;
+    },
+    onClickUnderlineToggle: function(e) {
+      parsedTextCtrl.toggleMultiple();
+    },
+    onClickLemmaToggle: function(e) {
+      parsedTextCtrl.toggleLemmas();
+    },
+    clearAnalysis: function() {
+      parsedTextCtrl.reset();
+      textInfoCtrl.reset();
+      wordInfoCtrl.reset();
+      $("#analysis").addClass("d-none");
+      return this;
+    }
+  };
+
   
+  // Page-level event handlers registered here
   $(document).ready(function() {
-    $(document).on('click', '#parsebtn', utils.logEvent(domCtrl.onClickParse));
-    $(document).on('click', '#clearbtn', utils.logEvent(domCtrl.onClickClear));
-    $(document).on('click', '.underline-toggle', utils.logEvent(domCtrl.onClickUnderlineToggle));
-    $(document).on('click', '.word.parsed', utils.logEvent(domCtrl.onClickWord));  
-    $(document).on('click', '.lemma-toggle', utils.logEvent(domCtrl.onClickLemmaToggle));
+    $(document).on('click', '#parsebtn', utils.logEvent(mainCtrl.onClickParse));
+    $(document).on('click', '#clearbtn', utils.logEvent(mainCtrl.onClickClear));
+    $(document).on('click', '.underline-toggle', utils.logEvent(mainCtrl.onClickUnderlineToggle));
+    $(document).on('click', '.word.parsed', utils.logEvent(mainCtrl.onClickWord));  
+    $(document).on('click', '.lemma-toggle', utils.logEvent(mainCtrl.onClickLemmaToggle));
   });
 
 })(jQuery);
