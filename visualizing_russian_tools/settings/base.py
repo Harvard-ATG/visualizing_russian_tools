@@ -160,7 +160,7 @@ LOGGING = {
         },
         'parser_tool': {
             'handlers': ['console', 'file'],
-            'level': os.getenv('LOG_LEVEL', 'DEBUG'),
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
     }
