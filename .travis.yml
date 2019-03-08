@@ -7,5 +7,5 @@ env:
 install:
 - pipenv install
 script:
-- python manage.py migrate --noinput
-- python manage.py test
+- pipenv run python3 manage.py migrate --noinput
+- pipenv run python3 manage.py test
