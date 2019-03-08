@@ -5,6 +5,7 @@ python:
 env:
 - DJANGO_SETTINGS_MODULE="visualizing_russian_tools.settings.local" BOTO_CONFIG=/dev/null
 install:
+- pip install pipenv
 - pipenv install
 script:
 - pipenv run python3 manage.py migrate --noinput
