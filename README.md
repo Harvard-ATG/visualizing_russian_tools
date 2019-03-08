@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Harvard-ATG/visualizing_russian_tools.svg?branch=master)](https://travis-ci.org/Harvard-ATG/visualizing_russian_tools)
+
 # Visualizing Russian Tools
 
 Visualizing Russian is a suite of web-based tools for language learners, researchers, and teachers. 
