@@ -1,7 +1,7 @@
 import logging
 
-from . import tokenizer
 from clancy_database import lemmatizer
+from . import tokenizer
 
 logger = logging.getLogger(__name__)
 

@@ -7,8 +7,6 @@ from . import tokenizer
 
 logger = logging.getLogger(__name__)
 
-RE_CONSECUTIVE_SPACES = re.compile("[ ]{2,}", flags=re.MULTILINE)
-
 ELEMENT_NODE = 1
 TEXT_NODE = 3
 

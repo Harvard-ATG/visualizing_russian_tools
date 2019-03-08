@@ -32,29 +32,31 @@ class LemmatizeAPIView(View):
 class TextParserAPIView(View):
     MAX_TEXT_LENGTH = 10000
     def post(self, request):
+        # Check request
         if request.content_type != "application/json":
             raise JsonBadRequest("Expected JSON accept or content type header")
+        if len(request.body.decode('utf-8')) > self.MAX_TEXT_LENGTH:
+            raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=self.MAX_TEXT_LENGTH))
+
+        # Parse the JSON
         try:
             text = json.loads(request.body.decode('utf-8'))
         except ValueError:
             raise JsonBadRequest('Invalid JSON')
 
-        # Set upper bound on maximum length of the text
-        if len(text) > self.MAX_TEXT_LENGTH:
-            raise ValueError("Submitted text is too large (maximum {max_text_length:,} characters).".format(max_text_length=self.MAX_TEXT_LENGTH))
-
-        # Parse the submitted text
+        # Process the text
         parsed_data = self._parse(text)
-
-        # Include rendered HTML in the JSON response if requested
         render_html = request.GET.get('html', 'n') != 'n'
         if render_html:
-            parsed_data["html"] = htmlgenerator.tokens2html(tokens=parsed_data["tokens"])
+            parsed_data["html"] = self._tokens2html(parsed_data["tokens"])
 
         return JsonResponse(parsed_data, safe=False)
 
     def _parse(self, text):
         return textparser.parse(text)
+    
+    def _tokens2html(self, tokens):
+        return htmlgenerator.tokens2html(tokens=tokens)
 
 text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())
 lemmatize_api_view = csrf_exempt(LemmatizeAPIView.as_view())
