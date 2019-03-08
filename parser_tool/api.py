@@ -5,12 +5,11 @@ from django.urls import reverse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import json
+import logging
 
 from visualizing_russian_tools.exceptions import JsonBadRequest
-from . import tokenizer, textparser, htmlgenerator
 from clancy_database import lemmatizer
-
-import logging
+from . import tokenizer, textparser, htmlgenerator
 
 logger = logging.getLogger(__name__)
 
