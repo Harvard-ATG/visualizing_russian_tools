@@ -1,8 +1,10 @@
 from .base import *
 
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'VUBevwwnHxXKG3UaGpxac795KpWhsPmCqhZMztCVb6hAZJfRNGhKrFrUd4YPbuYD')
+
 DEBUG = True
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'VUBevwwnHxXKG3UaGpxac795KpWhsPmCqhZMztCVb6hAZJfRNGhKrFrUd4YPbuYD')
+ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {
