@@ -50,20 +50,20 @@ def makelookup(forms=None):
     return table
 
 
-def lemmatize(forms):
+def lemmatize(form):
     """
-    Lemmatizes multiple forms. 
-    Returns a dictionary that maps each form to its lemmatization.
+    Returns the lemma or set of lemmas (if ambiguous) that matches a given form.
     """
-    if isinstance(forms, str):
-        forms = list(forms)
-    queryset = query_multiple(forms)
+    queryset = query_multiple([form])
     queryset = queryset.select_related('lemma').order_by('lemma__level', 'lemma__rank')
-    data = {}
+    lemmas = []
+    seen = set()
     for inflection in queryset:
-        data.setdefault(inflection.form.lower(), []).append(inflection.lemmatize())
-    return data
-
+        lemma_id = inflection.lemma.id
+        if lemma_id not in seen:
+            seen.add(lemma_id)
+            lemmas.append(inflection.lemma.to_dict())
+    return lemmas
 
 def batch(iterable, n=1):
     """

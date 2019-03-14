@@ -16,17 +16,33 @@ logger = logging.getLogger(__name__)
 
 class LemmatizeAPIView(View):
     def get(self, request):
-        word = request.GET.get("word", None)
-        word = tokenizer.canonical(word)
-        data = {}
-        data["result"] = None
-        data["query"] = {"word": word}
-        if word:
-            logger.debug("calling lemmatize with word: %s" % word)
-            lemmatized = lemmatizer.lemmatize([word])
-            logger.debug("after lemmatize: %s" % lemmatized)
-            data["result"] = lemmatized.get(word)
-        return JsonResponse(data, safe=False)
+        status = "success"
+        message_for_status = {
+            "fail": "Missing 'word' query parameter", 
+            "error": "Internal server error"
+        }
+
+        word = request.GET.get("word", "").strip()
+        try:
+            lemmas = []
+            if word:
+                word = tokenizer.canonical(word)
+                lemmas = lemmatizer.lemmatize(word)
+            else:
+                status = "fail" # no word was submitted
+        except Exception as e:
+            logger.exception(e)
+            status = "error"
+
+        result = {"status": status}
+        if status == "success":
+            result["data"] = {"lemmas": lemmas}
+        if status in message_for_status:
+            result["message"] = message_for_status[status]
+
+        logger.debug("lemmatize response data=%s" % result)
+
+        return JsonResponse(result, safe=False)
 
 class TextParserAPIView(View):
     MAX_TEXT_LENGTH = 10000

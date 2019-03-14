@@ -26,7 +26,6 @@ class Lemma(models.Model):
     def to_dict(self):
         data = {
             "id": self.id,
-            "external_id": self.external_id,
             "label": self.lemma,
             "stressed": self.stressed,
             "translation": self.translation,
