@@ -13,8 +13,8 @@ def parse(text):
     # Tokenize and tag the text such that for each token we have: [(word, index, offset, tokentype, canonical_text), ...]
     tokens = tokenizer.tokenize(text)
     tokens = tokenizer.tag(tokens, taggers=[tokenizer.tokentype, tokenizer.canonical])
-    for t in tokens:
-        logger.debug(str(t))
+    #for t in tokens:
+    #    logger.debug(str(t))
 
     # Lemmatize the russian tokens
     unique_canonical_tokens = list(set([token[4] for token in tokens if token[3] == tokenizer.TOKEN_RUS]))
