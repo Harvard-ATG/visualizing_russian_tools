@@ -7,17 +7,35 @@ logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 300
 
+CYRILLIC_SMALL_LETTER_IE= '\u0435' # е
+CYRILLIC_SMALL_LETTER_IO = '\u0451' # ё
+
+def get_variant_forms(form):
+    """
+    Returns a list of alternative forms based on spelling and/or case.
+    Used to match against the database such as when ё is disguised as е.
+    For example, зачёт may be written as зачет, in which case it's understood that the е is really ё.
+    """
+    variant_forms = [form.capitalize(), form.lower()]
+    if CYRILLIC_SMALL_LETTER_IO in form:
+        disguised_io_as_ie_form = form.replace(CYRILLIC_SMALL_LETTER_IO, CYRILLIC_SMALL_LETTER_IE)
+        variant_forms.append(disguised_io_as_ie_form)
+    return variant_forms
+
 def query_multiple(forms):
     """
     Returns a queryset of Inflection objects that match the given forms.
     """
-    # Ensure that we match capitalized forms in the DB for some entries (e.g. России).
-    # Sqlite doesn't work well with the annotated filter, so using this to cheat a bit.
-    # Migrating to postgres should make this hack unnecessary.
-    forms = list(forms) + [s.capitalize() for s in forms] 
-
+    # Construct the forms that should be used for querying purposes (variations on spelling and case)
+    forms_to_query = []
+    for form in forms:
+        for variant_form in get_variant_forms(form):
+            forms_to_query.append(variant_form)
+    
     # Query database for set of matching forms
-    queryset = Inflection.objects.annotate(formlower=Lower('form')).filter(formlower__in=forms)
+    logger.debug("forms_to_query: %s" % forms_to_query)
+    #queryset = Inflection.objects.annotate(formlower=Lower('form')).filter(formlower__in=forms_to_query)
+    queryset = Inflection.objects.filter(form__in=forms_to_query)
     return queryset
 
 def makelookup(forms=None):
@@ -46,6 +64,8 @@ def makelookup(forms=None):
         logger.debug("makelookup(): batch=%s lemmas=%s" % (idx, len(lemma_ids)))
         for lemma in Lemma.objects.filter(id__in=list(lemma_ids)):
             table["lemmas"][lemma.id] = lemma.to_dict()
+    
+    logger.debug("makelookup(): table=%s" % table)
 
     return table
 

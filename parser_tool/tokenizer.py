@@ -164,22 +164,26 @@ def merge_multiwordexpr(tokens):
     # TODO: use trie data structure to detect and merge MWEs
     return tokens
 
-def tag(tokens, taggers=None):
+def tag(tokens):
     """
     Tag tokens with additional information. 
-    Optionally provide callable "taggers" that will be called on each token.
     Returns an array of tuples: [(token1, index1, offset1, ...), (token2, index2, offset2, ...)]
 
-    >>> tag(['Ко', 'двору,'], taggers=[lambda token: token.lower(), lambda token: len(token)])
-    [('Ко', 0, 0, 'ко', 2), ('двору,', 1, 2, 'двору,', 6)]
+    >>> tag(['Ко', 'двору'])
+    [{'token': 'Ко', 'index': 0, 'offset': 0, 'tokentype': 'RUS', 'canonical': 'ко'}, {'token': 'двору', 'index': 1, 'offset': 2, 'tokentype': 'RUS', 'canonical': 'двору'}]
+    >>> tag(['100', '!'])
+    [{'token': '100', 'index': 0, 'offset': 0, 'tokentype': 'NUM', 'canonical': '100'}, {'token': '!', 'index': 1, 'offset': 3, 'tokentype': 'PUNCT', 'canonical': '!'}]
     """
-    if taggers is None:
-        taggers = []
     tagged = []
     offset = 0
     for idx, token in enumerate(tokens):
-        tags = [tagger(token) for tagger in taggers]
-        tagged.append( tuple([token, idx, offset] + tags) )
+        tagged.append({
+            "token": token,
+            "index": idx,
+            "offset": offset,
+            "tokentype": tokentype(token),
+            "canonical": canonical(token)
+        })
         offset += len(token)
     return tagged
 

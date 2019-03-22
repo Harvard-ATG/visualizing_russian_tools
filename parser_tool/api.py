@@ -44,6 +44,7 @@ class LemmatizeAPIView(View):
 
         return JsonResponse(result, safe=False)
 
+
 class TextParserAPIView(View):
     MAX_TEXT_LENGTH = 10000
     def post(self, request):

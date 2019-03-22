@@ -12,44 +12,45 @@ def parse(text):
     """
     # Tokenize and tag the text such that for each token we have: [(word, index, offset, tokentype, canonical_text), ...]
     tokens = tokenizer.tokenize(text)
-    tokens = tokenizer.tag(tokens, taggers=[tokenizer.tokentype, tokenizer.canonical])
-    #for t in tokens:
-    #    logger.debug(str(t))
+    tokens = tokenizer.tag(tokens)
+    for token in tokens:
+        logger.debug(token)
 
     # Lemmatize the russian tokens
-    unique_canonical_tokens = list(set([token[4] for token in tokens if token[3] == tokenizer.TOKEN_RUS]))
+    unique_canonical_tokens = list(set([t['canonical'] for t in tokens if t['tokentype'] == tokenizer.TOKEN_RUS]))
+    logger.debug(unique_canonical_tokens)
     lemmatized = lemmatizer.makelookup(forms=unique_canonical_tokens)
 
     # Associate tokens with form database entries 
-    tokens_with_forms = []
     for token in tokens:
-        (tokentext, tokenidx, tokenoffset, tokentype, tokencanonical) = token
-        token_data = {
-            "token": tokentext, 
-            "index": tokenidx, 
-            "offset": tokenoffset, 
-            "tokentype": tokentype,
-            "canonical": tokencanonical,
-            "form_ids": [],
-            "level": ""
-        }
-        if tokentype == tokenizer.TOKEN_RUS:
-            form_ids = lemmatized["lookup"].get(tokencanonical)
-            if form_ids:
-                form_id = form_ids[0]
-                lemma_id = lemmatized["forms"][form_id]["lemma_id"]
-                lemma = lemmatized["lemmas"][lemma_id]
-                token_data["level"] = lemma["level"]
-                token_data["form_ids"] = form_ids
-                token_data["canonical"] = tokencanonical
-        
-        tokens_with_forms.append(token_data)
+        token["form_ids"] = []
+        token["level"] = ""
+        if token["tokentype"] == tokenizer.TOKEN_RUS:
+            lookup_form = None
+
+            # Get all variations on the canonical form that could have matched the database
+            # and try to find the first variant that is in the lookup table.
+            variant_forms = lemmatizer.get_variant_forms(token["canonical"])
+            for variant_form in variant_forms:
+                if variant_form in lemmatized["lookup"]:
+                    lookup_form = variant_form
+                    break
+            
+            # Perform the lookup and assign attributes to the token
+            if lookup_form is not None:
+                form_ids = lemmatized["lookup"].get(lookup_form)
+                if form_ids:
+                    form_id = form_ids[0]
+                    lemma_id = lemmatized["forms"][form_id]["lemma_id"]
+                    lemma = lemmatized["lemmas"][lemma_id]
+                    token["level"] = lemma["level"]
+                    token["form_ids"] = form_ids
 
     # Aggregate all of the data, such that each token can be mapped to a form entry and by extension a lemma entry
     data = {
         "forms": lemmatized["forms"],
         "lemmas": lemmatized["lemmas"],
-        "tokens": tokens_with_forms,
+        "tokens": tokens,
     }
 
     # Assertion: should be able to produce a copy of the original text from the tokens
