@@ -1,29 +1,37 @@
+#parsed {
+    position: relative;
+    font-size: 18px;
+    line-height: 1.5em;
+    white-space: pre-wrap; /* Note: this seems to help with copy & paste to word... */
+    color: black; /* Ensure that non-word characters (e.g. space and punctuation) is black */
+}
 .word.level1, [data-level='1E'] {
-     color: green;
+    color: green;
 }
 .word.level2, [data-level='2I'] {
-     color: blue;
+    color: blue;
 }
 .word.level3, [data-level='3A'], [data-level='3AU'] {
-     color: #8000ff;
+    color: #8000ff;
 }
 .word.level4, [data-level='4S'], [data-level='4SU'] {
-     color: orange;
+    color: orange;
 }
 .word.level5, [data-level='5U'] {
-     color: orange;
+    color: orange;
 }
 .word.level6, [data-level='6U'] {
-     color: black;
+    color: black;
 }
 .word.masklevel {
     color: inherit !important;
 }
- #parsed {
-     position: relative;
-     font-size: 18px;
-     line-height: 1.5em;
-     white-space: pre-wrap; /* Note: this seems to help with copy & paste to word... */
+.word.parsed:hover {
+    background-color: yellow;
+    cursor: pointer;
+}
+.word.parsed.highlight {
+    background-color: yellow;
 }
 #textinfo {
     font-size: 125%;
@@ -33,30 +41,20 @@
     position: relative;
 }
  .underline {
-     text-decoration: underline;
+    text-decoration: underline;
 }
  .btn-red {
-     background-color: #990000;
-     color: #DEDEDE;
-     font-weight: bold;
+    background-color: #990000;
+    color: #DEDEDE;
+    font-weight: bold;
  }
  .btn-red:hover {
-     background-color: #DEDEDE;
-     color: #990000;
+    background-color: #DEDEDE;
+    color: #990000;
  }
  .btn-red:active {
-     background-color: #DEDEDE;
-     color: #990000;
- }
- .word {
-     color: #333;
-}
- .word.parsed:hover {
-     background-color: yellow;
-     cursor: pointer;
-}
- .word.parsed.highlight {
-     background-color: yellow;
+    background-color: #DEDEDE;
+    color: #990000;
  }
  .numbers {
      color: #990000;
