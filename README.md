@@ -4,6 +4,8 @@
 
 Visualizing Russian is a suite of web-based tools for language learners, researchers, and teachers. 
 
+![Visible Vocabulary](docs/img/visiblevocabulary.png)
+
 ## Getting Started
 
 ```
