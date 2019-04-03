@@ -1,5 +1,6 @@
 import logging
 from django.db.models.functions import Lower
+from operator import itemgetter, attrgetter
 
 from .models import Inflection, Lemma
 
@@ -65,10 +66,28 @@ def makelookup(forms=None):
         for lemma in Lemma.objects.filter(id__in=list(lemma_ids)):
             table["lemmas"][lemma.id] = lemma.to_dict()
     
+    # Sort the lookup so that form IDs are returned in order of level and rank
+    # This is necessary since we didn't sort the forms when we queried the database
+    table["lookup"] = sortlookup(table)
     logger.debug("makelookup(): table=%s" % table)
 
     return table
 
+def sortlookup(table):
+    '''
+    This function sorts the "lookup" dictionary in the table of forms/lemmas so that given a word form, 
+    the matching list of forms are sorted by level (e.g. 1E, 2I, 3A, ...) and then by rank (1.0, 2.0, ...).
+    '''
+    sorted_lookup = {}
+    for word in table["lookup"]:
+        form_tuples = []
+        for form_id in table["lookup"][word]:
+            form = table["forms"][form_id]
+            lemma = table["lemmas"][form["lemma_id"]]
+            form_tuples.append((form_id, lemma["level"], lemma["rank"]))
+        sorted_form_tuples = sorted(form_tuples, key=itemgetter(1,2,0))
+        sorted_lookup[word] = [form_tuple[0] for form_tuple in sorted_form_tuples]
+    return sorted_lookup
 
 def lemmatize(form):
     """
