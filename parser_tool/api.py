@@ -46,7 +46,7 @@ class LemmatizeAPIView(View):
 
 
 class TextParserAPIView(View):
-    MAX_TEXT_LENGTH = 10000
+    MAX_TEXT_LENGTH = 50000
     def post(self, request):
         # Check request
         if request.content_type != "application/json":
