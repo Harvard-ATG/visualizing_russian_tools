@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = 'Import database from SQL dump file.'
 
     def add_arguments(self, parser):
-        default_sql_file = os.path.join(os.path.dirname(clancy_database.__file__), "fixtures", "russian.sql.gz")
+        default_sql_file = os.path.join(os.path.dirname(clancy_database.__file__), "data", "russian.sql.gz")
         parser.add_argument("--sqlfile", required=False, help="Input SQL file.", default=default_sql_file)
         parser.add_argument("--dbfile", required=False, help="Database to load", default=settings.DATABASES['default']['NAME'])
 
