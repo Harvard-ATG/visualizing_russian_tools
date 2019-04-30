@@ -126,14 +126,12 @@ INSERT INTO inflection_type (key, description) VALUES ('VbAdv2', 'secondary verb
 INSERT INTO inflection_type (key, description) VALUES ('Infinitive', 'infinitive');
 -- Noninflected
 INSERT INTO inflection_type (key, description) VALUES ('adverb','adverb');
-INSERT INTO inflection_type (key, description) VALUES ('adverbial adjective', 'adverbial adjective');
+INSERT INTO inflection_type (key, description) VALUES ('adjectival adverb', 'adjectival adverb');
 INSERT INTO inflection_type (key, description) VALUES ('conjunction', 'conjunction');
 INSERT INTO inflection_type (key, description) VALUES ('discourse', 'discourse');
-INSERT INTO inflection_type (key, description) VALUES ('indefinite', 'indefinite');
 INSERT INTO inflection_type (key, description) VALUES ('function', 'function');
 INSERT INTO inflection_type (key, description) VALUES ('miscellaneous', 'miscellaneous');
-INSERT INTO inflection_type (key, description) VALUES ('modal', 'modal');
-INSERT INTO inflection_type (key, description) VALUES ('particle', 'particle');
+INSERT INTO inflection_type (key, description) VALUES ('phrase', 'phrase');
 INSERT INTO inflection_type (key, description) VALUES ('prefix', 'prefix');
 INSERT INTO inflection_type (key, description) VALUES ('preposition', 'preposition');
 INSERT INTO inflection_type (key, description) VALUES ('adjective', 'adjective');

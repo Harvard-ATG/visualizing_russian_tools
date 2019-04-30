@@ -22,14 +22,12 @@ POS = {
     },
     'noninflected': {
         'adv': 'adverb',
-        'advadj': 'adverbial adjective',
+        'adjadv': 'adjectival adverb',
         'conj': 'conjunction',
         'disc': 'discourse',
         'func': 'function',
-        'indef': 'indefinite',
         'misc': 'miscellaneous',
-        'modal': 'modal',
-        'particle': 'particle',
+        'phrase': 'phrase',
         'prefix': 'prefix',
         'prep': 'preposition',
     },
@@ -185,11 +183,13 @@ def insert_inflections(cursor, pk, row, verbose=False):
     inserts = []
 
     if row['POS'] in POS['inflected']:
-        inserts =  handle_inflected_forms(pk, row) # Nouns, Adjectives, Pronouns, Cardinal Numbers
+        inserts =  handle_inflected_forms(pk, row) # Nouns, Adjectives, Pronouns, Cardinal Numbers, etc
     elif row['POS'] in POS['noninflected']:
         inserts =  handle_noninflected_forms(pk, row) # Adverbs, Conjunctions, Particles, etc
     elif row['POS'] == 'verb':
         inserts =  handle_verb_forms(pk, row)
+    else:
+        raise Exception("Unhandled part of speech!")
 
     # If we did not generate any inserts, add a single word entry for the lemma
     if len(inserts) == 0:
@@ -231,6 +231,13 @@ def get_cell_multi_forms(form, stressed=''):
 
     return forms_with_stressed
 
+def has_second_russian(row):
+    if row['POS'] in ('phrase', 'prefix', 'prep', 'num'):
+        return True
+    if row['POS'] == 'conj' and 'mwe' in row['POS_Subtype']:
+        return True
+    return False
+
 def handle_inflected_forms(pk, row):
     inflected = POS['inflected']
     inserts = []
@@ -243,6 +250,9 @@ def handle_inflected_forms(pk, row):
         stressed = row.get('%s_stressed' % colname, '')
         frequency = get_row_freq(row, colname)
         forms_with_stressed = get_cell_multi_forms(form, stressed)
+        if has_second_russian(row):
+            secondary_forms_with_stressed = get_cell_multi_forms(row['SecondRussian'])
+            forms_with_stressed.extend(secondary_forms_with_stressed)
 
         for form, stressed in forms_with_stressed:
             if form+inflection_type not in uniq:
@@ -261,9 +271,9 @@ def handle_noninflected_forms(pk, row):
     stressed = row['Strеssеd_Russiаn']
     frequency = None
     forms_with_stressed = get_cell_multi_forms(form, stressed)
-    #if row['SecondRussian']:
-    #    secondary_forms_with_stressed = get_cell_multi_forms(row['SecondRussian'])
-    #    forms_with_stressed.extend(secondary_forms_with_stressed)
+    if has_second_russian(row):
+        secondary_forms_with_stressed = get_cell_multi_forms(row['SecondRussian'])
+        forms_with_stressed.extend(secondary_forms_with_stressed)
 
     for form, stressed in forms_with_stressed:
         if form+inflection_type not in uniq:
