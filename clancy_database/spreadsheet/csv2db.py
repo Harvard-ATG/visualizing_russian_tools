@@ -261,9 +261,9 @@ def handle_noninflected_forms(pk, row):
     stressed = row['Strеssеd_Russiаn']
     frequency = None
     forms_with_stressed = get_cell_multi_forms(form, stressed)
-    if row['SecondRussian']:
-        secondary_forms_with_stressed = get_cell_multi_forms(row['SecondRussian'])
-        forms_with_stressed.extend(secondary_forms_with_stressed)
+    #if row['SecondRussian']:
+    #    secondary_forms_with_stressed = get_cell_multi_forms(row['SecondRussian'])
+    #    forms_with_stressed.extend(secondary_forms_with_stressed)
 
     for form, stressed in forms_with_stressed:
         if form+inflection_type not in uniq:
