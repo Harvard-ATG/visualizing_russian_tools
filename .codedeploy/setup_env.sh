@@ -2,7 +2,7 @@
 DJANGO_SECRET_KEY=$(aws ssm get-parameter --name /$APPLICATION_NAME/$DEPLOYMENT_GROUP_NAME/django_secret_key --output text --query Parameter.Value --region us-east-1)
 ALLOWED_HOSTS=$(aws ssm get-parameter --name /$APPLICATION_NAME/$DEPLOYMENT_GROUP_NAME/allowed_hosts --output text --query Parameter.Value --region us-east-1)
 SENTRY_DSN=$(aws ssm get-parameter --name /$APPLICATION_NAME/sentry_dsn --output text --query Parameter.Value --region us-east-1)
-SENTRY_ENVIRONMENT=$(aws ssm get-parameter --name /$APPLICATION_NAME/$DEPLOYMENT_GROUP_NAME/sentry_environment --output text --query Parameter.Value --region us-east-1)
+SENTRY_ENVIRONMENT=$DEPLOYMENT_GROUP_NAME
 
 cd /home/ubuntu/sites/visualizing_russian_tools
 echo DJANGO_SETTINGS_MODULE="visualizing_russian_tools.settings.aws" >> .env
