@@ -10,7 +10,7 @@ if 'SENTRY_DSN' in os.environ:
     from sentry_sdk.integrations.django import DjangoIntegration
     sentry_sdk.init(
         dsn=os.environ.get('SENTRY_DSN'),
-        debug=os.environ.get('SENTRY_DEBUG'),
+        debug=bool(os.environ.get('SENTRY_DEBUG')),
         environment=os.environ.get('SENTRY_ENVIRONMENT'),
         integrations=[DjangoIntegration()]
     )
