@@ -4,13 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [requires]
-python_version = "3.6"
+python_version = "3"
 
 [packages]
 django = "*"
 requests = "*"
 django-dotenv = "*"
 gunicorn = "*"
+sentry-sdk = "==0.10.1"
 
 [dev-packages]
 "flake8" = "*"

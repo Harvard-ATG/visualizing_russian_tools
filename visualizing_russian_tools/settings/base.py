@@ -4,6 +4,19 @@ Django settings for visualizing_russian_tools project.
 
 import os
 
+# Initialize Sentry
+import sentry_sdk
+if 'SENTRY_DSN' in os.environ:
+    from sentry_sdk.integrations.django import DjangoIntegration
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN'),
+        debug=os.environ.get('SENTRY_DEBUG'),
+        environment=os.environ.get('SENTRY_ENVIRONMENT'),
+        integrations=[DjangoIntegration()]
+    )
+else:
+    raise RuntimeError("No sentry DSN provided -- cannot track errors")
+
 # Base dir is the project directory containing settings, urlconf, wsgi, etc
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
