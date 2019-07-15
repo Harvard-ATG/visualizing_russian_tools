@@ -3,9 +3,7 @@ language: python
 python:
 - '3.6'
 env:
-- DJANGO_SETTINGS_MODULE="visualizing_russian_tools.settings.local" BOTO_CONFIG=/dev/null
-- SENTRY_DSN=""
-- SENTRY_DEBUG=1
+- DJANGO_SETTINGS_MODULE="visualizing_russian_tools.settings.local" BOTO_CONFIG=/dev/null SENTRY_DSN="" SENTRY_DEBUG=1
 install:
 - pip install pipenv
 - pipenv install
