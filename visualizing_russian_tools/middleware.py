@@ -2,7 +2,7 @@ import json
 import logging
 import traceback
 
-import sentry_sdk.capture_exception
+from sentry_sdk import capture_exception
 
 from django.conf import settings
 from django.http import HttpResponseServerError
@@ -33,7 +33,7 @@ class JsonExceptionMiddleware:
             data = dict(reason=str(exception))
             if settings.DEBUG:
                 data['traceback'] = traceback.format_exc()
-            sentry_sdk.capture_exception(exception)
+            capture_exception(exception)
             response = HttpResponseServerError(json.dumps({"error": data}, indent=4), content_type='application/json')
         return response
  
