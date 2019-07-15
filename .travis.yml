@@ -5,7 +5,7 @@ python:
 env:
 - DJANGO_SETTINGS_MODULE="visualizing_russian_tools.settings.local" BOTO_CONFIG=/dev/null SENTRY_DSN="" SENTRY_DEBUG=1
 install:
-- apt install --only-upgrade libsqlite3-0
+- sudo apt install --only-upgrade libsqlite3-0
 - pip install pipenv
 - pipenv install
 script:
