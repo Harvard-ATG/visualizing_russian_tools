@@ -1,14 +1,15 @@
 import json
 import logging
 import traceback
-import sys
+
+import sentry_sdk.capture_exception
 
 from django.conf import settings
 from django.http import HttpResponseServerError
 
-from .exceptions import JsonBadRequest
 
 logger = logging.getLogger(__name__)
+
 
 class JsonExceptionMiddleware:
     """
@@ -22,7 +23,7 @@ class JsonExceptionMiddleware:
         # Code to be executed for each request before the view (and later middleware) are called.
         logger.debug("%s before get_response" % self.__class__.__name__)
         response = self.get_response(request)
-        logger.debug("%s after get_response (status %s)"  % (self.__class__.__name__, response.status_code))
+        logger.debug("%s after get_response (status %s)" % (self.__class__.__name__, response.status_code))
         return response
 
     def process_exception(self, request, exception):
@@ -32,8 +33,9 @@ class JsonExceptionMiddleware:
             data = dict(reason=str(exception))
             if settings.DEBUG:
                 data['traceback'] = traceback.format_exc()
+            sentry_sdk.capture_exception(exception)
             response = HttpResponseServerError(json.dumps({"error": data}, indent=4), content_type='application/json')
         return response
-    
+ 
     def is_api_call(self, request):
         return request.META.get("CONTENT_TYPE") == "application/json"
