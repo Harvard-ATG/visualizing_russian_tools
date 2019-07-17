@@ -24,6 +24,8 @@ class Lemma(models.Model):
         return "%s [%s:%s] " % (self.lemma, self.pos, self.id, )
     
     def to_dict(self):
+        aspect_counterpart = self.aspect_counterpart.split(";") if self.aspect_counterpart else []
+        aspect_counterpart = [s.strip() for s in aspect_counterpart]
         data = {
             "id": self.id,
             "label": self.lemma,
@@ -36,7 +38,7 @@ class Lemma(models.Model):
             "rank": self.rank,
             "animacy": self.animacy,
             "aspect": self.aspect,
-            "aspect_counterpart": self.aspect_counterpart,
+            "aspect_counterpart": aspect_counterpart,
             "transitivity": self.transitivity,
             "reverse": "",
         }
