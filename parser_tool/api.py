@@ -8,10 +8,89 @@ import json
 import logging
 
 from visualizing_russian_tools.exceptions import JsonBadRequest
-from clancy_database import lemmatizer
+from clancy_database import lemmatizer, queries
 from . import tokenizer, textparser, htmlgenerator
 
 logger = logging.getLogger(__name__)
+
+MAX_TEXT_LENGTH = 50000
+
+
+def get_request_body_json(request):
+        if request.content_type != "application/json":
+            raise JsonBadRequest("Expected JSON accept or content type header")
+        if len(request.body.decode('utf-8')) > MAX_TEXT_LENGTH:
+            raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=MAX_TEXT_LENGTH))
+
+        try:
+            body = json.loads(request.body.decode('utf-8'))
+        except ValueError:
+            raise JsonBadRequest('Invalid JSON')
+        return body
+
+
+class LemmaAPIView(View):
+    def get(self, request):
+        status = "success"
+        message_for_status = {
+            "fail": "Missing 'word' or 'lemma_id' query parameter", 
+            "error": "Internal server error"
+        }
+
+        data = []
+        try:
+            if "word" in request.GET:
+                word = request.GET.get("word", "").strip()
+                data = queries.lookup_lemma_by_word(word)
+            elif "lemma_id" in request.GET:
+                lemma_id = request.GET.get("lemma_id", "").strip()
+                data = queries.lookup_lemma_by_id(lemma_id)
+            else:
+                status = "fail"
+        except Exception as e:
+            logger.exception(e)
+            status = "error"
+
+        result = {"status": status}
+        if status == "success":
+            result["data"] = {"lemmas": data}
+        if status in message_for_status:
+            result["message"] = message_for_status[status]
+
+        logger.debug("lemma response data=%s" % result)
+
+        return JsonResponse(result, safe=False)
+
+
+class TokenizeAPIView(View):
+    def post(self, request):
+        body = get_request_body_json(request)
+        status = "success"
+        message_for_status = {
+            "missing_content": "JSON body must contain an object with 'content' set to a string value",
+            "error": "Internal server error"
+        }
+        tokens = []
+        try:
+            if "content" in body:
+                content = body["content"]
+                tokens = tokenizer.tokenize(content)
+                tokens = tokenizer.tag(tokens)
+            else:
+                status = "missing_content"
+        except Exception as e:
+            logger.exception(e)
+            status = "error"
+
+        result = {"status": status}
+        if status == "success":
+            result["data"] = {"tokens": tokens}
+        if status in message_for_status:
+            result["message"] = message_for_status[status]
+
+        logger.debug("tokenized response data=%s" % result)
+
+        return JsonResponse(result, safe=False)
 
 
 class LemmatizeAPIView(View):
@@ -46,26 +125,12 @@ class LemmatizeAPIView(View):
 
 
 class TextParserAPIView(View):
-    MAX_TEXT_LENGTH = 50000
     def post(self, request):
-        # Check request
-        if request.content_type != "application/json":
-            raise JsonBadRequest("Expected JSON accept or content type header")
-        if len(request.body.decode('utf-8')) > self.MAX_TEXT_LENGTH:
-            raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=self.MAX_TEXT_LENGTH))
-
-        # Parse the JSON
-        try:
-            text = json.loads(request.body.decode('utf-8'))
-        except ValueError:
-            raise JsonBadRequest('Invalid JSON')
-
-        # Process the text
-        parsed_data = self._parse(text)
+        body = get_request_body_json(request)
+        parsed_data = self._parse(body)
         render_html = request.GET.get('html', 'n') != 'n'
         if render_html:
             parsed_data["html"] = self._tokens2html(parsed_data["tokens"])
-
         return JsonResponse(parsed_data, safe=False)
 
     def _parse(self, text):
@@ -76,3 +141,5 @@ class TextParserAPIView(View):
 
 text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())
 lemmatize_api_view = csrf_exempt(LemmatizeAPIView.as_view())
+tokenize_api_view = csrf_exempt(TokenizeAPIView.as_view())
+lemma_api_view = csrf_exempt(LemmaAPIView.as_view())
