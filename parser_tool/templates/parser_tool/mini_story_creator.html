@@ -1,0 +1,38 @@
+{% extends "site_base.html" %}
+{% load staticfiles %}
+
+{% block head_title %}Mini Story Creator{% endblock %}
+{% block body_id %}mini-story-creator-page{% endblock %}
+{% block body_class %}{% endblock %}
+
+{% block extra_style %}
+    {{ block.super }}
+{% endblock %}
+
+{% block extra_script %}
+    <script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
+    <script type="text/javascript" src="{% static 'js/api_client.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/mini_story_creator.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-8">
+        Write text using the target vocabulary:
+        <textarea id="ministorytext" class="form-control" style="min-height:150px;"></textarea>
+        <!--
+        <button type="button" align="left" class="btn btn-lg btn-primary" id="checkstory">Check Vocabulary</button>
+        -->
+        <div id="results"></div>
+    </div>
+    <div class="col-md-4">
+        Enter target vocabulary (one entry per line):
+        <textarea id="ministoryvocab" class="form-control" style="min-height:150px;"></textarea>
+    </div>
+</div>
+{% endblock %}

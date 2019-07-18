@@ -67,17 +67,12 @@ class TokenizeAPIView(View):
         body = get_request_body_json(request)
         status = "success"
         message_for_status = {
-            "missing_content": "JSON body must contain an object with 'content' set to a string value",
             "error": "Internal server error"
         }
         tokens = []
         try:
-            if "content" in body:
-                content = body["content"]
-                tokens = tokenizer.tokenize(content)
-                tokens = tokenizer.tag(tokens)
-            else:
-                status = "missing_content"
+            tokens = tokenizer.tokenize(body)
+            tokens = tokenizer.tag(tokens)
         except Exception as e:
             logger.exception(e)
             status = "error"
@@ -122,7 +117,32 @@ class LemmatizeAPIView(View):
         logger.debug("lemmatize response data=%s" % result)
 
         return JsonResponse(result, safe=False)
+    
+    def post(self, request):
+        body = get_request_body_json(request)
+        status = "success"
+        message_for_status = {
+            "error": "Internal server error"
+        }
+        try:
+            parsed_data = textparser.parse(body)
+        except Exception as e:
+            logger.exception(e)
+            status = "error"
 
+        result = {"status": status}
+        if status == "success":
+            result["data"] = {
+                "lemmas": parsed_data["lemmas"],
+                "forms": parsed_data["forms"],
+                "tokens": parsed_data["tokens"],
+            }
+        if status in message_for_status:
+            result["message"] = message_for_status[status]
+
+        logger.debug("lemmatize response data=%s" % result)
+
+        return JsonResponse(result, safe=False)
 
 class TextParserAPIView(View):
     def post(self, request):

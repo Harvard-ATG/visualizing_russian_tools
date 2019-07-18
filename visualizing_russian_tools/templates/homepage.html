@@ -7,12 +7,24 @@
 {% block nav_class_about %}active{% endblock %}
 
 {% block content %}
-<div class="col-md-12">
-    <div class="card" style="width: 36rem;">
+<div class="row">
+<div class="col-md-4">
+    <div class="card">
+        <div class="card-header">Visible Vocabulary</div>
         <div class="card-body">
             <p class="card-text">Visualize the relative difficulty of a Russian text based on core, foundation, expansion, and specialization vocabulary. Words are colorized according to their level.</p>
-            <a href="{% url 'text_parsing_analysis' %}" class="btn btn-primary">Visible Vocabulary</a>
+            <a href="{% url 'text_parsing_analysis' %}" class="btn btn-primary">Enter Visible Vocabulary</a>
         </div>
     </div>
+</div>
+<div class="col-md-4">
+    <div class="card">
+            <div class="card-header">Mini-story Creator</div>
+        <div class="card-body">
+            <p class="card-text">Enter target vocabulary and then write sentences, a paragraph, a mini-story, etc that uses up that vocabulary.</p>
+            <a href="{% url 'mini_story_creator' %}" class="btn btn-primary">Enter Mini-story Creator</a>
+        </div>
+    </div>
+</div>
 </div>
 {% endblock %}
