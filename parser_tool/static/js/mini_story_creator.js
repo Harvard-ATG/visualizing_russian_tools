@@ -26,10 +26,10 @@
                 var vocab_results = model.check_vocab();
                 console.log(vocab_results);
 
-                $results.html(""); // $results.html(JSON.stringify(results));
-                vocab_results.forEach((result, idx) => {
-                    $results.append(`<div><b>${result.word}</b>: ${result.count}</div>`);
-                });
+                var html_li = vocab_results.map((result, idx) => {
+                    return `<li><b>${result.word}</b>: ${result.count}</li>`;
+                }).join("");
+                $results.html("").html(`<p>Vocabulary used in text:</p><ul>${html_li}</ul>`);
             });
         }
     }
@@ -99,7 +99,7 @@
     }
 
     $(document).ready(function() {
-        $(document).on('change', '#ministorytext,#ministoryvocab', $.debounce( 500, handleStoryChange ));
+        $(document).on('change', '#ministorytext,#ministoryvocab', handleStoryChange );
     });
 
 })(jQuery);
