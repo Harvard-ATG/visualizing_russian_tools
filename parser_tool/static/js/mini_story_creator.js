@@ -19,18 +19,27 @@
         }
 
         checkstory() {
-            var $results = $("#results");
-
             this.lemmatize(this.raw_content).then((res, textStatus, jqXhr) => {
                 var model = new MiniStoryModel(res.data.tokens, res.data.forms, res.data.lemmas, this.raw_vocab);
-                var vocab_results = model.check_vocab();
-                console.log(vocab_results);
-
-                var html_li = vocab_results.map((result, idx) => {
-                    return `<li><b>${result.word}</b>: ${result.count}</li>`;
-                }).join("");
-                $results.html("").html(`<p>Vocabulary used in text:</p><ul>${html_li}</ul>`);
+                this.updateresults(model);
             });
+        }
+
+        updateresults(model) {
+            var vocab_results = model.get_vocab_results();
+            var token_results = model.get_token_results();
+            console.log(vocab_results, token_results);
+
+            var vocab_html_li = vocab_results.map((result, idx) => {
+                return `<li><b>${result.word}</b>: ${result.count}</li>`;
+            }).join("");
+
+            var token_html_li = token_results.map((result, idx) => {
+                return `<li><b>${result.word}</b>: ${result.count}</li>`;
+            }).join("");
+
+            $("#vocab_results").html("").html(`<p>Target vocabulary (${vocab_results.length}) in text:</p><ul>${vocab_html_li}</ul>`);
+            $("#unique_tokens").html("").html(`<p>Unique tokens (${token_results.length}) in text:</p><ul>${token_html_li}</ul>`);
         }
     }
 
@@ -42,7 +51,7 @@
             this.raw_vocab = raw_vocab;
         }
 
-        check_vocab() {
+        get_vocab_results() {
             var token_count = this.get_token_counts();
             var vocab_list = this.get_vocab_list_sorted();
             var vocab_count = {};
@@ -72,8 +81,17 @@
             }).filter(function(s) {
                 return s !== "";
             });
-            vocab_list.sort();
-            return vocab_list;
+            
+            var uniq_vocab_list = [], seen = {}, word;
+            for(var i = 0; i < vocab_list.length; i++) {
+                word = vocab_list[i];
+                if(!seen.hasOwnProperty(word)) {
+                    seen[word] = true;
+                    uniq_vocab_list.push(word);
+                }
+            }
+            uniq_vocab_list.sort();
+            return uniq_vocab_list;
         }
 
         get_token_counts() {
@@ -89,6 +107,20 @@
             }
             return token_count;
         }
+
+        get_token_results() {
+            var token_counts = this.get_token_counts();
+            var results = [];
+            for(var token in token_counts) {
+                if(token_counts.hasOwnProperty(token)) {
+                    results.push({ word: token, count: token_counts[token] });
+                }
+            }
+            results.sort((a, b) => {
+                return a.count - b.count;
+            });
+            return results;
+        }
     }
 
     function handleStoryChange(e) {
@@ -99,7 +131,7 @@
     }
 
     $(document).ready(function() {
-        $(document).on('change', '#ministorytext,#ministoryvocab', handleStoryChange );
+        $(document).on('click', '#checkstory', handleStoryChange );
     });
 
 })(jQuery);
