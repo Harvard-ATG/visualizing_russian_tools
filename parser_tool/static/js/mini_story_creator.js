@@ -130,8 +130,19 @@
         controller.checkstory();
     }
 
+    const debounce = (fn, time) => {
+        let timeout;
+        return function() {
+          const functionCall = () => fn.apply(this, arguments);
+          clearTimeout(timeout);
+          timeout = setTimeout(functionCall, time);
+        }
+      }
+
     $(document).ready(function() {
-        $(document).on('click', '#checkstory', handleStoryChange );
+        var handleStoryChangeDebounced = debounce(handleStoryChange, 200);
+        $(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory',  handleStoryChangeDebounced);
+        $(document).on('click', '#checkstory', handleStoryChangeDebounced);
     });
 
 })(jQuery);
