@@ -125,7 +125,8 @@ class LemmatizeAPIView(View):
             "error": "Internal server error"
         }
         try:
-            parsed_data = textparser.parse(body)
+            text = body.get("text", "")
+            parsed_data = textparser.parse(text)
         except Exception as e:
             logger.exception(e)
             status = "error"
@@ -147,7 +148,8 @@ class LemmatizeAPIView(View):
 class TextParserAPIView(View):
     def post(self, request):
         body = get_request_body_json(request)
-        parsed_data = self._parse(body)
+        text = body.get("text", "")
+        parsed_data = self._parse(text)
         render_html = request.GET.get('html', 'n') != 'n'
         if render_html:
             parsed_data["html"] = self._tokens2html(parsed_data["tokens"])

@@ -22,15 +22,19 @@
 
 {% block content %}
 <div class="row mb-3">
-    <div class="col-md-8">
+    <div class="col-md-6">
         Write text using the target vocabulary:
         <textarea id="ministorytext" class="form-control" style="min-height:200px;"></textarea>
         <button type="button" align="left" class="btn btn-lg btn-primary" id="checkstory">Check Story</button>
 
-        <div id="vocab_results"></div>
-        <div id="unique_tokens"></div>
+        <div class="row mt-3">
+            <div class="col-md-3" id="story_words"></div>
+            <div class="col-md-3" id="story_lemmas"></div>
+            <div class="col-md-3" id="vocab_words"></div>
+            <div class="col-md-3" id="vocab_lemmas"></div>
+        </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         Enter target vocabulary (one entry per line):
         <textarea id="ministoryvocab" class="form-control" style="min-height:200px;"></textarea>
     </div>

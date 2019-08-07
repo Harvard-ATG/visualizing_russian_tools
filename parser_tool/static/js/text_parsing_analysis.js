@@ -43,7 +43,7 @@
         url: this.url,
         dataType: "json",
         contentType: "application/json",
-        data: JSON.stringify(text)
+        data: JSON.stringify({text: text})
       });
 
       var handleSuccess = function(data, textStatus) {
