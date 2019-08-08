@@ -72,10 +72,10 @@
                 .join("");
 
             // Display results 
-            $("#story_words").html(`<h4>Story words (${story_vocab_stats.length}):</h4><ul>${story_vocab_stats_html}</ul>`);
-            $("#story_lemmas").html(`<h4>Story lemmas (${story_lemma_stats.length}):</h4><ul>${story_lemma_stats_html}</ul>`);
-            $("#vocab_words").html(`<h4>Vocabulary words (${vocab_words_intersect_list.length}):</h4><ul>${vocab_words_intersect_list_html}</ul>`);
-            $("#vocab_lemmas").html(`<h4>Vocabulary lemmas (${vocab_lemmas_intersect_list.length}):</h4><ul>${vocab_lemmas_intersect_list_html}</ul>`);
+            $("#story_words").html(`<h5>Story words (${story_vocab_stats.length}):</h5><ul>${story_vocab_stats_html}</ul>`);
+            $("#story_lemmas").html(`<h5>Story lemmas (${story_lemma_stats.length}):</h5><ul>${story_lemma_stats_html}</ul>`);
+            $("#vocab_words").html(`<h5>Vocabulary words (${vocab_words_intersect_list.length}):</h5><ul>${vocab_words_intersect_list_html}</ul>`);
+            $("#vocab_lemmas").html(`<h5>Vocabulary lemmas (${vocab_lemmas_intersect_list.length}):</h5><ul>${vocab_lemmas_intersect_list_html}</ul>`);
         }
 
         _updateVocab(vocab_value) {
