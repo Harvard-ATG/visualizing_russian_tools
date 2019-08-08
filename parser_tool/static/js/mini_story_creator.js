@@ -46,11 +46,9 @@
             });
         }
 
-        //--[DATA]
         // returns a copy of the individual tokens from the lemmatized text
         tokens() {
-            let tokens = this._tokens.slice(0);
-            return tokens;
+            return this._tokens.slice(0);
         }
 
         // returns the words
@@ -67,22 +65,22 @@
 
         // returns the set of unique words in the text
         vocab() {
-            let vocab = unique(this.words());
-            vocab.sort((a, b) => a.localeCompare(b), "ru-RU", {sensitivity: "base", ignorePunctuation: true});
+            let compare_options = {sensitivity: "base", ignorePunctuation: true};
+            let vocab = unique(this.words()).sort((a, b) => a.localeCompare(b), "ru-RU", compare_options);
             return vocab;
         } 
 
         // iterate over each word in the text
-        foreachWord(fn) {
+        forEachWord(fn) {
             let _tokens = this._tokens;
             for(let i = 0, len = _tokens.length; i < len; i++) {
                 if(_tokens[i].tokentype === "RUS") {
-                    fn.call(this, _tokens[i], i, _tokens);
+                    fn.call(this, _tokens[i].token, i, _tokens);
                 }
             }
         }
 
-        // find first index where the word appears
+        // find first index where the word appears in the list of tokens
         indexOf(searchWord, fromIndex) {
             let _tokens = this._tokens;
             fromIndex = parseInt(fromIndex, 10);
@@ -93,7 +91,7 @@
                 return -1;
             }
             for(let i = 0; i < _tokens.length; i++) {
-                let token = _tokens[i];
+                let token = _tokens[i].token;
                 if(token === searchWord) {
                     return i;
                 }
@@ -102,13 +100,25 @@
         }
 
         // lookup the lemmas of a word in the text 
-        lemmasOf(word) {
-           if(this._cache_lemmas_of[word]) {
-                return this._cache_lemmas_of[word]; // returns array of lemmas
-           } 
+        lemmasOf(word, options) {
+            options = options || {};
+            options.sort = options.sort || "rank";
+
+            const compare = {
+                level: (a, b) => parseInt(a.level) - parseInt(b.level),
+                rank: (a, b) => a.rank - b.rank
+            };
+            const compareFn = compare[options.sort];
+            
+            if(this._cache_lemmas_of[word]) {
+                let word_lemmas = this._cache_lemmas_of[word];
+                return word_lemmas.sort(compareFn);
+            } 
+
            let seen = {};
            let word_lemmas = [];
            let word_forms = this.formsOf(word);
+           
            for(let i = 0; i < word_forms.length; i++) {
                 let lemma_id = word_forms[i].lemma_id;
                 let lemma_obj = this._lemmas[lemma_id];
@@ -117,10 +127,10 @@
                     seen[lemma_id] = true;
                 }
            }
-           word_lemmas.sort((a,b) => a.rank - b.rank); // ensure lemmas are in order of most frequent first
 
            this._cache_lemmas_of[word] = word_lemmas;
-           return word_lemmas;
+
+           return word_lemmas.sort(compareFn);
         }
 
         // lookup the forms of a word that matched in the text
@@ -128,46 +138,43 @@
             if(this._cache_forms_of[word]) {
                 return this._cache_forms_of[word];
             }
+
             let word_forms = [];
             let _forms = Object.values(this._forms);
+
             for(let i = 0; i < _forms.length; i++) {
                 let form_obj = _forms[i];
                 if(form_obj.label.localeCompare(word, "ru-RU", {sensitivity: "base", ignorePunctuation: true}) == 0) {
                     word_forms.push(form_obj);
                 }
             }
+
             this._cache_forms_of[word] = word_forms;
+
             return word_forms;
         }
 
         vocab_stats() {
-            // iterate through the tokens and count word forms
             let counter = {};
-            this.foreachWord((token) => {
-                if(!counter.hasOwnProperty(token.token)) {
-                    counter[token.token] = 0;
+            this.forEachWord((word) => {
+                if(!counter.hasOwnProperty(word)) {
+                    counter[word] = 0;
                 }
-                counter[token.token]++;
+                counter[word]++;
             });
 
-            // transform to an array of word counts
-            let stats = [];
-            for(let w in counter) {
-                if(counter.hasOwnProperty(w)) {
-                    stats.push({ word: w, count: counter[w] });
-                }
-            }
-            stats.sort((a,b) => b.count - a.count);
+            let stats = Object.keys(counter)
+                .map((w) => ({word: w, count: counter[w]}))
+                .sort((a, b) => b.count - a.count);
         
             return stats;
         }
 
         lemma_stats() {
-            // iterate through the tokens and count lemmas
             let counter = {};
-            this.foreachWord((token) => {
-                let lemmas = this.lemmasOf(token.token);
-                let lemma = (lemmas.length > 0 ? lemmas[0] : false);
+            this.forEachWord((word) => {
+                let lemma_records = this.lemmasOf(word);
+                let lemma = (lemma_records.length > 0 ? lemma_records[0] : false);
                 if(lemma) {
                     if(!counter.hasOwnProperty(lemma.label)) {
                         counter[lemma.label] = 0;
@@ -176,14 +183,9 @@
                 }
             });
 
-            // transform to an array of word counts
-            let stats = [];
-            for(let w in counter) {
-                if(counter.hasOwnProperty(w)) {
-                    stats.push({ word: w, count: counter[w] });
-                }
-            }
-            stats.sort((a,b) => b.count - a.count);
+            let stats = Object.keys(counter)
+                .map((w) => ({word: w, count: counter[w]}))
+                .sort((a, b) => b.count - a.count);
 
             return stats;
         }
@@ -191,18 +193,86 @@
         // returns the number of times the word appears
         count(word) {
             let count = 0;
-            this.foreachWord((iter_word) => {
-                if(iter_word.localeCompare(word, "ru-RU", {sensitivity: "base"})) {
+            this.forEachWord((iter_word) => {
+                if(iter_word.localeCompare(word, "ru-RU", {sensitivity: "base"}) == 0) {
                     count++;
                 }
             });
             return count;
         } 
 
-        levels(level) {}  // produce an ordered list of level counts [[L1, count], [L2, count], ...]
-        readability(target_level) {}  // produce a readability score for a target_level
+        // returns the lowest level associated with the word or -1 if no level could be assigned
+        levelOf(word) {
+            let lemma_records = this.lemmasOf(word, {sort: "level"});
+            let lemma = (lemma_records.length > 0 ? lemma_records[0] : false);
+            if(lemma) {
+                let level_num = parseInt(lemma.level);
+                return level_num;
+            }
+            return -1;
+        }
 
-        //--[LANGUAGE FEATUERS]
+        // returns an array where the indexes represent the level numbers and the values represent the counts:
+        //      Levels[0] = Count of Unparsed
+        //      Levels[1] = Count at Level 1E
+        //      Levels[2] = Count at Level 2I
+        //      Levels[3] = Count at Level 3A
+        //      Levels[4] = Count at Level 4S
+        levels() {
+            let levels = [];
+            let max_level = 0;
+            let total_words = 0;
+            let total_words_with_level = 0;
+            
+            this.forEachWord((word, index) => {
+                let level_num = this.levelOf(word);
+                if(level_num >= 0) {
+                    if(typeof levels[level_num] == "undefined") {
+                        levels[level_num] = 0;
+                    }
+                    max_level = (level_num > max_level ? level_num : max_level);
+                    levels[level_num]++;
+                    total_words_with_level++;
+                }
+                total_words++;
+            });
+
+            // ensure values up to max level are zeroed out for convenience
+            for(let i = 0; i < max_level; i++) {
+                if(typeof levels[i] == "undefined") {
+                    levels[i] = 0;
+                }
+            }
+
+            // level zero doesn't exist, so use this to report any words that could not be assigned a level
+            levels[0] = total_words - total_words_with_level;
+
+            return levels;
+        }
+
+        // returns an integer between 0-100 representing the precentage of words at the target level
+        readability(target_level) {
+            if(typeof target_level == "undefined" || target_level < 1 || target_level > 4) {
+                target_level = 1;
+            }
+            
+            let words_at_or_below_level = 0;
+            let words_above_level = 0;
+            let levels = this.levels();
+
+            for(let i = 0; i < levels.length; i++) {
+                // TODO: how should we handle unparsed words (e.g. level 0)?
+                if(i <= target_level) {
+                    words_at_or_below_level += levels[i];
+                } else {
+                    words_above_level += levels[i];
+                }
+            }
+
+            let score = Math.round(words_at_or_below_level / (words_at_or_below_level + words_above_level) * 100);
+            return score;
+        }
+
         verbs() {} // produce a list of the verbs
         verb_aspectual_pair(verb) {} // produce the aspectual pair for a given verb
         nouns() {} // produce a list of the nouns
@@ -234,6 +304,9 @@
             let story_words = this.story_text.words();
             let story_lemmas = this.story_text.lemmas();
 
+            console.log("levels", this.story_text.levels());
+            console.log("readability", this.story_text.readability());
+
             this.vocab_text.vocab().forEach((vocab_word) => {
                 if(!vocab_word_usage.hasOwnProperty(vocab_word)) {
                     vocab_word_usage[vocab_word] = 0;
@@ -244,9 +317,9 @@
                     }
                 }
 
-                let vocab_word_lemmas = this.vocab_text.lemmasOf(vocab_word);
-                for(let i = 0; i < vocab_word_lemmas.length; i++) {
-                    let vocab_word_lemma = vocab_word_lemmas[i].label;
+                let vocab_word_lemma_records = this.vocab_text.lemmasOf(vocab_word);
+                for(let i = 0; i < vocab_word_lemma_records.length; i++) {
+                    let vocab_word_lemma = vocab_word_lemma_records[i].label;
                     if(!vocab_lemma_usage.hasOwnProperty(vocab_word_lemma)) {
                         vocab_lemma_usage[vocab_word_lemma] = 0;
                     }
@@ -275,7 +348,6 @@
 
             let story_vocab_stats = this.story_text.vocab_stats();
             let story_vocab_stats_html = story_vocab_stats.map((item, idx) => `<li>${item.word} - ${item.count}</li>`).join("");
-
 
             $("#story_words").html("").html(`<p>Story words (${story_vocab_stats.length}):</p><ul>${story_vocab_stats_html}</ul>`);
             $("#story_lemmas").html("").html(`<p>Story lemmas (${story_lemma_stats.length}):</p><ul>${story_lemma_stats_html}</ul>`);

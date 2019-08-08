@@ -7,6 +7,9 @@
 
 {% block extra_style %}
     {{ block.super }}
+    <style>
+        h2 { color: #777777 }
+    </style>
 {% endblock %}
 
 {% block extra_script %}
@@ -21,22 +24,21 @@
 
 
 {% block content %}
-<div class="row mb-3">
-    <div class="col-md-6">
-        Write text using the target vocabulary:
+<div class="row mb-3" style="background-color: #f7f7f7">
+    <div class="col-md-7 offset-1 mt-3">
+        <h2>Write mini-story using the target vocabulary:</h2>
         <textarea id="ministorytext" class="form-control" style="min-height:200px;"></textarea>
-        <button type="button" align="left" class="btn btn-lg btn-primary" id="checkstory">Check Story</button>
-
-        <div class="row mt-3">
-            <div class="col-md-3" id="story_words"></div>
-            <div class="col-md-3" id="story_lemmas"></div>
-            <div class="col-md-3" id="vocab_words"></div>
-            <div class="col-md-3" id="vocab_lemmas"></div>
-        </div>
+        <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="checkstory">Check Story Vocabulary</button>
     </div>
-    <div class="col-md-3">
-        Enter target vocabulary (one entry per line):
+    <div class="col-md-3 mt-3">
+        <h2>Target vocabulary</h2>
         <textarea id="ministoryvocab" class="form-control" style="min-height:200px;"></textarea>
     </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-2 offset-1" id="story_words"></div>
+    <div class="col-md-2" id="story_lemmas"></div>
+    <div class="col-md-2" id="vocab_words"></div>
+    <div class="col-md-2" id="vocab_lemmas"></div>
 </div>
 {% endblock %}
