@@ -1,4 +1,4 @@
-(function($) {
+(function(global, $) {
     "use strict";
 
     class ApiClient {
@@ -61,6 +61,6 @@
     }
 
     // Exports
-    window.VZR = window.VZR || {};
-    window.VZR.ApiClient = ApiClient;
-})(jQuery);
+    global.app = global.app || {};
+    global.app.ApiClient = ApiClient;
+})(window, jQuery);

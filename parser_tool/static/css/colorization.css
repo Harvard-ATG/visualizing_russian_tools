@@ -1,0 +1,21 @@
+.word.level0, .wordlevel0, [data-level='0'] {
+    color: inherit;
+}
+.word.level1, .wordlevel1, [data-level='1E'] {
+    color: green;
+}
+.word.level2, .wordlevel2, [data-level='2I'] {
+    color: blue;
+}
+.word.level3, .wordlevel3, [data-level='3A'], [data-level='3AU'] {
+    color: #8000ff;
+}
+.word.level4, .wordlevel4, [data-level='4S'], [data-level='4SU'] {
+    color: orange;
+}
+.word.level5, .wordlevel5, [data-level='5U'] {
+    color: orange;
+}
+.word.level6, .wordlevel6, [data-level='6U'] {
+    color: black;
+}

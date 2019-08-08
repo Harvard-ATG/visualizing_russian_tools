@@ -1,4 +1,4 @@
-(function($) {
+(function(global, $) {
   "use strict";
 
   /**
@@ -188,12 +188,12 @@
 
       var html = '<h3 class="wordtitle inline d-block">'+form+'</h3>';
       if(lemmas.length > 0) {
-        html += '<span>Lemma:</span> <span class="numbers">' + lemmas.join(", ") + "</span><br>";
+        html += '<span>Lemma:</span> <span class="textinfoval">' + lemmas.join(", ") + "</span><br>";
       }
-      html += '<span>Parts of Speech:</span> <span class="numbers">' + pos.join(", ") + "</span><br>";
-      html += '<span>Levels:</span> <span class="numbers">' + levels.join(", ") + "</span><br>";
-      html += '<span>Inflections:</span> <span class="numbers">' + types.join(", ") + "</span><br>";
-      html += '<span>Translation:</span> <span class="numbers">' + translations.join(", ") + "</span><br>";
+      html += '<span>Parts of Speech:</span> <span class="textinfoval">' + pos.join(", ") + "</span><br>";
+      html += '<span>Levels:</span> <span class="textinfoval">' + levels.join(", ") + "</span><br>";
+      html += '<span>Inflections:</span> <span class="textinfoval">' + types.join(", ") + "</span><br>";
+      html += '<span>Translation:</span> <span class="textinfoval">' + translations.join(", ") + "</span><br>";
       return html;
     }
   };
@@ -385,4 +385,4 @@
     $(document).on('click', '.lemma-toggle', utils.logEvent(mainCtrl.onClickLemmaToggle));
   });
 
-})(jQuery);
+})(window, jQuery);
