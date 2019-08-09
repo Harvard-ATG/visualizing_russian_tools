@@ -209,7 +209,6 @@
         };
         //$(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory,#showstorywords,#showlevels',  debounce(onUpdate, 500));
         $(document).on('click', '#checkstory', onUpdate);
-        generate_test_story();
     });
 
     function generate_test_story() {
