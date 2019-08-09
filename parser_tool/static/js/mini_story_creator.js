@@ -141,10 +141,10 @@
             ctrl.showlevels = $('#showlevels')[0].checked;
             ctrl.onUpdate(e);
         };
-        //$(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory',  debounce(onUpdate, 500));
+        $(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory,#showstorywords,#showlevels',  debounce(onUpdate, 500));
         $(document).on('click', '#checkstory', onUpdate);
         
-        generate_placeholder_values();
+        //generate_placeholder_values();
     });
 
     function generate_placeholder_values() {
