@@ -24,6 +24,10 @@
             this.showstorywords = false;
         }
 
+        onError(e) {
+            $("#ministoryerror").show().html("An error occurred. Particulars: "+String(e));
+        }
+
         onUpdate(e) {
             const vocab_value = document.getElementById("ministoryvocab").value.trim();
             const story_value = document.getElementById("ministorytext").value.trim();
@@ -36,9 +40,22 @@
         }
 
         executeTask(fn) {
-            $("#processing_indicator").show();
+            let before_task = () => {
+                $("#ministoryerror").hide();
+                $("#processing_indicator").show();
+            };
+            let after_task = () => {
+                $("#ministoryerror").hide();
+                $("#processing_indicator").hide();
+            };
+
+            before_task();
             let promise = fn.apply(this, arguments);
-            promise.then(() => $("#processing_indicator").hide());
+            promise.then(after_task).catch((e) => {
+                after_task();
+                return this.onError(e)
+            });
+
             return promise;
         }
 
@@ -146,17 +163,20 @@
     $(document).ready(function() {
         const ctrl = new MiniStoryController();
         const onUpdate = (e) => {
-            ctrl.showstorywords = $('#showstorywords')[0].checked;
-            ctrl.showlevels = $('#showlevels')[0].checked;
-            ctrl.onUpdate(e);
+            try {
+                ctrl.showstorywords = $('#showstorywords')[0].checked;
+                ctrl.showlevels = $('#showlevels')[0].checked;
+                ctrl.onUpdate(e);
+            } catch(e) {
+                console.error(e);
+                alert("Error: "+String(e));
+            }
         };
         //$(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory,#showstorywords,#showlevels',  debounce(onUpdate, 500));
         $(document).on('click', '#checkstory', onUpdate);
-        
-        //generate_placeholder_values();
     });
 
-    function generate_placeholder_values() {
+    function generate_test_story() {
         const story = `
 Мы ждали на автобусном остановке. Мы здесь ждем каждый день, потому что мы ездим на работу на автобусе. Вчера я был на работе, а Лена была дома. Я работал весь день, потом поехал домой. Я всегда езжу на автобусе. Лена иногда ходит пешком на работу или ездит на велосипеде. 
 `;
@@ -173,5 +193,7 @@
     document.getElementById("ministorytext").value = story.trim();
     document.getElementById("ministoryvocab").value = vocab.trim();
     }
+
+    global.generate_test_story = generate_test_story;
 
 })(window, jQuery);
