@@ -22,6 +22,7 @@
             this.story_value = "";
             this.showlevels = false;
             this.showstorywords = false;
+            this.showstorytext = false;
         }
 
         onError(e) {
@@ -63,6 +64,7 @@
             this._renderStoryWords();
             this._renderStoryLemmas();
             this._renderTargetLemmas();
+            this._renderStoryText();
         }
 
         _renderStoryWords() {
@@ -78,10 +80,12 @@
 
             $("#story_words").show().html(`
                 <h5>Story words (${story_vocab_stats.length}):</h5>
+                <div class="table-responsive">
                 <table class="table">
-                    <thead><tr><th>Word</th><th>Count</th></tr></thead>
+                    <thead class="thead-light"><tr><th>Word</th><th>Count</th></tr></thead>
                     ${story_vocab_stats_html}
-                </table>`);
+                </table>
+                </div>`);
 
             if(story_vocab_stats.length > 0) {
                 sorttable.makeSortable(document.querySelector("#story_words table"));
@@ -91,6 +95,7 @@
         _renderStoryLemmas() {
             // Collect story lemma statistics
             let story_lemma_stats = this.story_text.lemma_stats();
+
             let story_lemma_stats_html = story_lemma_stats.map((item, idx) => {
                 let words = Object.keys(item.words).map(w => {
                     if(item.words[w] > 1) {
@@ -103,10 +108,12 @@
 
             $("#story_lemmas").html(`
                 <h5>Story lemmas (${story_lemma_stats.length}):</h5>
+                <div class="table-responsive">
                 <table class="sortable table">
-                    <thead><tr><th>Lemma</th><th>Forms <small>(in order of appearance)</small></th><th>Count</th></tr></thead>
+                    <thead class="thead-light"><tr><th>Lemma</th><th>Forms <small>(in order of appearance)</small></th><th>Count</th></tr></thead>
                     ${story_lemma_stats_html}
-                </table>`);
+                </table>
+                </div>`);
 
             if(story_lemma_stats.length > 0) {
                 sorttable.makeSortable(document.querySelector("#story_lemmas table"));
@@ -136,14 +143,41 @@
             
             $("#target_lemmas").html(`
                 <h5>Target lemmas (${vocab_lemmas_intersect_list.length}):</h5>
+                <div class="table-responsive">
                 <table class="sortable table">
-                    <thead><tr><th>Word</th><th>Used in story?</th></tr></thead>
+                    <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
                     ${vocab_lemmas_intersect_list_html}
-                </table>`);
+                </table>
+                </div>`);
             
             if(vocab_lemmas_intersect_list.length > 0) {
                 sorttable.makeSortable(document.querySelector("#target_lemmas table"));
             }
+        }
+
+        _renderStoryText() {
+            if(!this.showstorytext) {
+                return $("#story_text_output").hide();
+            }
+
+            let html = this.story_text.mapTokens((token, tokentype, index) => {
+                let output = token;
+                if(tokentype == "RUS") {
+                    let level = this.story_text.levelOf(token);
+                    let words = this.story_text.lemmasOf(token).map((word) => word.label);
+                    let found = this.vocab_text.containsLemmas(words);
+                    if(found) {
+                        output = `<b>${token}</b>`;
+                    }
+                    if(this.showlevels) {
+                        output = `<span class="wordlevel${level}">${output}</span>`;
+                    }
+                } else {
+                    output = output.replace(/\n/g, '<br>');
+                }
+                return output;
+            });
+            $("#story_text_output").show().html(html);
         }
 
         _updateVocab(vocab_value) {
@@ -166,6 +200,7 @@
             try {
                 ctrl.showstorywords = $('#showstorywords')[0].checked;
                 ctrl.showlevels = $('#showlevels')[0].checked;
+                ctrl.showstorytext = $("#showstorytext")[0].checked;
                 ctrl.onUpdate(e);
             } catch(e) {
                 console.error(e);
@@ -174,6 +209,7 @@
         };
         //$(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory,#showstorywords,#showlevels',  debounce(onUpdate, 500));
         $(document).on('click', '#checkstory', onUpdate);
+        generate_test_story();
     });
 
     function generate_test_story() {

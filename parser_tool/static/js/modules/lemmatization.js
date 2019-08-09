@@ -72,6 +72,17 @@
             }
         }
 
+        // map over each token in the text
+        mapTokens(fn) {
+            let results = [];
+            let _tokens = this._tokens;
+            for(let i = 0, len = _tokens.length; i < len; i++) {
+                let result = fn.call(this, _tokens[i].token, _tokens[i].tokentype, i, _tokens);
+                results.push(result);
+            }
+            return results;
+        }
+
         // find first index where the word appears in the list of tokens
         indexOf(searchWord, fromIndex) {
             let _tokens = this._tokens;
@@ -180,6 +191,15 @@
             let first_letter = forms[0].label.charAt(0);
             let is_capitalized = (first_letter === first_letter.toUpperCase());
             return is_capitalized;
+        }
+
+        // Returns true if the lemmas are represented in the text, false otherwise.
+        containsLemmas(lemmas) {
+            for(let i = 0, len = lemmas.length; i < len; i++) {
+                let matching_lemmas = this.lemmasOf(lemmas[i]);
+                return matching_lemmas.length > 0;
+            }
+            return false;
         }
 
         // returns the total number of times each word appears in the text
@@ -376,25 +396,25 @@
 
         // Returns list of lemmas in TextA that are also in TextB
         intersect_lemmas() {
-            let intersect = this._compare_lemmas();
+            let intersect = this.compare_lemmas();
             return Object.keys(intersect).filter(o => intersect[o]);
         }
 
         // Returns list of vocab in TextA that are also in TextB
         intersect_vocab() {
-            let intersect = this._intersect_vocab();
+            let intersect = this.compare_vocab();
             return Object.keys(intersect).filter(o => intersect[o]);
         }
 
         // Returns the set of vocabulary words in TextA that are NOT in TextB
         diff_vocab() {
-            let intersect = this._compare_vocab();
+            let intersect = this.compare_vocab();
             return Object.keys(intersect).filter(o => intersect[o] == 0);
         }
 
         // Returns the set of lemmas in TextA that are NOT in TextB
         diff_lemmas() {
-            let intersect = this._compare_lemmas();
+            let intersect = this.compare_lemmas();
             return Object.keys(intersect).filter(o => intersect[o] == false);
         }
     }
