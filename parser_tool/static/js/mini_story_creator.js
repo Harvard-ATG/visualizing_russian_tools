@@ -65,7 +65,10 @@
                     <thead><tr><th>Word</th><th>Count</th></tr></thead>
                     ${story_vocab_stats_html}
                 </table>`);
-            sorttable.makeSortable(document.querySelector("#story_words table"));
+
+            if(story_vocab_stats.length > 0) {
+                sorttable.makeSortable(document.querySelector("#story_words table"));
+            }
         }
 
         _renderStoryLemmas() {
@@ -87,7 +90,10 @@
                     <thead><tr><th>Lemma</th><th>Forms <small>(in order of appearance)</small></th><th>Count</th></tr></thead>
                     ${story_lemma_stats_html}
                 </table>`);
+
+            if(story_lemma_stats.length > 0) {
                 sorttable.makeSortable(document.querySelector("#story_lemmas table"));
+            }
         }
 
         _renderTargetLemmas() {
@@ -117,7 +123,10 @@
                     <thead><tr><th>Word</th><th>Used in story?</th></tr></thead>
                     ${vocab_lemmas_intersect_list_html}
                 </table>`);
-            sorttable.makeSortable(document.querySelector("#target_lemmas table"));
+            
+            if(vocab_lemmas_intersect_list.length > 0) {
+                sorttable.makeSortable(document.querySelector("#target_lemmas table"));
+            }
         }
 
         _updateVocab(vocab_value) {
@@ -141,7 +150,7 @@
             ctrl.showlevels = $('#showlevels')[0].checked;
             ctrl.onUpdate(e);
         };
-        $(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory,#showstorywords,#showlevels',  debounce(onUpdate, 500));
+        //$(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory,#showstorywords,#showlevels',  debounce(onUpdate, 500));
         $(document).on('click', '#checkstory', onUpdate);
         
         //generate_placeholder_values();
