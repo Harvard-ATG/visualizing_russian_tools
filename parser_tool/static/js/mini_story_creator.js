@@ -69,19 +69,22 @@
 
         _renderStoryWords() {
             // Show list of story words if it's enabled
-            if(!this.showstorywords) {
-                return $("#story_words").hide();
+            if(this.showstorywords) {
+                $("#story_words").show();
+            } else {
+                $("#story_words").hide();
+                return;
             }
 
             let story_vocab_stats = this.story_text.vocab_stats();
             let story_vocab_stats_html = story_vocab_stats
                 .map((item, idx) => `<tr class="wordlevel${this.showlevels ? this.story_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${item.count}</td></tr>`)
                 .join("");
-
-            $("#story_words").show().html(`
+            
+            $("#story_words").html(`
                 <h5>Story words (${story_vocab_stats.length}):</h5>
                 <div class="table-responsive">
-                <table class="table">
+                <table class="table table-sm">
                     <thead class="thead-light"><tr><th>Word</th><th>Count</th></tr></thead>
                     ${story_vocab_stats_html}
                 </table>
@@ -109,7 +112,7 @@
             $("#story_lemmas").html(`
                 <h5>Story lemmas (${story_lemma_stats.length}):</h5>
                 <div class="table-responsive">
-                <table class="sortable table">
+                <table class="sortable table table-sm">
                     <thead class="thead-light"><tr><th>Lemma</th><th>Forms <small>(in order of appearance)</small></th><th>Count</th></tr></thead>
                     ${story_lemma_stats_html}
                 </table>
@@ -144,7 +147,7 @@
             $("#target_lemmas").html(`
                 <h5>Target lemmas (${vocab_lemmas_intersect_list.length}):</h5>
                 <div class="table-responsive">
-                <table class="sortable table">
+                <table class="sortable table table-sm">
                     <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
                     ${vocab_lemmas_intersect_list_html}
                 </table>
