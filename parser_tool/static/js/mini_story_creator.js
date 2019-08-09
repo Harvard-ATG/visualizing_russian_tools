@@ -4,6 +4,7 @@
     // Imports
     const LemmatizedText = global.app.LemmatizedText;
     const LemmatizedTextCompare = global.app.LemmatizedTextCompare;
+    const sorttable = global.sorttable; // sorttable.js library (https://kryogenix.org/code/browser/sorttable/)
 
     const debounce = (fn, time) => {
         let timeout;
@@ -19,63 +20,94 @@
         constructor() {
             this.vocab_value = "";
             this.story_value = "";
-            this.colorize = false;
+            this.showlevels = false;
+            this.showstorywords = false;
         }
 
         onUpdate(e) {
             const vocab_value = document.getElementById("ministoryvocab").value.trim();
             const story_value = document.getElementById("ministorytext").value.trim();
             
-            let p1 = this._updateVocab(vocab_value);
-            let p2 = this._updateStory(story_value);
-
-            this.executeLongRunningProcess(() => {
-                return Promise.all([p1,p2]).then(() => this._update());
+            this.executeTask(() => {
+                let p1 = this._updateVocab(vocab_value);
+                let p2 = this._updateStory(story_value);
+                return Promise.all([p1,p2]).then(() => this.render());
             });
-            
         }
 
-        executeLongRunningProcess(fn) {
+        executeTask(fn) {
             $("#processing_indicator").show();
-            fn.apply(this, arguments).then(() => $("#processing_indicator").hide());
+            let promise = fn.apply(this, arguments);
+            promise.then(() => $("#processing_indicator").hide());
+            return promise;
         }
 
-        _update() {
-            // Describe story vocabulary and lemmas 
+        render() {
+            this._renderStoryWords();
+            this._renderStoryLemmas();
+            this._renderTargetLemmas();
+        }
+
+        _renderStoryWords() {
+            // Show list of story words if it's enabled
+            if(!this.showstorywords) {
+                return $("#story_words").hide();
+            }
+
             let story_vocab_stats = this.story_text.vocab_stats();
             let story_vocab_stats_html = story_vocab_stats
-                .map((item, idx) => `<li class="wordlevel${this.colorize ? this.story_text.levelOf(item.word) : 0}">${item.word} - ${item.count}</li>`)
+                .map((item, idx) => `<tr class="wordlevel${this.showlevels ? this.story_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${item.count}</td></tr>`)
                 .join("");
 
+            $("#story_words").show().html(`
+                <h5>Story words (${story_vocab_stats.length}):</h5>
+                <table class="table">
+                    <thead><tr><th>Word</th><th>Count</th></tr></thead>
+                    ${story_vocab_stats_html}
+                </table>`);
+            sorttable.makeSortable(document.querySelector("#story_words table"));
+        }
+
+        _renderStoryLemmas() {
+            // Collect story lemma statistics
             let story_lemma_stats = this.story_text.lemma_stats();
-            let story_lemma_stats_html = story_lemma_stats
-                .map((item, idx) => `<li class="wordlevel${this.colorize ? this.story_text.levelOf(item.word) : 0}">${item.word} - ${item.count}</li>`)
-                .join("");
+            let story_lemma_stats_html = story_lemma_stats.map((item, idx) => {
+                let words = Object.keys(item.words).map(w => {
+                    if(item.words[w] > 1) {
+                        return w + `(×${item.words[w]})`;
+                    }
+                    return w;
+                }).join(", ");
+                return `<tr class="wordlevel${this.showlevels ? this.story_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td></tr>`
+            }).join("");
 
-            // Compare target vocabulary and lemmas against the story
+            $("#story_lemmas").html(`
+                <h5>Story lemmas (${story_lemma_stats.length}):</h5>
+                <table class="sortable table">
+                    <thead><tr><th>Lemma</th><th>Forms <small>(in order of appearance)</small></th><th>Count</th></tr></thead>
+                    ${story_lemma_stats_html}
+                </table>`);
+                sorttable.makeSortable(document.querySelector("#story_lemmas table"));
+        }
+
+        _renderTargetLemmas() {
+            // Compare target vocabulary against the story
             let text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
             let vocab_lemmas_intersect = text_compare.intersect_lemmas();
-            let vocab_words_intersect = text_compare.intersect_vocab();
-
             let vocab_lemmas_intersect_list = Object.keys(vocab_lemmas_intersect)
                 .map((w) => ({word: w, count: vocab_lemmas_intersect[w]}))
                 .sort((a,b) => b.count - a.count);
             let vocab_lemmas_intersect_list_html = vocab_lemmas_intersect_list
-                .map((item, idx) => `<li class="wordlevel${this.colorize ? this.vocab_text.levelOf(item.word) : 0}">${item.word} - ${item.count}</li>`)
+                .map((item, idx) => `<tr class="wordlevel${this.showlevels ? this.vocab_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${item.count}</td></tr>`)
                 .join("");
-
-            let vocab_words_intersect_list = Object.keys(vocab_words_intersect)
-                .map((w) => ({word: w, count: vocab_words_intersect[w]}))
-                .sort((a,b) => b.count - a.count);
-            let vocab_words_intersect_list_html = vocab_words_intersect_list
-                .map((item, idx) => `<li class="wordlevel${this.colorize ? this.vocab_text.levelOf(item.word) : 0}">${item.word} - ${item.count}</li>`)
-                .join("");
-
-            // Display results 
-            $("#story_words").html(`<h5>Story words (${story_vocab_stats.length}):</h5><ul>${story_vocab_stats_html}</ul>`);
-            $("#story_lemmas").html(`<h5>Story lemmas (${story_lemma_stats.length}):</h5><ul>${story_lemma_stats_html}</ul>`);
-            $("#target_words").html(`<h5>Target words (${vocab_words_intersect_list.length}):</h5><ul>${vocab_words_intersect_list_html}</ul>`);
-            $("#target_lemmas").html(`<h5>Target lemmas (${vocab_lemmas_intersect_list.length}):</h5><ul>${vocab_lemmas_intersect_list_html}</ul>`);
+            
+            $("#target_lemmas").html(`
+                <h5>Target lemmas (${vocab_lemmas_intersect_list.length}):</h5>
+                <table class="sortable table">
+                    <thead><tr><th>Word</th><th>Count</th></tr></thead>
+                    ${vocab_lemmas_intersect_list_html}
+                </table>`);
+            sorttable.makeSortable(document.querySelector("#target_lemmas table"));
         }
 
         _updateVocab(vocab_value) {
@@ -95,28 +127,28 @@
     $(document).ready(function() {
         const ctrl = new MiniStoryController();
         const onUpdate = (e) => {
-            ctrl.colorize = $('#colorizeoutput')[0].checked;
+            ctrl.showstorywords = $('#showstorywords')[0].checked;
+            ctrl.showlevels = $('#showlevels')[0].checked;
             ctrl.onUpdate(e);
         };
         //$(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory',  debounce(onUpdate, 500));
         $(document).on('click', '#checkstory', onUpdate);
         
-        //generate_test_story_and_vocab();
+        generate_placeholder_values();
     });
 
-    function generate_test_story_and_vocab() {
+    function generate_placeholder_values() {
         const story = `
-Все смешалось в доме Облонских. Жена узнала, что муж был в связи с бывшею в их доме француженкою-гувернанткой, и объявила мужу, что не может жить с ним в одном доме. Положение это продолжалось уже третий день и мучительно чувствовалось и самими супругами, и всеми членами семьи, и домочадцами. Все члены семьи и домочадцы чувствовали, что нет смысла в их сожительстве и что на каждом постоялом дворе случайно сошедшиеся люди более связаны между собой, чем они, члены семьи и домочадцы Облонских. Жена не выходила из своих комнат, мужа третий день не было дома. Дети бегали по всему дому, как потерянные; англичанка поссорилась с экономкой и написала записку приятельнице, прося приискать ей новое место; повар ушел вчера со двора, во время самого обеда; черная кухарка и кучер просили расчета.
-На третий день после ссоры князь Степан Аркадьич Облонский — Стива, как его звали в свете, — в обычный час, то есть в восемь часов утра, проснулся не в спальне жены, а в своем кабинете, на сафьянном диване. Он повернул свое полное, выхоленное тело на пружинах дивана, как бы желая опять заснуть надолго, с другой стороны крепко обнял подушку и прижался к ней щекой; но вдруг вскочил, сел на диван и открыл глаза.
-«Да, да, как это было? — думал он, вспоминая сон. — Да, как это было? Да! Алабин давал обед в Дармштадте; нет, не в Дармштадте, а что-то американское. Да, но там Дармштадт был в Америке. Да, Алабин давал обед на стеклянных столах, да, — и столы пели: Il mio tesoro 1 и не Il mio tesoro, а что-то лучше, и какие-то маленькие графинчики, и они же женщины», — вспоминал он.
+Мы ждали на автобусном остановке. Мы здесь ждем каждый день, потому что мы ездим на работу на автобусе. Вчера я был на работе, а Лена была дома. Я работал весь день, потом поехал домой. Я всегда езжу на автобусе. Лена иногда ходит пешком на работу или ездит на велосипеде. 
 `;
+
         const vocab = `
-американское
-Да
-но
-Дармштадте
-члены
-его
+ждать
+ездить
+быть
+потом
+работа
+пешком
 `;
 
     document.getElementById("ministorytext").value = story.trim();

@@ -162,10 +162,33 @@
             return word_forms;
         }
 
+        // returns true if the form is intended to be capitalized (e.g. proper name)
+        isCapitalized(word) {
+            let forms = this.formsOf(word);
+            if(forms.length == 0) {
+                return false;
+            }
+            forms.sort((a, b) => {
+                if(a.label < b.label) {
+                    return -1;
+                } else if(a.label == b.label) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            });
+            let first_letter = forms[0].label.charAt(0);
+            let is_capitalized = (first_letter === first_letter.toUpperCase());
+            return is_capitalized;
+        }
+
         // returns the total number of times each word appears in the text
         vocab_stats() {
             let counter = {};
             this.forEachWord((word) => {
+                if(!this.isCapitalized(word)) {
+                    word = word.toLowerCase();
+                }
                 if(!counter.hasOwnProperty(word)) {
                     counter[word] = 0;
                 }
@@ -185,18 +208,23 @@
         lemma_stats() {
             let counter = {};
             this.forEachWord((word) => {
+                let word_normalized = word.toLowerCase();
                 let lemma_records = this.lemmasOf(word, {"sort": "rank"});
                 let lemma = (lemma_records.length > 0 ? lemma_records[0] : false);
                 if(lemma) {
                     if(!counter.hasOwnProperty(lemma.label)) {
-                        counter[lemma.label] = 0;
+                        counter[lemma.label] = {count: 0, words: {}};
                     }
-                    counter[lemma.label]++
+                    counter[lemma.label].count++
+                    if(!counter[lemma.label].words.hasOwnProperty(word_normalized)) {
+                        counter[lemma.label].words[word_normalized] = 0;
+                    }
+                    counter[lemma.label].words[word_normalized]++;
                 }
             });
 
             let stats = Object.keys(counter)
-                .map((w) => ({word: w, count: counter[w]}))
+                .map((w) => ({word: w, count: counter[w].count, words: counter[w].words}))
                 .sort((a, b) => b.count - a.count);
 
             return stats;
