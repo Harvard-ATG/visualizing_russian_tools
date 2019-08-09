@@ -184,19 +184,19 @@
         }
 
         _updateVocab(vocab_value) {
-            this.vocab_value = vocab_value;
             if(this.vocab_value === vocab_value && this.vocab_text) {
-                return Promise.resolve(); // no changes, so we can reuse the lemmatized text
+                return Promise.resolve(); 
             }
+            this.vocab_value = vocab_value;
             return LemmatizedText.asyncFromString(vocab_value).then((vocab_text) => {
                 this.vocab_text = vocab_text;
             });
         }
         _updateStory(story_value) {
-            this.story_value = story_value;
             if(this.story_value === story_value && this.story_text) {
-                return Promise.resolve(); // no changes, so we can reuse the lemmatized text
+                return Promise.resolve(); 
             }
+            this.story_value = story_value;
             return LemmatizedText.asyncFromString(story_value).then((story_text) => {
                 this.story_text = story_text;
             });
