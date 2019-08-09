@@ -93,18 +93,28 @@
         _renderTargetLemmas() {
             // Compare target vocabulary against the story
             let text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
-            let vocab_lemmas_intersect = text_compare.intersect_lemmas();
+            let vocab_lemmas_intersect = text_compare.compare_lemmas();
             let vocab_lemmas_intersect_list = Object.keys(vocab_lemmas_intersect)
-                .map((w) => ({word: w, count: vocab_lemmas_intersect[w]}))
-                .sort((a,b) => b.count - a.count);
+                .map((w) => ({word: w, intersects: vocab_lemmas_intersect[w]}))
+                .sort((a,b) => {
+                    if(a.intersects && b.intersects) {
+                        return a.word - b.word;
+                    } else if(a.intersects && !b.intersects) {
+                        return -1;
+                    } else if(!a.intersects && b.intersects) {
+                        return 1;
+                    } else {
+                        return a.word - b.word;
+                    }
+                });
             let vocab_lemmas_intersect_list_html = vocab_lemmas_intersect_list
-                .map((item, idx) => `<tr class="wordlevel${this.showlevels ? this.vocab_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${item.count}</td></tr>`)
+                .map((item, idx) => `<tr class="wordlevel${this.showlevels ? this.vocab_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`)
                 .join("");
             
             $("#target_lemmas").html(`
                 <h5>Target lemmas (${vocab_lemmas_intersect_list.length}):</h5>
                 <table class="sortable table">
-                    <thead><tr><th>Word</th><th>Count</th></tr></thead>
+                    <thead><tr><th>Word</th><th>Used in story?</th></tr></thead>
                     ${vocab_lemmas_intersect_list_html}
                 </table>`);
             sorttable.makeSortable(document.querySelector("#target_lemmas table"));
