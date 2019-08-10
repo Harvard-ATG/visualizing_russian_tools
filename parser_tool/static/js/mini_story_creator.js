@@ -26,6 +26,7 @@
         }
 
         onError(e) {
+            console.error(e);
             $("#ministoryerror").show().html("An error occurred. Particulars: "+String(e));
         }
 
@@ -126,34 +127,21 @@
         _renderTargetLemmas() {
             // Compare target vocabulary against the story
             let text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
-            let vocab_lemmas_intersect = text_compare.compare_lemmas();
-            let vocab_lemmas_intersect_list = Object.keys(vocab_lemmas_intersect)
-                .map((w) => ({word: w, intersects: vocab_lemmas_intersect[w]}))
-                .sort((a,b) => {
-                    if(a.intersects && b.intersects) {
-                        return a.word - b.word;
-                    } else if(a.intersects && !b.intersects) {
-                        return -1;
-                    } else if(!a.intersects && b.intersects) {
-                        return 1;
-                    } else {
-                        return a.word - b.word;
-                    }
-                });
-            let vocab_lemmas_intersect_list_html = vocab_lemmas_intersect_list
+            let vocab_lemmas = text_compare.leftjoin("lemmas");
+            let vocab_lemmas_html = vocab_lemmas
                 .map((item, idx) => `<tr class="wordlevel${this.showlevels ? this.vocab_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`)
                 .join("");
             
             $("#target_lemmas").html(`
-                <h5>Target lemmas (${vocab_lemmas_intersect_list.length}):</h5>
+                <h5>Target lemmas (${vocab_lemmas.length}):</h5>
                 <div class="table-responsive">
                 <table class="sortable table table-sm">
                     <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
-                    ${vocab_lemmas_intersect_list_html}
+                    ${vocab_lemmas_html}
                 </table>
                 </div>`);
             
-            if(vocab_lemmas_intersect_list.length > 0) {
+            if(vocab_lemmas.length > 0) {
                 sorttable.makeSortable(document.querySelector("#target_lemmas table"));
             }
         }

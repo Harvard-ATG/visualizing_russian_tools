@@ -346,7 +346,7 @@
 
         // Returns a dict showing for each lemma in TextA, whether it is also in TextB.
         //      {lemma1:true, lemma2:false, ...}
-        compare_lemmas() {
+        intersect_lemmas() {
             let intersect = {};
             let text_a_vocab = this.text_a.vocab();
             let text_b_lemmas = this.text_b.lemmas();
@@ -374,7 +374,7 @@
 
         // Returns a dict showing for each vocab word in TextA, its count in TextB.
         //      {word1:count1, word2:count2, ...}
-        compare_vocab() {
+        intersect_vocab() {
             let intersect = {};
             let text_a_vocab = this.text_a.vocab();
             let text_b_vocab = this.text_b.vocab();
@@ -394,28 +394,42 @@
             return intersect;
         }
 
-        // Returns list of lemmas in TextA that are also in TextB
-        intersect_lemmas() {
-            let intersect = this.compare_lemmas();
-            return Object.keys(intersect).filter(o => intersect[o]);
+        // Returns list of all lemmas/vocab in TextA and whether they are in TextB or not.
+        leftjoin(word_type) {
+            word_type = word_type || "lemmas";
+
+            let intersect = {};
+            switch(word_type) {
+                case "lemmas":
+                    intersect = this.intersect_lemmas();
+                    break;
+                case "vocab":
+                    intersect = this.intersect_vocab();
+                    break;
+                default:
+                    throw new Error("invalid word_type: "+word_type);
+            }
+            
+            let results = Object.keys(intersect)
+                .map((w) => ({ word: w, intersects: intersect[w]}))
+                .sort((a,b) => {
+                    if(a.intersects && b.intersects) {
+                        return a.word - b.word;
+                    } else if(a.intersects && !b.intersects) {
+                        return -1;
+                    } else if(!a.intersects && b.intersects) {
+                        return 1;
+                    } else {
+                        return a.word - b.word;
+                    }
+                });
+
+            return results;
         }
 
-        // Returns list of vocab in TextA that are also in TextB
-        intersect_vocab() {
-            let intersect = this.compare_vocab();
-            return Object.keys(intersect).filter(o => intersect[o]);
-        }
-
-        // Returns the set of vocabulary words in TextA that are NOT in TextB
-        diff_vocab() {
-            let intersect = this.compare_vocab();
-            return Object.keys(intersect).filter(o => intersect[o] == 0);
-        }
-
-        // Returns the set of lemmas in TextA that are NOT in TextB
-        diff_lemmas() {
-            let intersect = this.compare_lemmas();
-            return Object.keys(intersect).filter(o => intersect[o] == false);
+        // Returns only list of lemmas/vocab from TextA that are also in TextB
+        innerjoin(word_type) {
+            return this.leftjoin(word_type).filter((w) => w.intersects);
         }
     }
 
