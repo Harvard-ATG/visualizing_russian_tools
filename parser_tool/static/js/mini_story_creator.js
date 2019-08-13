@@ -15,14 +15,12 @@
         }
     }
 
-
     class MiniStoryController {
         constructor() {
             this.vocab_value = "";
             this.story_value = "";
             this.showlevels = false;
             this.showstorywords = false;
-            this.showstorytext = false;
         }
 
         onError(e) {
@@ -32,7 +30,7 @@
 
         onUpdate(e) {
             const vocab_value = document.getElementById("ministoryvocab").value.trim();
-            const story_value = document.getElementById("ministorytext").value.trim();
+            const story_value = document.getElementById("ministorytext").innerText.trim();
             
             this.executeTask(() => {
                 let p1 = this._updateVocab(vocab_value);
@@ -65,7 +63,7 @@
             this._renderStoryWords();
             this._renderStoryLemmas();
             this._renderTargetLemmas();
-            this._renderStoryText();
+            this._renderStoryTextEditor();
         }
 
         _renderStoryWords() {
@@ -146,29 +144,33 @@
             }
         }
 
-        _renderStoryText() {
-            if(!this.showstorytext) {
-                return $("#story_text_output").hide();
-            }
-
+        _renderStoryTextEditor() {
             let html = this.story_text.mapTokens((token, tokentype, index) => {
                 let output = token;
                 if(tokentype == "RUS") {
                     let level = this.story_text.levelOf(token);
                     let words = this.story_text.lemmasOf(token).map((word) => word.label);
                     let found = this.vocab_text.containsLemmas(words);
-                    if(found) {
-                        output = `<b>${token}</b>`;
-                    }
                     if(this.showlevels) {
-                        output = `<span class="wordlevel${level}">${output}</span>`;
+                        if(found) {
+                            output = `<b class="wordlevel${level}">${output}</b>`
+                        } else {
+                            output = `<span class="wordlevel${level}">${output}</span>`;
+                        }
+                    } else {
+                        if(found) {
+                            output = `<b>${token}</b>`;
+                        } else {
+                            output = token;
+                        }
                     }
                 } else {
                     output = output.replace(/\n/g, '<br>');
                 }
                 return output;
-            });
-            $("#story_text_output").show().html(html);
+            }).join("");
+
+            document.getElementById("ministorytext").innerHTML = html;
         }
 
         _updateVocab(vocab_value) {
@@ -197,14 +199,12 @@
             try {
                 ctrl.showstorywords = $('#showstorywords')[0].checked;
                 ctrl.showlevels = $('#showlevels')[0].checked;
-                ctrl.showstorytext = $("#showstorytext")[0].checked;
                 ctrl.onUpdate(e);
             } catch(e) {
                 console.error(e);
                 alert("Error: "+String(e));
             }
         };
-        //$(document).on('keyup', '#ministorytext,#ministoryvocab,#checkstory,#showstorywords,#showlevels',  debounce(onUpdate, 500));
         $(document).on('click', '#checkstory', onUpdate);
     });
 
@@ -222,7 +222,7 @@
 пешком
 `;
 
-    document.getElementById("ministorytext").value = story.trim();
+    document.getElementById("ministorytext").innerText = story.trim();
     document.getElementById("ministoryvocab").value = vocab.trim();
     }
 
