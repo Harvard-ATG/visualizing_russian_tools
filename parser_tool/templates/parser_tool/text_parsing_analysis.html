@@ -4,10 +4,10 @@
 {% block head_title %}Visible Vocabulary{% endblock %}
 {% block body_id %}visible-vocabulary-page{% endblock %}
 {% block body_class %}{% endblock %}
-{% block nav_class_parser %}active{% endblock %}
 
 {% block extra_style %}
     {{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'css/text_parsing_analysis.css' %}" />
 <style>
 .parser-input {
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="d-flex justify-content-between" style="margin-bottom: 1em;">
-                <button type="button" align="left" class="btn btn-lg btn-primary" id="parsebtn">Parse Text <i id="parsespinner" class="fas fa-spinner fa-spin d-none"></i></button>
+                <button type="button" align="left" class="btn btn-lg btn-primary" id="parsebtn">Parse Text <i id="parsespinner" class="spinner-border d-none" role="status"><span class="sr-only"></span></i></button>
                 <button type="button" align="left" class="btn btn-lg btn-dark" id="clearbtn">Clear</button>
             </div>
             <div id="parser-error" class="alert alert-danger d-none"></div>

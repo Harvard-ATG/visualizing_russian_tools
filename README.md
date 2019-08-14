@@ -45,3 +45,4 @@ To import a SQL dump:
 
 ```
 $ ./manage.py import_clancy_sqldump --sqlfile NewVisualizingRussian21January2019.sql
+

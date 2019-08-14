@@ -13,10 +13,10 @@
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" />
 
     {% block style_base %}
-        <link rel="stylesheet" type="text/css" href="{% static 'vendor/bootstrap-4.0.0/css/bootstrap.css' %}" />
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato" >
+        <link rel="stylesheet" type="text/css" href="{% static 'vendor/bootstrap-4.3.1/css/bootstrap.css' %}" />
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.1.0/css/all.css"/>
         <link rel="stylesheet" type="text/css" href="{% static 'vendor/c3/c3.min.css' %}"/>
-        <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
         {% block extra_style %}{% endblock %}
     {% endblock %}
@@ -32,7 +32,8 @@
         <div class="container-fluid">
             <div class="navbar-nav">
                 <a class="navbar-brand" href="/">Russian Modules</a>
-                <a class="nav-item nav-link {% block nav_class_parser %}{% endblock %}" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a>
+                <a class="nav-item nav-link" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a>
+                <a class="nav-item nav-link" href="{% url 'mini_story_creator' %}">Mini-story Creator</a>
             </div>
             <div class="navbar-nav navbar-right">
             {% if request.user.is_authenticated and request.user.is_staff %}
@@ -54,9 +55,9 @@
     {% block script_base %}
         <script src="{% static 'vendor/jquery-3.3.1/jquery.min.js' %}"></script>
         <script src="{% static 'vendor/popper-1.14.3/popper.min.js' %}"></script>
-        <script src="{% static 'vendor/bootstrap-4.0.0/js/bootstrap.min.js' %}"></script>
-        <script type="text/javascript" src="{% static 'vendor/d3/d3.v3.js' %}"></script>
-        <script type="text/javascript" src="{% static 'vendor/c3/c3.min.js' %}"></script>
+        <script src="{% static 'vendor/bootstrap-4.3.1/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'vendor/d3/d3.v3.js' %}"></script>
+        <script src="{% static 'vendor/c3/c3.min.js' %}"></script>
         {% block extra_script %}{% endblock %}
     {% endblock %}
 
