@@ -23,23 +23,27 @@
             this.showstorywords = false;
         }
 
-        onError(e) {
-            console.error(e);
+        error(err) {
+            console.error(err);
             $("#ministoryerror").show().html("An error occurred. Particulars: "+String(e));
         }
 
-        onUpdate(e) {
-            const vocab_value = document.getElementById("ministoryvocab").value.trim();
-            const story_value = document.getElementById("ministorytext").innerText.trim();
+        update() {
+            this.showstorywords = document.getElementById('showstorywords').checked;
+            this.showlevels = document.getElementById('showlevels').checked;
             
-            this.executeTask(() => {
+            this.executeAsyncTask(() => {
+                const vocab_value = document.getElementById("ministoryvocab").value.trim();
+                const story_value = document.getElementById("ministorytext").innerText.trim();
+
                 let p1 = this._updateVocab(vocab_value);
                 let p2 = this._updateStory(story_value);
+
                 return Promise.all([p1,p2]).then(() => this.render());
             });
         }
 
-        executeTask(fn) {
+        executeAsyncTask(fn) {
             let before_task = () => {
                 $("#ministoryerror").hide();
                 $("#processing_indicator").show();
@@ -51,11 +55,10 @@
 
             before_task();
             let promise = fn.apply(this, arguments);
-            promise.then(after_task).catch((e) => {
+            promise.then(after_task).catch((err) => {
                 after_task();
-                return this.onError(e)
+                return this.error(err);
             });
-
             return promise;
         }
 
@@ -195,17 +198,31 @@
 
     $(document).ready(function() {
         const ctrl = new MiniStoryController();
-        const onUpdate = (e) => {
+        const onCheckStory = (e) => {
             try {
-                ctrl.showstorywords = $('#showstorywords')[0].checked;
-                ctrl.showlevels = $('#showlevels')[0].checked;
-                ctrl.onUpdate(e);
+                ctrl.update();
             } catch(e) {
                 console.error(e);
                 alert("Error: "+String(e));
             }
         };
-        $(document).on('click', '#checkstory', onUpdate);
+        const onPasteMakePlainText = (e) => {
+            e.preventDefault();
+            var text = '';
+            if (e.clipboardData || e.originalEvent.clipboardData) {
+              text = (e.originalEvent || e).clipboardData.getData('text/plain');
+            } else if (window.clipboardData) {
+              text = window.clipboardData.getData('Text');
+            }
+            if (document.queryCommandSupported('insertText')) {
+              document.execCommand('insertText', false, text);
+            } else {
+              document.execCommand('paste', false, text);
+            }
+        }
+
+        $(document).on('click', '#checkstory', onCheckStory);
+        document.getElementById("ministorytext").addEventListener('paste', onPasteMakePlainText);
     });
 
     function generate_test_story() {
