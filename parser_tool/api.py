@@ -13,27 +13,27 @@ from . import tokenizer, textparser, htmlgenerator
 
 logger = logging.getLogger(__name__)
 
-MAX_TEXT_LENGTH = 50000
+MAX_TEXT_LENGTH = 150000
 
 
 def get_request_body_json(request):
-        if request.content_type != "application/json":
-            raise JsonBadRequest("Expected JSON accept or content type header")
-        if len(request.body.decode('utf-8')) > MAX_TEXT_LENGTH:
-            raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=MAX_TEXT_LENGTH))
+    if request.content_type != "application/json":
+        raise JsonBadRequest("Expected JSON accept or content type header")
+    if len(request.body.decode('utf-8')) > MAX_TEXT_LENGTH:
+        raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=MAX_TEXT_LENGTH))
 
-        try:
-            body = json.loads(request.body.decode('utf-8'))
-        except ValueError:
-            raise JsonBadRequest('Invalid JSON')
-        return body
+    try:
+        body = json.loads(request.body.decode('utf-8'))
+    except ValueError:
+        raise JsonBadRequest('Invalid JSON')
+    return body
 
 
 class LemmaAPIView(View):
     def get(self, request):
         status = "success"
         message_for_status = {
-            "fail": "Missing 'word' or 'lemma_id' query parameter", 
+            "fail": "Missing 'word' or 'lemma_id' query parameter",
             "error": "Internal server error"
         }
 
@@ -92,7 +92,7 @@ class LemmatizeAPIView(View):
     def get(self, request):
         status = "success"
         message_for_status = {
-            "fail": "Missing 'word' query parameter", 
+            "fail": "Missing 'word' query parameter",
             "error": "Internal server error"
         }
 
@@ -117,7 +117,7 @@ class LemmatizeAPIView(View):
         logger.debug("lemmatize response data=%s" % result)
 
         return JsonResponse(result, safe=False)
-    
+
     def post(self, request):
         body = get_request_body_json(request)
         status = "success"
@@ -157,7 +157,7 @@ class TextParserAPIView(View):
 
     def _parse(self, text):
         return textparser.parse(text)
-    
+
     def _tokens2html(self, tokens):
         return htmlgenerator.tokens2html(tokens=tokens)
 

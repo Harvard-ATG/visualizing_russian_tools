@@ -1,3 +1,5 @@
+import requests
+
 from .base import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -8,6 +10,14 @@ DEBUG = False
 
 # Hostnames
 ALLOWED_HOSTS = [h for h in os.environ.get('ALLOWED_HOSTS', '').split(' ') if h]
+EC2_PRIVATE_IP = None
+try:
+    EC2_PRIVATE_IP = requests.get('http://169.254.169.254/latest/meta-data/local-ipv4', timeout=0.01).text
+except requests.exceptions.RequestException:
+    pass
+
+if EC2_PRIVATE_IP:
+    ALLOWED_HOSTS.append(EC2_PRIVATE_IP)
 
 # SSL is terminated at the ELB so look for this header to know that we should be in ssl mode
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
