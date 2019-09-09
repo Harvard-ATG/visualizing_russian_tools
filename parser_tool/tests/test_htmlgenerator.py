@@ -77,7 +77,7 @@ class TestHtmlGenerator(unittest.TestCase):
         root = ET.fromstring(html)
 
         # Check the root element (e.g. container)
-        self.assertEqual("div", root.tag)
+        self.assertEqual("pre", root.tag)
         self.assertEqual({"class": "words"}, root.attrib)
 
         # Check that we have the expected number of child elements (1 element for each word or russian token)
