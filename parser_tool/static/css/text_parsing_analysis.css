@@ -5,6 +5,11 @@
     white-space: pre-wrap; /* Note: this seems to help with copy & paste to word... */
     color: black; /* Ensure that non-word characters (e.g. space and punctuation) is black */
 }
+pre.words {
+    font-size: 18px;
+    tab-size: 8; /* tab entities - &x9; or &tab; - only render in "pre" elements */
+    font-family: Lato, sans-serif;
+}
 #textinfo {
     font-size: 125%;
     margin: 18px 0;

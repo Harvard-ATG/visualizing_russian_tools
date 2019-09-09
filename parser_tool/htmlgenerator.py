@@ -21,22 +21,23 @@ def tokens2html(tokens, **options):
     """
 
     # Add tokens to element tree
-    container_el = ET.Element('div', attrib={"class": options.get("containerCls", "words")})
-    prev_el = None
+    # Note: intentionally using "pre" so that tab characters can be rendered properly
+    container_el = ET.Element('pre', attrib={"class": options.get("containerCls", "words")})
+    prev_el = container_el
+
     for token in tokens:
         rendered = render_token(token)
         if rendered['node_type'] == ELEMENT_NODE:
             container_el.append(rendered['element'])
             prev_el = rendered['element']
         elif rendered['node_type'] == TEXT_NODE:
-            if prev_el is None:
-                container_el.text = rendered['text'] if container_el.text is None else container_el.text + rendered['text']
-            else:
-                prev_el.tail = rendered['text'] if prev_el.tail is None else prev_el.tail + rendered['text']
+            text_attribute = 'text' if prev_el is None else 'tail'
+            starting_text = getattr(prev_el, text_attribute, '') or ''
+            setattr(prev_el, text_attribute, starting_text + rendered['text'])
 
     # Serialize element tree to HTML string
     html = serialize(container_el)
-    html = newline2br(html)
+    #html = newline2br(html) # commented out because switched to "pre" tag
 
     return html
 
@@ -47,13 +48,14 @@ def serialize(root_el):
     return html
 
 def newline2br(text):
-    return text.replace("\n", "<br>").replace("\r", "<br>")
+    return text.replace("\n", "<br>")
 
 def render_token(token):
     token_text = token['token']
     if token['tokentype']  in (tokenizer.TOKEN_PUNCT, tokenizer.TOKEN_SPACE):
-        token_text = token_text.replace("\t", "\u0009")
-        token_text = token_text.replace("  ", "\u00A0\u00A0")
+        token_text = token_text.replace("\r", "\n") # normalize returns as newlines
+        token_text = token_text.replace("\t", "\u0009") # render tab entities
+        token_text = token_text.replace("  ", "\u00A0\u00A0") # render 2 consecutive spaces as nbsp
         return {'node_type': TEXT_NODE, 'text': token_text}
 
     attrib = {}
@@ -73,3 +75,7 @@ def render_token(token):
     el.text = token_text
 
     return {'node_type': ELEMENT_NODE, 'element': el}
+
+def insert_token(prev_el, container_el, token):
+
+    return prev_el
