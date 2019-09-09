@@ -6,6 +6,7 @@
     color: black; /* Ensure that non-word characters (e.g. space and punctuation) is black */
 }
 pre.words {
+    color: #000000;
     font-size: 18px;
     tab-size: 8; /* tab entities - &x9; or &tab; - only render in "pre" elements */
     font-family: Lato, sans-serif;
