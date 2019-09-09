@@ -15,7 +15,7 @@ def tokens2html(tokens, **options):
     Transforms a list of tokens to HTML.
     Example:
         <div class="words">
-            <span class="word parsed level1" data-level="1E" data-form-ids="100,200">Все</span> 
+            <span class="word parsed level1" data-level="1E" data-form-ids="100,200">Все</span>
             <span class="word parsed level1" data-level="1E" data-form-ids="12500,12502" >счастливые</span>
         </div>
     """
@@ -30,9 +30,9 @@ def tokens2html(tokens, **options):
             prev_el = rendered['element']
         elif rendered['node_type'] == TEXT_NODE:
             if prev_el is None:
-                container_el.text = rendered['text'] if container_el.text is None else container_el.text + rendered['text'] 
+                container_el.text = rendered['text'] if container_el.text is None else container_el.text + rendered['text']
             else:
-                prev_el.tail = rendered['text'] if prev_el.tail is None else prev_el.tail + rendered['text'] 
+                prev_el.tail = rendered['text'] if prev_el.tail is None else prev_el.tail + rendered['text']
 
     # Serialize element tree to HTML string
     html = serialize(container_el)
@@ -52,10 +52,11 @@ def newline2br(text):
 def render_token(token):
     token_text = token['token']
     if token['tokentype']  in (tokenizer.TOKEN_PUNCT, tokenizer.TOKEN_SPACE):
+        token_text = token_text.replace("\t", "\u0009")
         token_text = token_text.replace("  ", "\u00A0\u00A0")
         return {'node_type': TEXT_NODE, 'text': token_text}
 
-    attrib = {} 
+    attrib = {}
     attribCls = []
     if token['tokentype'] in (tokenizer.TOKEN_WORD, tokenizer.TOKEN_RUS):
         attribCls.append("word")
