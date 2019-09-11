@@ -89,7 +89,7 @@ MWES = (
 
 # Translators
 TRANSLATOR_PUNCT_REMOVE = str.maketrans('', '', RUS_PUNCT)
-TRANSLATOR_DIACRITICS_REMOVE = str.maketrans('', '', COMBINING_ACCENT_CHAR)
+TRANSLATOR_DIACRITICS_REMOVE = str.maketrans('', '', COMBINING_ACCENT_CHAR+COMBINING_X_ABOVE)
 
 # Regular expressions
 RE_MATCH_DIGITS_ONLY = re.compile(r'^\d+$')
@@ -110,6 +110,8 @@ def tokenize(text):
     ['A', ' ', 'typical', ' ', 'seventeen', '-', 'year', '-', 'old', ' ', 'первоку́рсник', ' ', '|', ' ', 'первоку́рсница', ' ', '(', 'first', '-', 'year', ' ', 'student', ')', ' ', 'in', ' ', 'the', ' ', 'филологи́ческий', ' ', 'факульте́т', ' ', '(', 'филфа́к', ')', ' ', '(', 'Philology', ' ', 'Faculty', ')', ' ', 'has', ' ', '23', ' ', 'па́ры']
     >>> tokenize("ученик´ ученика́ ученике́ ученику́ ученико́м")
     ['ученик´', ' ', 'ученика́', ' ', 'ученике́', ' ', 'ученику́', ' ', 'ученико́м']
+    >>> tokenize("э̽той техноло́гии")
+    ['э̽той', ' ', 'техноло́гии']
     """
     tokens = re.split(r'(\s+)', text)
     tokens = split_punctuation(tokens)
