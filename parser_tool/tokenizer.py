@@ -54,10 +54,11 @@ QUOTE_RAISED_LEFT = '\u201e'
 QUOTE_RAISED_RIGHT = '\u201c'
 
 # Punctuation list
-RUS_PUNCT = '.…,/#!?$%^&*;:{}=_`~[]()‘’“”\'"|' + QUOTE_ANGLE_LEFT + QUOTE_ANGLE_RIGHT + QUOTE_RAISED_LEFT + QUOTE_RAISED_RIGHT + EN_DASH_CHAR + EM_DASH_CHAR + HYPHEN_CHAR 
+RUS_PUNCT = '.…,/#!?$%^&*;:{}=_`~[]()‘’“”\'"|' + QUOTE_ANGLE_LEFT + QUOTE_ANGLE_RIGHT + QUOTE_RAISED_LEFT + QUOTE_RAISED_RIGHT + EN_DASH_CHAR + EM_DASH_CHAR + HYPHEN_CHAR
 
 # Diacritics
 COMBINING_ACCENT_CHAR = '\u0301'   # Diacritic used to mark stress on russian words
+COMBINING_X_ABOVE = '\u033D'       # Diacritic used to mark stress on russian words (non-standard usage)
 COMBINING_DIURESIS_CHAR = '\u0308' # Diacritic used with the seventh letter of the russian alphabet (ё)
 COMBINING_BREVE_CHAR = '\u0306'    # Diacritic used with the eleventh letter of the russian alphabet (й)
 
@@ -109,7 +110,7 @@ def tokenize(text):
     ['A', ' ', 'typical', ' ', 'seventeen', '-', 'year', '-', 'old', ' ', 'первоку́рсник', ' ', '|', ' ', 'первоку́рсница', ' ', '(', 'first', '-', 'year', ' ', 'student', ')', ' ', 'in', ' ', 'the', ' ', 'филологи́ческий', ' ', 'факульте́т', ' ', '(', 'филфа́к', ')', ' ', '(', 'Philology', ' ', 'Faculty', ')', ' ', 'has', ' ', '23', ' ', 'па́ры']
     """
     tokens = re.split(r'(\s+)', text)
-    tokens = split_punctuation(tokens) 
+    tokens = split_punctuation(tokens)
     tokens = split_hyphenated(tokens)
     tokens = merge_multiwordexpr(tokens)
     return tokens
@@ -166,7 +167,7 @@ def merge_multiwordexpr(tokens):
 
 def tag(tokens):
     """
-    Tag tokens with additional information. 
+    Tag tokens with additional information.
     Returns an array of tuples: [(token1, index1, offset1, ...), (token2, index2, offset2, ...)]
 
     >>> tag(['Ко', 'двору'])
@@ -240,7 +241,7 @@ TOKEN_RUS = "RUS"
 
 def tokentype(text):
     """
-    Classifies a token as whitespace (SPACE), punctuation (PUNCT), numeric (NUM), 
+    Classifies a token as whitespace (SPACE), punctuation (PUNCT), numeric (NUM),
     word (WORD), or a russian word (RUS). Note that the difference between a word
     and a russian word is merely the alphabet used. This is a simple heuristic to
     to guide lemmatization.
@@ -249,7 +250,7 @@ def tokentype(text):
     'PUNCT'
     >>> tokentype('123')
     'NUM'
-    >>> tokentype("find") 
+    >>> tokentype("find")
     'WORD'
     >>> tokentype("найти")
     'RUS'
