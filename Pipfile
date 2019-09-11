@@ -7,7 +7,7 @@ name = "pypi"
 python_version = "3"
 
 [packages]
-django = "*"
+django = "==2.2.5"
 requests = "*"
 django-dotenv = "*"
 gunicorn = "*"
