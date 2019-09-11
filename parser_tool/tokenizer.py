@@ -108,6 +108,8 @@ def tokenize(text):
     ['в', ' ', 'день', ' ', 'по-весеннему', ' ', 'свежий', ' ', 'и', ' ', 'по-летнему', ' ', 'теплый', '…']
     >>> tokenize("A typical seventeen-year-old первоку́рсник | первоку́рсница (first-year student) in the филологи́ческий факульте́т (филфа́к) (Philology Faculty) has 23 па́ры")
     ['A', ' ', 'typical', ' ', 'seventeen', '-', 'year', '-', 'old', ' ', 'первоку́рсник', ' ', '|', ' ', 'первоку́рсница', ' ', '(', 'first', '-', 'year', ' ', 'student', ')', ' ', 'in', ' ', 'the', ' ', 'филологи́ческий', ' ', 'факульте́т', ' ', '(', 'филфа́к', ')', ' ', '(', 'Philology', ' ', 'Faculty', ')', ' ', 'has', ' ', '23', ' ', 'па́ры']
+    >>> tokenize("ученик´ ученика́ ученике́ ученику́ ученико́м")
+    ['ученик´', ' ', 'ученика́', ' ', 'ученике́', ' ', 'ученику́', ' ', 'ученико́м']
     """
     tokens = re.split(r'(\s+)', text)
     tokens = split_punctuation(tokens)
@@ -223,13 +225,12 @@ def strip_diacritics(token):
 
 def canonical(token):
     """
-    Returns the canonical text stripped of all punctuation and diacritics.
-    Assumes that the token has already been stripped of non-essential puncutation.
-    This is intended to be used for doing lookups against the database.
+    Returns the canonical text stripped of all punctuation, diacritics, and whitespace.
+    This is intended to be used for doing lookups of words against the database.
     """
-    # Strip diacritics and lowercaes the token
     token = unicode_compose(strip_diacritics(unicode_decompose(normalize_hyphens(token))))
     token = token.lower()
+    token = token.strip()
     return token
 
 
