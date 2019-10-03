@@ -13,7 +13,7 @@ from . import tokenizer, textparser, htmlgenerator
 
 logger = logging.getLogger(__name__)
 
-MAX_TEXT_LENGTH = 150000
+MAX_TEXT_LENGTH = 400000
 
 
 def get_request_body_json(request):
