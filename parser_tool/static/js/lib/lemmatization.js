@@ -2,6 +2,7 @@
     "use strict";
 
     const ApiClient = global.app.ApiClient;
+    const LemmaTrie = global.app.LemmaTrie;
 
     // utility that returns the distinct or unique values in an array
     const unique = (arr) => {
@@ -24,6 +25,8 @@
             this._forms = data.forms;
             this._cache_forms_of = {}
             this._cache_lemmas_of = {};
+            this._trie = null;
+            this.init();
         }
 
         // returns a promise with an instance of a lemmatized text
@@ -36,6 +39,22 @@
             return api.lemmatizetext(text).then((res) => {
                 return new LemmatizedText(res.data);
             });
+        }
+
+        init() {
+            let trie = new LemmaTrie();
+
+            let _forms = Object.values(this._forms);
+            for(let i = 0; i < _forms.length; i++) {
+                trie.insert(_forms[i].label, {type:"form", id:_forms[i].id});
+            }
+
+            let _lemmas = Object.values(this._lemmas);
+            for(let i = 0; i < _lemmas.length; i++) {
+                trie.insert(_lemmas[i].label, {type:"lemma", id:_lemmas[i].id});
+            }
+
+            this._trie = trie;
         }
 
         // returns a copy of the individual tokens from the lemmatized text
@@ -122,27 +141,30 @@
                 return word_lemmas;
             } 
 
-           let seen = {};
-           let word_lemmas = [];
-           
-           // Step #1: search forms to find the lemma(s)
-           for(let i = 0, word_forms = this.formsOf(word); i < word_forms.length; i++) {
-                let lemma_id = word_forms[i].lemma_id;
-                let lemma_obj = this._lemmas[lemma_id];
-                if(!seen.hasOwnProperty(lemma_id)) {
-                    word_lemmas.push(lemma_obj);
-                    seen[lemma_id] = true;
-                }
-           }
-
-           // Step #2: search known lemmas 
-            let _lemmas = Object.values(this._lemmas);
-            for(let i = 0; i < _lemmas.length; i++) {
-                let lemma_obj = _lemmas[i];
-                let found_match = lemma_obj.label.localeCompare(word, "ru-RU", {sensitivity: "base", ignorePunctuation: true}) == 0;
-                if(found_match && !seen.hasOwnProperty(lemma_obj.id)) {
-                    word_lemmas.push(lemma_obj);
-                    seen[lemma_obj.id] = true;
+            let seen = {};
+            let word_lemmas = [];
+            let [d, node] = this._trie.find(word); 
+            if(d !== -1) {
+                for(let i = 0; i < node.datalist.length; i++) {
+                    let lemma_id = null;
+                    let nodedata = node.datalist[i];
+                    switch(nodedata.type) {
+                        case "form":
+                            lemma_id = this._forms[nodedata.id].lemma_id;
+                            break;
+                        case "lemma":
+                            lemma_id = nodedata.id;
+                            break;
+                        default:
+                            console.error(word, node, i);
+                            throw new Exception("invalid node datalist index");
+                    }
+                    
+                    let lemma_obj = this._lemmas[lemma_id];
+                    if(!seen.hasOwnProperty(lemma_id)) {
+                        word_lemmas.push(lemma_obj);
+                        seen[lemma_id] = true;
+                    }
                 }
             }
 
