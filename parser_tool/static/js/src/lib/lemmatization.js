@@ -17,7 +17,7 @@
     }
 
     class LemmatizedText {
-        
+
         constructor(data) {
             data = data || {tokens: [], forms: {}, lemmas: {}};
             this._tokens = data.tokens;
@@ -72,14 +72,14 @@
             let lemmas = Object.values(this._lemmas).map(o => o.label);
             lemmas.sort((a, b) => a.localeCompare(b), "ru-RU", {sensitivity: "base", ignorePunctuation: true});
             return lemmas;
-        } 
+        }
 
         // returns the set of unique words in the text
         vocab() {
             let compare_options = {sensitivity: "base", ignorePunctuation: true};
             let vocab = unique(this.words()).sort((a, b) => a.localeCompare(b), "ru-RU", compare_options);
             return vocab;
-        } 
+        }
 
         // iterate over each word in the text
         forEachWord(fn) {
@@ -121,7 +121,7 @@
             return -1;
         }
 
-        // lookup the lemmas of a word in the text 
+        // lookup the lemmas of a word in the text
         lemmasOf(word, options) {
             options = options || {};
 
@@ -132,22 +132,22 @@
             if(options.sort && !compare.hasOwnProperty(options.sort)) {
                 throw new Exception(`invalid option sort=${options.sort}`);
             }
-            
+
             if(this._cache_lemmas_of[word]) {
                 let word_lemmas = this._cache_lemmas_of[word];
                 if(options.sort) {
                     word_lemmas.sort(compare[options.sort]);
                 }
                 return word_lemmas;
-            } 
+            }
 
             let seen = {};
             let word_lemmas = [];
-            let [d, node] = this._trie.find(word); 
+            let [d, node] = this._trie.find(word);
             if(d !== -1) {
-                for(let i = 0; i < node.datalist.length; i++) {
+                for(let i = 0; i < node.value.length; i++) {
                     let lemma_id = null;
-                    let nodedata = node.datalist[i];
+                    let nodedata = node.value[i];
                     switch(nodedata.type) {
                         case "form":
                             lemma_id = this._forms[nodedata.id].lemma_id;
@@ -157,9 +157,9 @@
                             break;
                         default:
                             console.error(word, node, i);
-                            throw new Exception("invalid node datalist index");
+                            throw new Exception("invalid node value index");
                     }
-                    
+
                     let lemma_obj = this._lemmas[lemma_id];
                     if(!seen.hasOwnProperty(lemma_id)) {
                         word_lemmas.push(lemma_obj);
@@ -240,7 +240,7 @@
             let stats = Object.keys(counter)
                 .map((w) => ({word: w, count: counter[w]}))
                 .sort((a, b) => b.count - a.count);
-        
+
             return stats;
         }
 
@@ -281,13 +281,13 @@
                 }
             });
             return count;
-        } 
+        }
 
         // returns a non-zero integer reprsenting the difficulty level associated with the word, or zero if no level could be assigned
         levelOf(word) {
             let level_num = 0; // using zero to represent an "unknown" level
             let lemma_records = this.lemmasOf(word, {sort: "level"});
-            let lemma = (lemma_records.length > 0 ? lemma_records[0] : false);            
+            let lemma = (lemma_records.length > 0 ? lemma_records[0] : false);
             if(lemma) {
                 let parsed_level_num = parseInt(lemma.level, 10);
                 if(!Number.isNaN(parsed_level_num)) {
@@ -308,7 +308,7 @@
             let max_level = 0;
             let total_words = 0;
             let total_words_with_level = 0;
-            
+
             this.forEachWord((word, index) => {
                 let level_num = this.levelOf(word);
                 if(level_num >= 0) {
@@ -340,7 +340,7 @@
             if(typeof target_level == "undefined" || target_level < 1 || target_level > 4) {
                 target_level = 1;
             }
-            
+
             let words_at_or_below_level = 0;
             let words_above_level = 0;
             let levels = this.levels();
@@ -412,7 +412,7 @@
                     }
                 }
             });
-            
+
             return intersect;
         }
 
@@ -431,7 +431,7 @@
                 default:
                     throw new Error("invalid word_type: "+word_type);
             }
-            
+
             let results = Object.keys(intersect)
                 .map((w) => ({ word: w, intersects: intersect[w]}))
                 .sort((a,b) => {

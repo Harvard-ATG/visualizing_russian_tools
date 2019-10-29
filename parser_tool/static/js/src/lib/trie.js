@@ -12,9 +12,9 @@
             key = key.toLowerCase(); // case insensitive
 
             // Strip all diacritics from keys EXCEPT for the following which have special significance:
+            // - combining breve (U+0306) which is used for leter "й" or "Yot" (https://en.wiktionary.org/wiki/%D0%B9)
             // - combining diuresis (U+0308) which is used for letter "ё" or "Yo" (https://en.wiktionary.org/wiki/%D1%91)
-            // - combining breve (U+032E) which is used for leter "й" or "Yot" (https://en.wiktionary.org/wiki/%D0%B9)
-            key = key.normalize("NFD").replace(/[\u0300-\u0307,\u0309-\u032D,\u032F-\u036f]/g, ""); 
+            key = key.normalize("NFD").replace(/[\u0300-\u0305\u307\u0309-\u036f]/g, "");
 
             return key;
         }
@@ -43,17 +43,16 @@
             node.$ = (key.length == 0 ? 1 : 0);
 
             if(typeof data !== "undefined") {
-                node.datalist = node.datalist || [];
+                node.value = node.value || [];
                 if(Array.isArray(data)) {
-                    node.datalist = node.datalist.concat(data);
+                    node.value = node.value.concat(data);
                 } else {
-                    node.datalist.push(data);
+                    node.value.push(data);
                 }
             }
             return [d, node];
         }
         find(key) {
-            let orig_key = key;
             key = this.normalize(key);
 
             let node = this.root;
