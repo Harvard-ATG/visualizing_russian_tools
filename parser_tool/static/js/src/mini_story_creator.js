@@ -254,8 +254,12 @@
     $(document).ready(function() {
         const ctrl = new MiniStoryController();
         ctrl.listen();
+
+        // allow global access to controller for debugging / demo purposes
+        global.storyctrl = ctrl; 
+        global.storydemo = MiniStoryController.storydemo;
     });
 
-    global.storydemo = MiniStoryController.storydemo;
+    
 
 })(window, jQuery);
