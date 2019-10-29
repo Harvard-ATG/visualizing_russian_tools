@@ -122,13 +122,6 @@ def tokenize(text):
 def split_punctuation(tokens, punct=RUS_PUNCT, hyphen_char=HYPHEN_CHAR):
     """
     Splits punctuation except for hyphens, which require special treatment.
-
-    >>> split_punctuation(["фрукты=яблоко|вишня"])
-    ['фрукты', '=', 'яблоко', '|', 'вишня']
-    >>> split_punctuation(["(13  мая  1876)"])
-    ['(', '13  мая  1876', ')']
-    >>> split_punctuation(["(Students", " ", "and", "Faculty)."])
-    ['(', 'Students', ' ', 'and', 'Faculty', ').']
     """
     punct = punct.replace(hyphen_char, '') # hyphens should be handled separately
     punct = punct.replace('[', '\\[').replace(']', '\\]') # escaping for regex char class
@@ -146,12 +139,7 @@ def split_punctuation(tokens, punct=RUS_PUNCT, hyphen_char=HYPHEN_CHAR):
 
 def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_WORDS):
     """
-    >>> split_hyphenated(['по-весеннему'])
-    ['по-весеннему']
-    >>> split_hyphenated(['француженкою-гувернанткой'])
-    ['француженкою', '-', 'гувернанткой']
-    >>> split_hyphenated(['seventeen-year-old'])
-    ['seventeen', '-', 'year', '-', 'old']
+    Splits hyphenated tokens, handling special cases like "по-" words, which should not be split.
     """
     new_tokens = []
     for token in tokens:
@@ -173,11 +161,6 @@ def tag(tokens):
     """
     Tag tokens with additional information.
     Returns an array of tuples: [(token1, index1, offset1, ...), (token2, index2, offset2, ...)]
-
-    >>> tag(['Ко', 'двору'])
-    [{'token': 'Ко', 'index': 0, 'offset': 0, 'tokentype': 'RUS', 'canonical': 'ко'}, {'token': 'двору', 'index': 1, 'offset': 2, 'tokentype': 'RUS', 'canonical': 'двору'}]
-    >>> tag(['100', '!'])
-    [{'token': '100', 'index': 0, 'offset': 0, 'tokentype': 'NUM', 'canonical': '100'}, {'token': '!', 'index': 1, 'offset': 3, 'tokentype': 'PUNCT', 'canonical': '!'}]
     """
     tagged = []
     offset = 0
@@ -219,9 +202,6 @@ def strip_punctuation(token):
 def strip_diacritics(token):
     """
     Removes diacritics from text.
-
-    >>> strip_diacritics("В не́которых ру́сских деревня́х по э́той техноло́гии вручну́ю де́лают матрёшек и сего́дня.")
-    'В некоторых русских деревнях по этой технологии вручную делают матрёшек и сегодня.'
     """
     return token.translate(TRANSLATOR_DIACRITICS_REMOVE)
 

@@ -45,14 +45,49 @@ class TestTokenizer(unittest.TestCase):
         self.assertEqual(expected_tokens, actual_tokens)
         self.assertEqual(text, ''.join(actual_tokens))
 
+    def test_tokenizer_regressions(self):
+        tests = [
+            {
+                'text': "«Ко двору, — думает он. — Ко двору!»",
+                'tokens': ['«', 'Ко', ' ', 'двору', ',', ' ', '—', ' ', 'думает', ' ', 'он', '.', ' ', '—', ' ', 'Ко', ' ', 'двору', '!»'],
+            },
+            {
+                'text': "В не́которых ру́сских деревня́х по э́той техноло́гии вручну́ю де́лают матрёшек и сего́дня.",
+                'tokens': ['В', ' ', 'не́которых', ' ', 'ру́сских', ' ', 'деревня́х', ' ', 'по', ' ', 'э́той', ' ', 'техноло́гии', ' ', 'вручну́ю', ' ', 'де́лают', ' ', 'матрёшек', ' ', 'и', ' ', 'сего́дня', '.'],
+            },
+            {
+                'text': "ученик´ ученика́ ученике́ ученику́ ученико́м",
+                'tokens': ['ученик´', ' ', 'ученика́', ' ', 'ученике́', ' ', 'ученику́', ' ', 'ученико́м'],
+            },
+            {
+                'text': "э̽той техноло́гии",
+                'tokens': ['э̽той', ' ', 'техноло́гии'],
+            }
+        ]
+        for test in tests:
+            (text, expected_tokens) = test['text'], test['tokens']
+            self.assertEqual(expected_tokens, tokenizer.tokenize(text))
+
 
 class TestTokenizerHelpers(unittest.TestCase):
     def test_strip_diacritics(self):
         tests = [
-            {"accented": 'све́те',    "unaccented": 'свете'},
-            {"accented": 'любо́вь',   "unaccented": 'любовь'},
-            {"accented": 'вещество́', "unaccented": 'вещество'},
-            {"accented": 'мото́р',    "unaccented": 'мотор'},
+            {
+                "accented": 'све́те',
+                "unaccented": 'свете'
+            },
+            {
+                "accented": 'любо́вь',
+                "unaccented": 'любовь'
+            },
+            {
+                "accented": 'вещество́',
+                "unaccented": 'вещество'
+            },
+            {
+                "accented": 'мото́р',
+                "unaccented": 'мотор'
+            },
             {
                 "accented": "В не́которых ру́сских деревня́х по э́той техноло́гии вручну́ю де́лают матрёшек и сего́дня.",
                 "unaccented": 'В некоторых русских деревнях по этой технологии вручную делают матрёшек и сегодня.'
@@ -61,27 +96,26 @@ class TestTokenizerHelpers(unittest.TestCase):
         for test in tests:
             (accented, unaccented) = test['accented'], test['unaccented']
             self.assertEqual(unaccented, tokenizer.strip_diacritics(accented))
-    
+
     def test_split_hyphenated(self):
         tests = [
             {
-                "tokens": ['по-весеннему'], 
+                "tokens": ['по-весеннему'],
                 "expected": ['по-весеннему']
             },
             {
-                "tokens": ['француженкою-гувернанткой'], 
+                "tokens": ['француженкою-гувернанткой'],
                 "expected": ['француженкою', '-', 'гувернанткой']
             },
             {
                 "tokens": ['seventeen-year-old'],
                 "expected": ['seventeen', '-', 'year', '-', 'old']
-            }
-
+            },
         ]
         for test in tests:
             (tokens, expected) = test['tokens'], test['expected']
             self.assertEqual(expected, tokenizer.split_hyphenated(tokens))
-    
+
     def test_split_punctuation(self):
         tests = [
             {
@@ -100,7 +134,7 @@ class TestTokenizerHelpers(unittest.TestCase):
         for test in tests:
             (tokens, expected) = test['tokens'], test['expected']
             self.assertEqual(expected, tokenizer.split_punctuation(tokens))
-    
+
     def test_tokentype(self):
         tests = [
             ("найти", tokenizer.TOKEN_RUS),
@@ -117,6 +151,27 @@ class TestTokenizerHelpers(unittest.TestCase):
         for test in tests:
             (token, expected) = test
             self.assertEqual(expected, tokenizer.tokentype(token))
+
+    def test_tag(self):
+        tests = [
+            {
+                "tokens": ['Ко', 'двору'],
+                "tagged": [
+                    {'token': 'Ко', 'index': 0, 'offset': 0, 'tokentype': 'RUS', 'canonical': 'ко'},
+                    {'token': 'двору', 'index': 1, 'offset': 2, 'tokentype': 'RUS', 'canonical': 'двору'}
+                ]
+            },
+            {
+                "tokens": ['100', '!'],
+                "tagged": [
+                    {'token': '100', 'index': 0, 'offset': 0, 'tokentype': 'NUM', 'canonical': '100'},
+                    {'token': '!', 'index': 1, 'offset': 3, 'tokentype': 'PUNCT', 'canonical': '!'}
+                ]
+            }
+        ]
+        for test in tests:
+            (tokens, tagged) = test['tokens'], test['tagged']
+            self.assertEqual(tagged, tokenizer.tag(tokens))
 
 if __name__ == '__main__':
     unittest.main()
