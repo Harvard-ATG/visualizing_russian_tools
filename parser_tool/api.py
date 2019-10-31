@@ -1,15 +1,13 @@
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
-from django.core.exceptions import SuspiciousOperation
+from django.http import JsonResponse, HttpResponse
 from django.views import View
-from django.urls import reverse
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
 
 from visualizing_russian_tools.exceptions import JsonBadRequest
 from clancy_database import lemmatizer, queries
-from . import tokenizer, textparser, htmlgenerator
+from .htmlcolorizer import HtmlColorizer
+from . import tokenizer, lemmatizer, htmlgenerator
 
 logger = logging.getLogger(__name__)
 
@@ -71,8 +69,7 @@ class TokenizeAPIView(View):
         }
         tokens = []
         try:
-            tokens = tokenizer.tokenize(body)
-            tokens = tokenizer.tag(tokens)
+            tokens = tokenizer.tokenize_and_tag(body)
         except Exception as e:
             logger.exception(e)
             status = "error"
@@ -126,7 +123,7 @@ class LemmatizeAPIView(View):
         }
         try:
             text = body.get("text", "")
-            parsed_data = textparser.parse(text)
+            lemmatized_data = lemmatizer.lemmatize_text(text)
         except Exception as e:
             logger.exception(e)
             status = "error"
@@ -134,9 +131,9 @@ class LemmatizeAPIView(View):
         result = {"status": status}
         if status == "success":
             result["data"] = {
-                "lemmas": parsed_data["lemmas"],
-                "forms": parsed_data["forms"],
-                "tokens": parsed_data["tokens"],
+                "lemmas": lemmatized_data["lemmas"],
+                "forms": lemmatized_data["forms"],
+                "tokens": lemmatized_data["tokens"],
             }
         if status in message_for_status:
             result["message"] = message_for_status[status]
@@ -149,19 +146,37 @@ class TextParserAPIView(View):
     def post(self, request):
         body = get_request_body_json(request)
         text = body.get("text", "")
-        parsed_data = self._parse(text)
+        lemmatized_data = lemmatizer.lemmatize_text(text)
         render_html = request.GET.get('html', 'n') != 'n'
         if render_html:
-            parsed_data["html"] = self._tokens2html(parsed_data["tokens"])
-        return JsonResponse(parsed_data, safe=False)
+            lemmatized_data["html"] = htmlgenerator.tokens2html(tokens=lemmatized_data["tokens"])
+        return JsonResponse(lemmatized_data, safe=False)
 
-    def _parse(self, text):
-        return textparser.parse(text)
 
-    def _tokens2html(self, tokens):
-        return htmlgenerator.tokens2html(tokens=tokens)
+class HtmlColorizerAPIView(View):
+    def post(self, request):
+        content_type = request.META.get('CONTENT_TYPE', '')
+        if content_type.startswith("text/html"):
+            input_html = request.body.decode('utf-8')
+            output_html = self._parse(input_html)
+            response = HttpResponse(output_html, content_type="text/html")
+        else:
+            body = get_request_body_json(request)
+            input_html = body.get("html", "")
+            output_html = self._parse(input_html)
+            response = JsonResponse({"html": output_html}, safe=False)
+        return response
+
+    def _parse(self, input_html):
+        html_colorizer = HtmlColorizer(input_html)
+        doc_tokens = html_colorizer.get_doc_tokens()
+        lemmatized_data = lemmatizer.lemmatize_tokens(doc_tokens)
+        html_colorizer.colorize(lemmatized_data)
+        output_html = html_colorizer.output()
+        return output_html
 
 text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())
+html_colorizer_api_view = csrf_exempt(HtmlColorizerAPIView.as_view())
 lemmatize_api_view = csrf_exempt(LemmatizeAPIView.as_view())
 tokenize_api_view = csrf_exempt(TokenizeAPIView.as_view())
 lemma_api_view = csrf_exempt(LemmaAPIView.as_view())

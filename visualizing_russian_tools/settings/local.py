@@ -18,3 +18,6 @@ DATABASES = {
 }
 
 #DATABASE_ROUTERS = ['visualizing_russian_tools.database_routers.DatabaseRouter']
+
+# Cors headers
+CORS_ORIGIN_ALLOW_ALL = True
