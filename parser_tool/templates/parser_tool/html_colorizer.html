@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
     <style>
         h2 { color: #777777 }
-        iframe.preview_html {
+        iframe.previewhtml {
             border: 1px solid #ccc;
             padding: 5px;
             width: 100%;
@@ -18,7 +18,7 @@
             max-width: 100%;
             overflow: auto;
         }
-        textarea#output_html {
+        textarea#outputhtml {
             white-space: pre;
             width: 100%;
             min-height: 200px;
@@ -34,51 +34,7 @@
 
 {% block extra_script %}
     <script src="{% static 'js/src/lib/api.js' %}"></script>
-    <script>
-(function() {
-
-    $(document).ready(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-        $("textarea#output_html").focus(function() {
-          $(this).select();
-        });
-    });
-
-    async function colorize(input_html) {
-        const url = 'http://localhost:8000/api/colorizehtml';
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: new Headers({'Content-Type': 'text/html'}),
-          mode: 'cors',
-          body: input_html
-        });
-        const output_html = await response.text();
-        return output_html;
-    }
-
-    async function onClickProcessHtml(e) {
-        const input_html = document.getElementById("contentinput").value;
-        writeframe('inputpreview', input_html);
-        writeframe('outputpreview', 'Processing...');
-        const output_html = await colorize(input_html);
-        writeframe('outputpreview', output_html);
-        document.getElementById("output_html").style.display="";
-        document.getElementById("output_html").value = output_html;
-    }
-
-    function writeframe(id, html) {
-        var iframe = document.createElement('iframe');
-        iframe.className = "preview_html";
-        iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(html);
-        document.getElementById(id).innerHTML = "";
-        document.getElementById(id).appendChild(iframe);
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById("colorizebtn").addEventListener("click", onClickProcessHtml);
-    });
-})();
-    </script>
+    <script src="{% static 'js/src/html_colorizer.js' %}"></script>
 {% endblock %}
 
 
@@ -109,8 +65,11 @@
         <div id="outputpreview"></div>
     </div>
 </div>
-<div class="row mt-3">
+<div id="results" class="row mt-3 bt-5" style="display:none;">
     <div class="col-md-1"></div>
-    <div class="col-md-10"><textarea id="output_html" style="display:none;"></textarea></div>
+    <div class="col-md-10">
+        <button type="button" id="copytoclipboard" class="btn btn-secondary btn-sm" style="float:right;">Copy to clipboard</button>
+        <textarea id="outputhtml" style="clear:both; margin-top: 10px;" readonly></textarea>
+    </div>
 </div>
 {% endblock %}

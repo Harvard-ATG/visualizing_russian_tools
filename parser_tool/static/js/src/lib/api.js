@@ -4,7 +4,7 @@
     class ApiClient {
         constructor() {
             this.api_base_url = "";
-            this.ajax_settings = {                
+            this.ajax_settings = {
                 dataType: "json",
                 contentType: "application/json"
             };
@@ -55,6 +55,19 @@
             params = params || {};
             var url = this._url('/api/parsetext', params);
             var settings = {method: "POST", data: JSON.stringify(content)};
+            var jqXhr = this._ajax(url, settings);
+            return jqXhr;
+        }
+
+        colorizehtml(html, params) {
+            params = params || {};
+            var url = this._url('/api/colorizehtml', params);
+            var settings = {
+                method: "POST",
+                headers: {'Content-Type':'text/html'},
+                dataType: "text",
+                data: html
+            };
             var jqXhr = this._ajax(url, settings);
             return jqXhr;
         }
