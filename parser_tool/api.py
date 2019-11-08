@@ -14,9 +14,17 @@ logger = logging.getLogger(__name__)
 MAX_TEXT_LENGTH = 400000
 
 
+def get_request_body_html(request):
+    if not request.content_type.startswith("text/html"):
+        raise JsonBadRequest("Expected HTML content type header")
+    if len(request.body.decode('utf-8')) > MAX_TEXT_LENGTH:
+        raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=MAX_TEXT_LENGTH))
+    return request.body.decode('utf-8')
+
+
 def get_request_body_json(request):
     if request.content_type != "application/json":
-        raise JsonBadRequest("Expected JSON accept or content type header")
+        raise JsonBadRequest("Expected JSON content type header")
     if len(request.body.decode('utf-8')) > MAX_TEXT_LENGTH:
         raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=MAX_TEXT_LENGTH))
 
@@ -157,7 +165,7 @@ class HtmlColorizerAPIView(View):
     def post(self, request):
         content_type = request.META.get('CONTENT_TYPE', '')
         if content_type.startswith("text/html"):
-            input_html = request.body.decode('utf-8')
+            input_html = get_request_body_html(request)
             output_html = self._parse(input_html)
             response = HttpResponse(output_html, content_type="text/html")
         else:
@@ -168,7 +176,9 @@ class HtmlColorizerAPIView(View):
         return response
 
     def _parse(self, input_html):
+        attribute = self.request.GET.get("attribute", "").strip()
         html_colorizer = HtmlColorizer(input_html)
+        html_colorizer.set_color_attribute(attribute)
         doc_tokens = html_colorizer.get_doc_tokens()
         lemmatized_data = lemmatizer.lemmatize_tokens(doc_tokens)
         html_colorizer.colorize(lemmatized_data)

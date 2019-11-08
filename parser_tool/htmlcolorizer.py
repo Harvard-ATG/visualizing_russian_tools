@@ -7,6 +7,19 @@ class HtmlColorizer:
     def __init__(self, html_doc):
         self.html_doc = html_doc
         self.soup = BeautifulSoup(html_doc, 'html.parser')
+        self.color_attribute = "style"
+        self.color_list = 'inherit,green,blue,violet,orange,orange,black'.split(',') # must provide list of colors for levels 0-6
+
+    def set_color_attribute(self, attribute):
+        if attribute not in ('style', 'class', 'data'):
+            return False
+        self.color_attribute = attribute
+
+    def set_colors(self, color_str):
+        color_list = color_str.split(',')
+        if len(color_list) != 7:
+            return False
+        self.color_list = color_list
 
     def get_doc_tokens(self):
         doc_tokens = []
@@ -20,16 +33,7 @@ class HtmlColorizer:
         canonical_token_levels = {t['canonical']: t['level'] for t in lemmatized_data['tokens']}
         return self._colorize(canonical_token_levels)
 
-    def _colorize(self, canonical_token_levels, style_options=None):
-        if style_options is None:
-            style_options = {}
-        style_options.setdefault('applycolor', 'inline')
-        style_options.setdefault('colors', 'inherit,green,blue,indigo,orange,orange,black'.split(','))
-        if style_options.get('applycolor') not in ('data_attribute', 'inline'):
-            raise Exception("must specify either data attribute or inline for applying the color")
-        if len(style_options['colors']) != 7:
-            raise Exception("must provide list of colors for levels 0-6")
-
+    def _colorize(self, canonical_token_levels):
         text_nodes = []
         for child in self.soup.descendants:
             if not hasattr(child, 'children'):
@@ -45,10 +49,12 @@ class HtmlColorizer:
                     token_level_int = int(token_level[0])
                     element = self.soup.new_tag("span")
                     element.string = token['token']
-                    if style_options['applycolor'] == 'data_attribute':
+                    if self.color_attribute == 'data':
                         element['data-level'] = token_level
-                    else:
-                        element['style'] = 'color:'+style_options['colors'][token_level_int]
+                    elif self.color_attribute == 'class':
+                        element['class'] = 'wordlevel'+str(token_level_int)
+                    elif self.color_attribute == 'style':
+                        element['style'] = 'color:'+self.color_list[token_level_int]
                 else:
                     element = NavigableString(token['token'])
                 token_elements.append(element)

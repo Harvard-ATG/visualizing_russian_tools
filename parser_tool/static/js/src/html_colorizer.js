@@ -3,26 +3,24 @@
 
   const ApiClient = global.app.ApiClient;
 
-  function colorizehtml(input_html) {
+  async function colorizehtml() {
     const api = new ApiClient();
-    return api.colorizehtml(input_html).then((res) => {
-      return res;
-    });
-  }
-
-  async function processHtml() {
     const input_html = $("#contentinput").val();
+
     writeframe('inputpreview', input_html);
     writeframe('outputpreview', 'Processing...');
 
-    const output_html = await colorizehtml(input_html);
-    writeframe('outputpreview', output_html);
+    const output_html = await api.colorizehtml(input_html);
+
+    writeframe('outputpreview', output_html, {cssLink: "/static/css/colorization.css"});
     $("#outputhtml").val(output_html);
     $("#results").show();
   }
 
-  function writeframe(id, html) {
-    var iframe = document.createElement('iframe');
+  function writeframe(id, html, options) {
+    options = options || {};
+  
+    const iframe = document.createElement('iframe');
     iframe.className = "previewhtml";
     document.getElementById(id).innerHTML = "";
     document.getElementById(id).appendChild(iframe);
@@ -33,6 +31,14 @@
     iframe.contentWindow.document.open();
     iframe.contentWindow.document.write(html);
     iframe.contentWindow.document.close();
+
+    if(iframe.contentWindow.document.head && options.cssLink) {
+      const link = document.createElement("link");
+      link.href = options.cssLink;
+      link.type = "text/css";
+      link.rel = "stylesheet";
+      iframe.contentWindow.document.head.appendChild(link);
+    }
   }
 
   function copy() {
@@ -45,7 +51,7 @@
     $("textarea#output_html").focus(function() {
       $(this).select();
     });
-    $('#colorizebtn').on('click', processHtml);
+    $('#colorizebtn').on('click', colorizehtml);
     $("#copytoclipboard").on("click", copy);
   });
 
