@@ -1,37 +1,38 @@
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
+import re
+
 from . import tokenizer
 
 
+COLOR_ATTR_STYLE = 'style'
+COLOR_ATTR_CLASS = 'class'
+COLOR_ATTR_DATA = 'data'
+COLOR_ATTR_CHOICES = (COLOR_ATTR_STYLE, COLOR_ATTR_CLASS, COLOR_ATTR_DATA)
+COLOR_LIST = 'inherit,green,blue,indigo,orange,orange,black'.split(',') # for levels 0-6
+DEFAULT_COLOR_ATTR = COLOR_ATTR_DATA
+SCRUB_HTML_PATTERN = re.compile(r"<[^>]*>")
+
+
 class HtmlColorizer:
-    def __init__(self, html_doc):
+    def __init__(self, html_doc, color_attribute=None):
         self.html_doc = html_doc
         self.soup = BeautifulSoup(html_doc, 'html.parser')
-        self.color_attribute = "style"
-        self.color_list = 'inherit,green,blue,violet,orange,orange,black'.split(',') # must provide list of colors for levels 0-6
 
-    def set_color_attribute(self, attribute):
-        if attribute not in ('style', 'class', 'data'):
-            return False
-        self.color_attribute = attribute
-
-    def set_colors(self, color_str):
-        color_list = color_str.split(',')
-        if len(color_list) != 7:
-            return False
-        self.color_list = color_list
+        if color_attribute in COLOR_ATTR_CHOICES:
+            self.color_attribute = color_attribute
+        else:
+            self.color_attribute = DEFAULT_COLOR_ATTR
 
     def get_doc_tokens(self):
-        doc_tokens = []
-        for child in self.soup.descendants:
-            if not hasattr(child, 'children'):
-                child_tokens = tokenizer.tokenize_and_tag(str(child))
-                doc_tokens.extend(child_tokens)
+        text = SCRUB_HTML_PATTERN.sub('', self.html_doc)
+        doc_tokens = tokenizer.tokenize_and_tag(text)
         return doc_tokens
 
     def colorize(self, lemmatized_data):
         canonical_token_levels = {t['canonical']: t['level'] for t in lemmatized_data['tokens']}
-        return self._colorize(canonical_token_levels)
+        self._colorize(canonical_token_levels)
+        return str(self.soup)
 
     def _colorize(self, canonical_token_levels):
         text_nodes = []
@@ -49,19 +50,14 @@ class HtmlColorizer:
                     token_level_int = int(token_level[0])
                     element = self.soup.new_tag("span")
                     element.string = token['token']
-                    if self.color_attribute == 'data':
+                    if self.color_attribute == COLOR_ATTR_DATA:
                         element['data-level'] = token_level
-                    elif self.color_attribute == 'class':
+                    elif self.color_attribute == COLOR_ATTR_CLASS:
                         element['class'] = 'wordlevel'+str(token_level_int)
-                    elif self.color_attribute == 'style':
-                        element['style'] = 'color:'+self.color_list[token_level_int]
+                    elif self.color_attribute == COLOR_ATTR_STYLE:
+                        element['style'] = 'color:'+COLOR_LIST[token_level_int]
                 else:
                     element = NavigableString(token['token'])
                 token_elements.append(element)
             text_node.replace_with(token_elements.extract())
         return self
-
-    def output(self, pretty=False):
-        if pretty:
-            return self.soup.prettify()
-        return str(self.soup)

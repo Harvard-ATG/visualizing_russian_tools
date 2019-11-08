@@ -11,7 +11,7 @@ from . import tokenizer, lemmatizer, htmlgenerator
 
 logger = logging.getLogger(__name__)
 
-MAX_TEXT_LENGTH = 400000
+MAX_TEXT_LENGTH = 500000
 
 
 def get_request_body_html(request):
@@ -164,25 +164,23 @@ class TextParserAPIView(View):
 class HtmlColorizerAPIView(View):
     def post(self, request):
         content_type = request.META.get('CONTENT_TYPE', '')
+        color_attribute = self.request.GET.get("attribute", "").strip()
         if content_type.startswith("text/html"):
             input_html = get_request_body_html(request)
-            output_html = self._parse(input_html)
+            output_html = self._parse(input_html, color_attribute)
             response = HttpResponse(output_html, content_type="text/html")
         else:
             body = get_request_body_json(request)
             input_html = body.get("html", "")
-            output_html = self._parse(input_html)
+            output_html = self._parse(input_html, color_attribute)
             response = JsonResponse({"html": output_html}, safe=False)
         return response
 
-    def _parse(self, input_html):
-        attribute = self.request.GET.get("attribute", "").strip()
-        html_colorizer = HtmlColorizer(input_html)
-        html_colorizer.set_color_attribute(attribute)
-        doc_tokens = html_colorizer.get_doc_tokens()
+    def _parse(self, input_html, color_attribute):
+        h = HtmlColorizer(input_html, color_attribute)
+        doc_tokens = h.get_doc_tokens()
         lemmatized_data = lemmatizer.lemmatize_tokens(doc_tokens)
-        html_colorizer.colorize(lemmatized_data)
-        output_html = html_colorizer.output()
+        output_html = h.colorize(lemmatized_data)
         return output_html
 
 text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())

@@ -3,28 +3,37 @@
 
   const ApiClient = global.app.ApiClient;
 
-  async function colorizehtml() {
+  async function colorize() {
     const api = new ApiClient();
     const input_html = $("#contentinput").val();
+    try {
+      before_colorize(input_html);
+      const output_html = await api.colorizehtml(input_html);
+      after_colorize(output_html);
+    } catch(err) {
+      error(err);
+    }
+  }
 
+  function before_colorize(input_html) {
     $("#colorizeerror").html("").hide();
     $("#outputhtml").val("");
     $("#results").hide();
 
     writeframe('inputpreview', input_html);
     writeframe('outputpreview', 'Processing...');
+  }
 
-    try {
-      const output_html = await api.colorizehtml(input_html);
+  function after_colorize(output_html) {
+    writeframe('outputpreview', output_html, {cssLink: "/static/css/colorization.css"});
+    $("#outputhtml").val(output_html);
+    $("#results").show();
+  }
 
-      writeframe('outputpreview', output_html, {cssLink: "/static/css/colorization.css"});
-      $("#outputhtml").val(output_html);
-      $("#results").show();
-    } catch(err) {
-      console.log("Error colorizing HTML:", err);
-      $("#colorizeerror").html(err.statusText || "Error colorizing HTML").show();
-      writeframe('outputpreview', 'Error');
-    }
+  function error(err) {
+    console.log("Error colorizing HTML:", err);
+    $("#colorizeerror").html(err.statusText || "Error colorizing HTML").show();
+    writeframe('outputpreview', 'Error');
   }
 
   function writeframe(id, html, options) {
@@ -61,7 +70,7 @@
     $("textarea#output_html").focus(function() {
       $(this).select();
     });
-    $('#colorizebtn').on('click', colorizehtml);
+    $('#colorizebtn').on('click', colorize);
     $("#copytoclipboard").on("click", copy);
   });
 
