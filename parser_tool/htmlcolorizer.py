@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
-from parser_tool import tokenizer
+from . import tokenizer
 
 
 class HtmlColorizer:

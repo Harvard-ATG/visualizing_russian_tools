@@ -7,19 +7,29 @@
     const api = new ApiClient();
     const input_html = $("#contentinput").val();
 
+    $("#colorizeerror").html("").hide();
+    $("#outputhtml").val("");
+    $("#results").hide();
+
     writeframe('inputpreview', input_html);
     writeframe('outputpreview', 'Processing...');
 
-    const output_html = await api.colorizehtml(input_html);
+    try {
+      const output_html = await api.colorizehtml(input_html);
 
-    writeframe('outputpreview', output_html, {cssLink: "/static/css/colorization.css"});
-    $("#outputhtml").val(output_html);
-    $("#results").show();
+      writeframe('outputpreview', output_html, {cssLink: "/static/css/colorization.css"});
+      $("#outputhtml").val(output_html);
+      $("#results").show();
+    } catch(err) {
+      console.log("Error colorizing HTML:", err);
+      $("#colorizeerror").html(err.statusText || "Error colorizing HTML").show();
+      writeframe('outputpreview', 'Error');
+    }
   }
 
   function writeframe(id, html, options) {
     options = options || {};
-  
+
     const iframe = document.createElement('iframe');
     iframe.className = "previewhtml";
     document.getElementById(id).innerHTML = "";
