@@ -167,20 +167,21 @@ class HtmlColorizerAPIView(View):
         color_attribute = self.request.GET.get("attribute", "").strip()
         if content_type.startswith("text/html"):
             input_html = get_request_body_html(request)
-            output_html = self._parse(input_html, color_attribute)
+            output_html = self._colorize(input_html, color_attribute)
             response = HttpResponse(output_html, content_type="text/html")
         else:
             body = get_request_body_json(request)
             input_html = body.get("html", "")
-            output_html = self._parse(input_html, color_attribute)
+            output_html = self._colorize(input_html, color_attribute)
             response = JsonResponse({"html": output_html}, safe=False)
         return response
 
-    def _parse(self, input_html, color_attribute):
+    def _colorize(self, input_html, color_attribute):
         h = HtmlColorizer(input_html, color_attribute)
         doc_tokens = h.get_doc_tokens()
         lemmatized_data = lemmatizer.lemmatize_tokens(doc_tokens)
-        output_html = h.colorize(lemmatized_data)
+        canonical_token_levels = {t['canonical']: t['level'] for t in lemmatized_data['tokens']}
+        output_html = h.colorize(canonical_token_levels)
         return output_html
 
 text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())
