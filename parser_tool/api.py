@@ -180,8 +180,7 @@ class HtmlColorizerAPIView(View):
         h = HtmlColorizer(input_html, color_attribute)
         doc_tokens = h.get_doc_tokens()
         lemmatized_data = lemmatizer.lemmatize_tokens(doc_tokens)
-        canonical_token_levels = {t['canonical']: t['level'] for t in lemmatized_data['tokens']}
-        output_html = h.colorize(canonical_token_levels)
+        output_html = h.colorize(lemmatized_data)
         return output_html
 
 text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())
