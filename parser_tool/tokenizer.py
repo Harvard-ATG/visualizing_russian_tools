@@ -175,6 +175,12 @@ def tag(tokens):
         offset += len(token)
     return tagged
 
+def tokenize_and_tag(text):
+    """
+    Convenience function for tagging and tokenizing text.
+    """
+    return tag(tokenize(text))
+
 def normalize_hyphens(token):
     """
     Normalizes hyphens.

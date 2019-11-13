@@ -76,6 +76,3 @@ def render_token(token):
 
     return {'node_type': ELEMENT_NODE, 'element': el}
 
-def insert_token(prev_el, container_el, token):
-
-    return prev_el

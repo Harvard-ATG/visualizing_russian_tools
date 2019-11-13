@@ -44,3 +44,7 @@ else:
 
 # Static files
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+
+# Cors headers
+#CORS_ORIGIN_WHITELIST = [origin for origin in os.environ.get('CORS_ORIGIN_WHITELIST', '').split(' ') if origin]
+CORS_ORIGIN_ALLOW_ALL = True

@@ -36,6 +36,6 @@ class JsonExceptionMiddleware:
             capture_exception(exception)
             response = HttpResponseServerError(json.dumps({"error": data}, indent=4), content_type='application/json')
         return response
- 
+
     def is_api_call(self, request):
-        return request.META.get("CONTENT_TYPE") == "application/json"
+        return request.META.get("CONTENT_TYPE") == "application/json" or request.path.startswith("/api/")

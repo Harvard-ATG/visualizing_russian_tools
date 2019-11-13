@@ -5,3 +5,6 @@ def text_parsing_analysis(request):
 
 def mini_story_creator(request):
     return render(request, 'parser_tool/mini_story_creator.html')
+
+def html_colorizer(request):
+    return render(request, 'parser_tool/html_colorizer.html')

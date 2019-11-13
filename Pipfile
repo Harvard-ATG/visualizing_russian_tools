@@ -12,6 +12,9 @@ requests = "*"
 django-dotenv = "*"
 gunicorn = "*"
 sentry-sdk = "==0.10.1"
+lxml = "*"
+"beautifulsoup4" = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 "flake8" = "*"
