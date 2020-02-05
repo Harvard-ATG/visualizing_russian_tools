@@ -16,7 +16,7 @@ try:
 except requests.exceptions.RequestException:
     pass
 
-if EC2_PRIVATE_IP:
+if EC2_PRIVATE_IP and EC2_PRIVATE_IP not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(EC2_PRIVATE_IP)
 
 # SSL is terminated at the ELB so look for this header to know that we should be in ssl mode
