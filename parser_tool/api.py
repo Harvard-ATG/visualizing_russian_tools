@@ -1,6 +1,9 @@
 from django.http import JsonResponse, HttpResponse
+from django.core.cache import cache
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+
+import hashlib
 import json
 import logging
 
@@ -177,11 +180,17 @@ class HtmlColorizerAPIView(View):
         return response
 
     def _colorize(self, input_html, color_attribute):
-        h = HtmlColorizer(input_html, color_attribute)
-        doc_tokens = h.get_doc_tokens()
-        lemmatized_data = lemmatizer.lemmatize_tokens(doc_tokens)
-        output_html = h.colorize(lemmatized_data)
+        input_html_signature = hashlib.md5(color_attribute.encode() + input_html.encode()).hexdigest()
+        output_html = cache.get(input_html_signature)
+        if output_html is None:
+            h = HtmlColorizer(input_html, color_attribute)
+            doc_tokens = h.get_doc_tokens()
+            lemmatized_data = lemmatizer.lemmatize_tokens(doc_tokens)
+            output_html = h.colorize(lemmatized_data)
+            cache.set(input_html_signature, output_html)
+
         return output_html
+
 
 text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())
 html_colorizer_api_view = csrf_exempt(HtmlColorizerAPIView.as_view())

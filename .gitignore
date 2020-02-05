@@ -14,3 +14,4 @@ http_static
 NewVisualizingRussian*.csv
 NewVisualizingRussian*.xslx
 /scratch
+/django_cache

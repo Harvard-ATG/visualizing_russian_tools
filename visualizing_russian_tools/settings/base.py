@@ -63,6 +63,17 @@ WSGI_APPLICATION = 'visualizing_russian_tools.wsgi.application'
 
 DATABASES = {}
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.environ.get('CACHE_LOCATION', os.path.join(ROOT_DIR, 'django_cache')),
+        'TIMEOUT': 86400, # 1 day
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
