@@ -205,11 +205,12 @@
    */
   var textInfoCtrl = {
     render: function(data) {
-      var counts = this.getCounts();
-      this.generateChart(counts);
-      this.showTextInfo(counts);
+      this.counts = this.getCounts();
+      this.generateChart();
+      this.showTextInfo();
     },
     reset: function() {
+      this.counts = null;
       $("#levels").html('');
       $("#textinfo").html('');
     },
@@ -221,8 +222,9 @@
       counts[0] = $('.word').length - $('.word[data-level]').length;
       return counts;
     },
-    generateChart: function(counts) {
+    generateChart: function() {
       var self = this;
+      var counts = this.counts;
       var chart = c3.generate({
         bindto: '#levels',
         data: {
@@ -261,7 +263,8 @@
         }
       });
     },
-    showTextInfo: function(counts) {
+    showTextInfo: function() {
+      var counts = this.counts;
       var wl = $('.word').length;
       var html = "";
       html += '<div>Word Count: <span class="numbers mr-4"> ' + wl + '</span></div>';
@@ -270,7 +273,17 @@
       html += '<div>L2 Count: <span class="numbers mr-4"> ' + counts[2] + '</span></div>';
       html += '<div>L3 Count: <span class="numbers mr-4"> ' + counts[3] + '</span></div>';
       html += '<div>L4 Count: <span class="numbers mr-4"> ' + counts[4] + '</span></div>';
+      html += '<button type="button" id="textinfocopy" class="btn btn-secondary btn-sm">Copy to clipboard</button>';
       $('#textinfo').html(html);
+    },
+    copyToClipboard: function() {
+      var copyText = document.querySelector("#textinfo");
+      var range = document.createRange();
+      range.selectNode(copyText)
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand("copy");
+      window.getSelection().removeAllRanges();
     }
   };
 
@@ -366,6 +379,9 @@
     onClickLemmaToggle: function(e) {
       parsedTextCtrl.toggleLemmas();
     },
+    onClickCopyTextInfo: function(e) {
+      textInfoCtrl.copyToClipboard();
+    },
     clearAnalysis: function() {
       parsedTextCtrl.reset();
       textInfoCtrl.reset();
@@ -383,6 +399,7 @@
     $(document).on('click', '.underline-toggle', utils.logEvent(mainCtrl.onClickUnderlineToggle));
     $(document).on('click', '.word.parsed', utils.logEvent(mainCtrl.onClickWord));  
     $(document).on('click', '.lemma-toggle', utils.logEvent(mainCtrl.onClickLemmaToggle));
+    $(document).on('click', '#textinfocopy', utils.logEvent(mainCtrl.onClickCopyTextInfo));
   });
 
 })(window, jQuery);
