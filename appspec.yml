@@ -21,7 +21,7 @@ hooks:
       timeout: 60
   ApplicationStart:
     - location: .codedeploy/start_application.sh
-      timeout: 120
+      timeout: 60
   ApplicationStop:
     - location: .codedeploy/stop_application.sh
-      timeout: 120
+      timeout: 60
