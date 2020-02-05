@@ -18,7 +18,14 @@ pre.words {
 }
 #textinfo {
     font-size: 125%;
-    margin: 18px 0;
+    padding: 18px 0;
+    height: 100%;
+}
+#textinfo:hover > #textinfocopy {
+    display: block;
+}
+#textinfo:not(:hover) > #textinfocopy {
+    display: none;
 }
 #wordinfo {
     position: relative;
