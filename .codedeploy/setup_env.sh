@@ -5,8 +5,8 @@ DJANGO_SECRET_KEY=$(aws ssm get-parameter --name /$APPLICATION_NAME/$DEPLOYMENT_
 
 cd /home/ubuntu/sites/visualizing_russian_tools
 echo DJANGO_SETTINGS_MODULE="visualizing_russian_tools.settings.aws" >> .env
-echo DJANGO_LOG_FILE="/home/ubuntu/logs/django-$APPLICATION_NAME.log" >> .env
-echo CACHE_LOCATION="/home/ubuntu/cache/django-$APPLICATION_NAME-cache" >> .env
+echo DJANGO_LOG_FILE="/home/ubuntu/logs/django-visualizing_russian_tools.log" >> .env
+echo CACHE_LOCATION="/home/ubuntu/cache/django-visualizing_russian_tools-cache" >> .env
 echo DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY >> .env
 echo DJANGO_ENV=$DEPLOYMENT_GROUP_NAME >> .env
 echo ALLOWED_HOSTS="localhost 127.0.0.1 $AWS_PRIVATE_IP $AWS_PUBLIC_IP .compute-1.amazonaws.com .elb.amazonaws.com visualizingrussian.fas.harvard.edu" >> .env
