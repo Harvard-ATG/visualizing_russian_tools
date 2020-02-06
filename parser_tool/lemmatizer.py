@@ -1,9 +1,18 @@
 import logging
 
-import clancy_database
+from clancy_database import queries
+
 from . import tokenizer
 
 logger = logging.getLogger(__name__)
+
+
+def lookup_lemma_by_word(word):
+    return queries.lookup_lemma(word=word)
+
+
+def lookup_lemma_by_id(lemma_id):
+    return queries.lookup_lemma(lemma_id=lemma_id)
 
 
 def lemmatize_text(text):
@@ -24,7 +33,7 @@ def lemmatize_tokens(tokens):
     """
     unique_canonical_tokens = list(set([t['canonical'] for t in tokens if t['tokentype'] == tokenizer.TOKEN_RUS]))
     logger.debug(unique_canonical_tokens)
-    lemmatized = clancy_database.lemmatizer.makelookup(forms=unique_canonical_tokens)
+    lemmatized = queries.makelookup(forms=unique_canonical_tokens)
 
     for token in tokens:
         token["form_ids"] = []
@@ -34,7 +43,7 @@ def lemmatize_tokens(tokens):
 
             # Get all variations on the canonical form that could have matched the database
             # and try to find the first variant that is in the lookup table.
-            variant_forms = clancy_database.lemmatizer.get_variant_forms(token["canonical"])
+            variant_forms = queries.variant_forms(token["canonical"])
             for variant_form in variant_forms:
                 if variant_form in lemmatized["lookup"]:
                     lookup_form = variant_form

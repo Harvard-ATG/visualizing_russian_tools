@@ -1,5 +1,5 @@
-from django.http import JsonResponse, HttpResponse
 from django.core.cache import cache
+from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
@@ -8,9 +8,7 @@ import json
 import logging
 
 from visualizing_russian_tools.exceptions import JsonBadRequest
-from clancy_database import queries
-from .htmlcolorizer import HtmlColorizer
-from . import tokenizer, lemmatizer, htmlgenerator
+from . import tokenizer, lemmatizer, htmlgenerator, htmlcolorizer
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +57,7 @@ def colorize_html_with_cache(input_html, color_attribute):
     cache_key = "colorize_html:" + hashlib.md5(color_attribute.encode() + input_html.encode()).hexdigest()
     output_html = cache.get(cache_key)
     if output_html is None:
-        h = HtmlColorizer(input_html, color_attribute)
+        h = htmlcolorizer.HtmlColorizer(input_html, color_attribute)
         doc_tokens = h.get_doc_tokens()
         lemmatized_data = lemmatizer.lemmatize_tokens(doc_tokens)
         output_html = h.colorize(lemmatized_data)
@@ -71,7 +69,7 @@ class LemmaAPIView(View):
     def get(self, request):
         status = "success"
         message_for_status = {
-            "fail": "Missing 'word' or 'lemma_id' query parameter",
+            "fail": "Missing 'word' or 'id' query parameter",
             "error": "Internal server error"
         }
 
@@ -79,10 +77,11 @@ class LemmaAPIView(View):
         try:
             if "word" in request.GET:
                 word = request.GET.get("word", "").strip()
-                data = queries.lookup_lemma_by_word(word)
-            elif "lemma_id" in request.GET:
-                lemma_id = request.GET.get("lemma_id", "").strip()
-                data = queries.lookup_lemma_by_id(lemma_id)
+                data = lemmatizer.lookup_lemma_by_word(word)
+            elif "id" in request.GET:
+                lemma_id = request.GET.get("id", "").strip()
+                if lemma_id.isdigit():
+                    data = lemmatizer.lookup_lemma_by_id(lemma_id)
             else:
                 status = "fail"
         except Exception as e:
