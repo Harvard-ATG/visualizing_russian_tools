@@ -16,12 +16,14 @@ logger = logging.getLogger(__name__)
 
 MAX_TEXT_LENGTH = 500000
 
+
 def get_request_body_html(request):
     if not request.content_type.startswith("text/html"):
         raise JsonBadRequest("Expected HTML content type header")
     if len(request.body.decode('utf-8')) > MAX_TEXT_LENGTH:
         raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=MAX_TEXT_LENGTH))
     return request.body.decode('utf-8')
+
 
 def get_request_body_json(request):
     if request.content_type != "application/json":
@@ -34,6 +36,7 @@ def get_request_body_json(request):
         raise JsonBadRequest('Invalid JSON')
     return body
 
+
 def lemmatize_text_with_cache(text):
     cache_key = "lemmatize_text:" + hashlib.md5(text.encode()).hexdigest()
     lemmatized_data = cache.get(cache_key)
@@ -42,13 +45,15 @@ def lemmatize_text_with_cache(text):
         cache.set(cache_key, lemmatized_data)
     return lemmatized_data
 
+
 def tokenize_and_tag_with_cache(text):
     cache_key = "tokenize_and_tag:" + hashlib.md5(text.encode()).hexdigest()
     tokens = cache.get(cache_key)
     if tokens is None:
-        tokens = tokenizer.tokenize_and_tag(body)
+        tokens = tokenizer.tokenize_and_tag(text)
         cache.set(cache_key, tokens)
     return tokens
+
 
 def colorize_html_with_cache(input_html, color_attribute):
     cache_key = "colorize_html:" + hashlib.md5(color_attribute.encode() + input_html.encode()).hexdigest()
