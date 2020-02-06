@@ -2,6 +2,7 @@
 import unittest
 from parser_tool import tokenizer
 
+
 class TestTokenizer(unittest.TestCase):
     def test_tokenize_sentence_unaccented(self):
         text = 'Все счастливые семьи похожи друг на друга, каждая несчастливая семья несчастлива по-своему.\n\n'
@@ -172,6 +173,7 @@ class TestTokenizerHelpers(unittest.TestCase):
         for test in tests:
             (tokens, tagged) = test['tokens'], test['tagged']
             self.assertEqual(tagged, tokenizer.tag(tokens))
+
 
 if __name__ == '__main__':
     unittest.main()

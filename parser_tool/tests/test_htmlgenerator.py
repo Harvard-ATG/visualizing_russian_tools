@@ -4,14 +4,15 @@ from xml.etree import ElementTree as ET
 
 from parser_tool import tokenizer, htmlgenerator
 
+
 class TestHtmlGenerator(unittest.TestCase):
-    
+
     def _maketokendict(self, **kwargs):
         token_text = kwargs.get("token", "")
         token_dict = {
-            "token": token_text, 
-            "index": kwargs.get("index", 0), 
-            "offset": kwargs.get("offset", 0), 
+            "token": token_text,
+            "index": kwargs.get("index", 0),
+            "offset": kwargs.get("offset", 0),
             "tokentype": kwargs.get("tokentype", tokenizer.TOKEN_WORD),
             "canonical": kwargs.get("canonical", tokenizer.canonical(token_text)),
             "form_ids": kwargs.get("form_ids", []),
@@ -33,7 +34,7 @@ class TestHtmlGenerator(unittest.TestCase):
             "data-level": token_dict['level']
         }, el.attrib)
         self.assertEqual(token_text, el.text)
-        
+
     def test_render_token_english_word(self):
         token_text = "hypothetical"
         token_dict = self._maketokendict(token=token_text, tokentype=tokenizer.TOKEN_WORD)
@@ -44,34 +45,34 @@ class TestHtmlGenerator(unittest.TestCase):
         self.assertEqual("span", el.tag)
         self.assertEqual({"class": "word"}, el.attrib)
         self.assertEqual(token_text, el.text)
-    
+
     def test_render_token_with_multiple_spaces(self):
         token_text = " " * 3
         expected_text = token_text.replace("  ", "\u00A0\u00A0")
         token_dict = self._maketokendict(token=token_text, tokentype=tokenizer.TOKEN_SPACE)
         rendered = htmlgenerator.render_token(token_dict)
-        
+
         self.assertEqual(htmlgenerator.TEXT_NODE, rendered['node_type'])
         self.assertEqual(expected_text, rendered['text'])
-    
+
     def test_render_token_with_punctuation(self):
         token_text = "')."
         expected_text = token_text
         token_dict = self._maketokendict(token=token_text, tokentype=tokenizer.TOKEN_SPACE)
         rendered = htmlgenerator.render_token(token_dict)
-        
+
         self.assertEqual(htmlgenerator.TEXT_NODE, rendered['node_type'])
         self.assertEqual(expected_text, rendered['text'])
-    
+
     def test_tokens2html(self):
         tokens = [
             self._maketokendict(token="A", tokentype=tokenizer.TOKEN_WORD),
-            self._maketokendict(token= " ", tokentype=tokenizer.TOKEN_SPACE),
+            self._maketokendict(token=" ", tokentype=tokenizer.TOKEN_SPACE),
             self._maketokendict(token="первоку́рсник", tokentype=tokenizer.TOKEN_RUS, level="3A", form_ids=["174128"]),
-            self._maketokendict(token= " ", tokentype=tokenizer.TOKEN_SPACE),
-            self._maketokendict(token= "|", tokentype=tokenizer.TOKEN_PUNCT),
+            self._maketokendict(token=" ", tokentype=tokenizer.TOKEN_SPACE),
+            self._maketokendict(token="|", tokentype=tokenizer.TOKEN_PUNCT),
             self._maketokendict(token="первоку́рсница", tokentype=tokenizer.TOKEN_RUS, level="3A", form_ids=["174128"]),
-            self._maketokendict(token= " ", tokentype=tokenizer.TOKEN_SPACE),
+            self._maketokendict(token=" ", tokentype=tokenizer.TOKEN_SPACE),
         ]
         html = htmlgenerator.tokens2html(tokens)
         root = ET.fromstring(html)

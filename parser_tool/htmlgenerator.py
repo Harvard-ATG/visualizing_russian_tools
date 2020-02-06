@@ -1,5 +1,4 @@
 import io
-import re
 import logging
 from xml.etree import ElementTree as ET
 
@@ -9,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 ELEMENT_NODE = 1
 TEXT_NODE = 3
+
 
 def tokens2html(tokens, **options):
     """
@@ -37,9 +37,10 @@ def tokens2html(tokens, **options):
 
     # Serialize element tree to HTML string
     html = serialize(container_el)
-    #html = newline2br(html) # commented out because switched to "pre" tag
+    # html = newline2br(html) # commented out because switched to "pre" tag
 
     return html
+
 
 def serialize(root_el):
     textstream = io.BytesIO()
@@ -47,15 +48,17 @@ def serialize(root_el):
     html = textstream.getvalue().decode("utf-8")
     return html
 
+
 def newline2br(text):
     return text.replace("\n", "<br>")
 
+
 def render_token(token):
     token_text = token['token']
-    if token['tokentype']  in (tokenizer.TOKEN_PUNCT, tokenizer.TOKEN_SPACE):
-        token_text = token_text.replace("\r", "\n") # normalize returns as newlines
-        token_text = token_text.replace("\t", "\u0009") # render tab entities
-        token_text = token_text.replace("  ", "\u00A0\u00A0") # render 2 consecutive spaces as nbsp
+    if token['tokentype'] in (tokenizer.TOKEN_PUNCT, tokenizer.TOKEN_SPACE):
+        token_text = token_text.replace("\r", "\n")  # normalize returns as newlines
+        token_text = token_text.replace("\t", "\u0009")  # render tab entities
+        token_text = token_text.replace("  ", "\u00A0\u00A0")  # render 2 consecutive spaces as nbsp
         return {'node_type': TEXT_NODE, 'text': token_text}
 
     attrib = {}
@@ -75,4 +78,3 @@ def render_token(token):
     el.text = token_text
 
     return {'node_type': ELEMENT_NODE, 'element': el}
-

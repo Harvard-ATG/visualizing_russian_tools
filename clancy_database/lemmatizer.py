@@ -1,6 +1,5 @@
 import logging
-from django.db.models.functions import Lower
-from operator import itemgetter, attrgetter
+from operator import itemgetter
 
 from .models import Inflection, Lemma
 
@@ -8,8 +7,9 @@ logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 300
 
-CYRILLIC_SMALL_LETTER_IE= '\u0435' # е
+CYRILLIC_SMALL_LETTER_IE = '\u0435' # е
 CYRILLIC_SMALL_LETTER_IO = '\u0451' # ё
+
 
 def get_variant_forms(form):
     """
@@ -23,6 +23,7 @@ def get_variant_forms(form):
         variant_forms.append(disguised_io_as_ie_form)
     return variant_forms
 
+
 def query_multiple(forms):
     """
     Returns a queryset of Inflection objects that match the given forms.
@@ -32,12 +33,13 @@ def query_multiple(forms):
     for form in forms:
         for variant_form in get_variant_forms(form):
             forms_to_query.append(variant_form)
-    
+
     # Query database for set of matching forms
     logger.debug("forms_to_query: %s" % forms_to_query)
-    #queryset = Inflection.objects.annotate(formlower=Lower('form')).filter(formlower__in=forms_to_query)
+    # queryset = Inflection.objects.annotate(formlower=Lower('form')).filter(formlower__in=forms_to_query)
     queryset = Inflection.objects.filter(form__in=forms_to_query)
     return queryset
+
 
 def makelookup(forms=None):
     """
@@ -50,7 +52,7 @@ def makelookup(forms=None):
     logger.debug("makelookup(): number of forms: %s" % len(forms))
     table = {"forms": {}, "lemmas": {}, "lookup": {}}
 
-    # Batch the DB queries to work around "sqlite3.OperationalError: too many SQL variables" 
+    # Batch the DB queries to work around "sqlite3.OperationalError: too many SQL variables"
     for idx, forms in enumerate(batch(forms, n=BATCH_SIZE)):
         logger.debug("makelookup(): batch=%s forms=%s" % (idx, len(forms)))
         lemma_ids = set()
@@ -65,7 +67,7 @@ def makelookup(forms=None):
         logger.debug("makelookup(): batch=%s lemmas=%s" % (idx, len(lemma_ids)))
         for lemma in Lemma.objects.filter(id__in=list(lemma_ids)):
             table["lemmas"][lemma.id] = lemma.to_dict()
-    
+
     # Sort the lookup so that form IDs are returned in order of level and rank
     # This is necessary since we didn't sort the forms when we queried the database
     table["lookup"] = sortlookup(table)
@@ -73,11 +75,12 @@ def makelookup(forms=None):
 
     return table
 
+
 def sortlookup(table):
-    '''
-    This function sorts the "lookup" dictionary in the table of forms/lemmas so that given a word form, 
+    """
+    This function sorts the "lookup" dictionary in the table of forms/lemmas so that given a word form,
     the matching list of forms are sorted by level (e.g. 1E, 2I, 3A, ...) and then by rank (1.0, 2.0, ...).
-    '''
+    """
     sorted_lookup = {}
     for word in table["lookup"]:
         form_tuples = []
@@ -85,9 +88,10 @@ def sortlookup(table):
             form = table["forms"][form_id]
             lemma = table["lemmas"][form["lemma_id"]]
             form_tuples.append((form_id, lemma["level"], lemma["rank"]))
-        sorted_form_tuples = sorted(form_tuples, key=itemgetter(1,2,0))
+        sorted_form_tuples = sorted(form_tuples, key=itemgetter(1, 2, 0))
         sorted_lookup[word] = [form_tuple[0] for form_tuple in sorted_form_tuples]
     return sorted_lookup
+
 
 def lemmatize(form):
     """
@@ -104,10 +108,11 @@ def lemmatize(form):
             lemmas.append(inflection.lemma.to_dict())
     return lemmas
 
+
 def batch(iterable, n=1):
     """
     Utility function to slice an interable into batches of size n.
     """
     size = len(iterable)
     for i in range(0, size, n):
-        yield iterable[i : min(i + n, size)]
+        yield iterable[i:min(i + n, size)]

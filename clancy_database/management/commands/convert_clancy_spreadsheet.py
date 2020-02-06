@@ -6,6 +6,7 @@ import time
 
 from clancy_database.spreadsheet import csv2db
 
+
 class Command(BaseCommand):
     help = 'Converts spreadsheet into a SQLite database. Assumes that the spreadsheet is in CSV format (must be converted from XLSX first).'
 
@@ -17,7 +18,7 @@ class Command(BaseCommand):
         csvfile = options['csvfile']
         dbfile = options['dbfile']
         verbose = False
-        
+
         if not os.path.exists(csvfile):
             raise CommandError("Input CSV file %s does not exist!" % csvfile)
 

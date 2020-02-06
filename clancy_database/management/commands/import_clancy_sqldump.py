@@ -6,6 +6,7 @@ import os.path
 
 import clancy_database
 
+
 class Command(BaseCommand):
     help = 'Import database from SQL dump file.'
 
@@ -15,7 +16,6 @@ class Command(BaseCommand):
         parser.add_argument("--dbfile", required=False, help="Database to load", default=settings.DATABASES['default']['NAME'])
 
     def handle(self, *args, **options):
-        app_dir = os.path.dirname(clancy_database.__file__)
         dbfile = options['dbfile']
         sqlfile = options['sqlfile']
 

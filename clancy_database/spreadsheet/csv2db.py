@@ -127,14 +127,16 @@ VERB_CONJUGATIONS = [
 ]
 
 
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # Functions
+
 
 def create_schema(cursor):
     with open(os.path.join(FILE_DIR, 'schema.sql'), 'r', encoding='utf-8') as f:
         schema = f.read()
-        cursor.execute("PRAGMA foreign_keys = ON;");
+        cursor.execute("PRAGMA foreign_keys = ON;")
         cursor.executescript(schema)
+
 
 def process_data(cursor, filename, verbose=False):
     with open(filename, encoding='utf-8') as csvfile:
@@ -144,6 +146,7 @@ def process_data(cursor, filename, verbose=False):
                 continue
             pk = insert_lemma(cursor, row, verbose=verbose)
             insert_inflections(cursor, pk, row, verbose=verbose)
+
 
 def insert_lemma(cursor, row, verbose=False):
     data = {
@@ -166,9 +169,9 @@ def insert_lemma(cursor, row, verbose=False):
         'transitivity':       row['Transitivity'].strip(),
     }
     items = data.items()
-    fieldstr = ','.join(["'%s'" % k for k,v in items])
-    valstr = ','.join(['?' for k,v in items])
-    values = [v for k,v in items]
+    fieldstr = ','.join(["'%s'" % k for k, v in items])
+    valstr = ','.join(['?' for k, v in items])
+    values = [v for k, v in items]
     sql = 'INSERT INTO lemma (%s) VALUES (%s)' % (fieldstr, valstr)
     try:
         cursor.execute(sql, values)
@@ -178,22 +181,23 @@ def insert_lemma(cursor, row, verbose=False):
         raise e
     return cursor.lastrowid
 
+
 def insert_inflections(cursor, pk, row, verbose=False):
     sql = 'INSERT INTO inflection (lemma_id, form, stressed, type, frequency) VALUES (?, ?, ?, ?, ?)'
     inserts = []
 
     if row['POS'] in POS['inflected']:
-        inserts =  handle_inflected_forms(pk, row) # Nouns, Adjectives, Pronouns, Cardinal Numbers, etc
+        inserts = handle_inflected_forms(pk, row) # Nouns, Adjectives, Pronouns, Cardinal Numbers, etc
     elif row['POS'] in POS['noninflected']:
-        inserts =  handle_noninflected_forms(pk, row) # Adverbs, Conjunctions, Particles, etc
+        inserts = handle_noninflected_forms(pk, row) # Adverbs, Conjunctions, Particles, etc
     elif row['POS'] == 'verb':
-        inserts =  handle_verb_forms(pk, row)
+        inserts = handle_verb_forms(pk, row)
     else:
         raise Exception("Unhandled part of speech!")
 
     # If we did not generate any inserts, add a single word entry for the lemma
     if len(inserts) == 0:
-        inserts =  handle_lemma_forms(pk, row)
+        inserts = handle_lemma_forms(pk, row)
 
     if verbose:
         print("[%s:%s] %s => %d inserts (%s)\n" % (row['UniqueId'], row['POS'], row['Russian'], len(inserts), ",".join([insert[3] for insert in inserts])))
@@ -205,6 +209,7 @@ def insert_inflections(cursor, pk, row, verbose=False):
             logging.exception("inflection: %s" % insert)
             raise e
 
+
 def get_row_freq(row, colname):
     frequency = row.get('Freq_%s' % colname, '')
     if frequency in EMPTY_VALS:
@@ -212,6 +217,7 @@ def get_row_freq(row, colname):
     if frequency in EMPTY_VALS:
         frequency = None
     return frequency
+
 
 def get_cell_multi_forms(form, stressed=''):
     forms_with_stressed = []
@@ -227,9 +233,10 @@ def get_cell_multi_forms(form, stressed=''):
                 except IndexError:
                     forms_with_stressed.append((form, ''))
     elif form:
-        forms_with_stressed.append((form,stressed))
+        forms_with_stressed.append((form, stressed))
 
     return forms_with_stressed
+
 
 def has_second_russian(row):
     if row['POS'] in ('phrase', 'prefix', 'prep', 'num'):
@@ -238,8 +245,8 @@ def has_second_russian(row):
         return True
     return False
 
+
 def handle_inflected_forms(pk, row):
-    inflected = POS['inflected']
     inserts = []
     uniq = {}
     for declension in DECLENSIONS:
@@ -255,10 +262,11 @@ def handle_inflected_forms(pk, row):
             forms_with_stressed.extend(secondary_forms_with_stressed)
 
         for form, stressed in forms_with_stressed:
-            if form+inflection_type not in uniq:
-                uniq[form+inflection_type] = True
+            if form + inflection_type not in uniq:
+                uniq[form + inflection_type] = True
                 inserts.append([pk, form.strip(), stressed, inflection_type, frequency])
     return inserts
+
 
 def handle_noninflected_forms(pk, row):
     noninflected = POS['noninflected']
@@ -276,10 +284,11 @@ def handle_noninflected_forms(pk, row):
         forms_with_stressed.extend(secondary_forms_with_stressed)
 
     for form, stressed in forms_with_stressed:
-        if form+inflection_type not in uniq:
-            uniq[form+inflection_type] = True
+        if form + inflection_type not in uniq:
+            uniq[form + inflection_type] = True
             inserts.append([pk, form.strip(), stressed, inflection_type, frequency])
     return inserts
+
 
 def handle_verb_forms(pk, row):
     inserts = []
@@ -293,10 +302,11 @@ def handle_verb_forms(pk, row):
         stressed = row.get('%s_stressed' % colname, '')
         forms_with_stressed = get_cell_multi_forms(form, stressed)
         for form, stressed in forms_with_stressed:
-            if form+inflection_type not in uniq:
-                uniq[form+inflection_type] = True
+            if form + inflection_type not in uniq:
+                uniq[form + inflection_type] = True
                 inserts.append([pk, form.strip(), stressed, inflection_type, frequency])
     return inserts
+
 
 def handle_lemma_forms(pk, row):
     inserts = []
@@ -306,8 +316,9 @@ def handle_lemma_forms(pk, row):
         inserts.append([pk, form.strip(), stressed, colname, None])
     return inserts
 
+
 def csv_get_fields(filename):
-    '''Returns a list of the column headers from the CSV file.'''
+    """Returns a list of the column headers from the CSV file."""
     fields = []
     with open(filename, encoding='utf-8') as csvfile:
         csvreader = csv.DictReader(csvfile)
@@ -319,8 +330,9 @@ def csv_get_fields(filename):
                 break
     return fields
 
+
 def main(csvfile, dbfile, verbose=False):
-    '''Main task runner -- expected to be called from a script passing in the required arguments.'''
+    """Main task runner -- expected to be called from a script passing in the required arguments."""
     CONN = sqlite3.connect(dbfile)
     cursor = CONN.cursor()
     create_schema(cursor)

@@ -8,7 +8,7 @@ import json
 import logging
 
 from visualizing_russian_tools.exceptions import JsonBadRequest
-from clancy_database import lemmatizer, queries
+from clancy_database import queries
 from .htmlcolorizer import HtmlColorizer
 from . import tokenizer, lemmatizer, htmlgenerator
 
@@ -140,7 +140,7 @@ class LemmatizeAPIView(View):
                 word = tokenizer.canonical(word)
                 lemmas = lemmatizer.lemmatize(word)
             else:
-                status = "fail" # no word was submitted
+                status = "fail"  # no word was submitted
         except Exception as e:
             logger.exception(e)
             status = "error"

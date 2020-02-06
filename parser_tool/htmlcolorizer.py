@@ -5,7 +5,7 @@ import re
 from . import tokenizer
 
 # List of colors to use when applying as an inline style
-COLOR_LIST = ['inherit', 'green', 'blue', 'indigo', 'orange', 'orange', 'black'] # for levels 0-6
+COLOR_LIST = ['inherit', 'green', 'blue', 'indigo', 'orange', 'orange', 'black']  # for levels 0-6
 
 # Define color choices, either apply as an inline style, a class or data attribute
 COLOR_ATTR_STYLE = 'style'
@@ -19,9 +19,9 @@ SCRUB_HTML_PATTERN = re.compile(r"<[^>]*>")
 
 
 class HtmlColorizer:
-    '''
+    """
     A class used to colorize the words in an HTML document according to the difficulty level of the lemma.
-    '''
+    """
     def __init__(self, html_doc, color_attribute=None):
         self.html_doc = html_doc
         self.soup = BeautifulSoup(html_doc, 'html.parser')
@@ -32,13 +32,13 @@ class HtmlColorizer:
             self.color_attribute = DEFAULT_COLOR_ATTR
 
     def get_doc_tokens(self):
-        ''' Returns a complete list of tokens from the html document. '''
+        """ Returns a complete list of tokens from the html document. """
         text = SCRUB_HTML_PATTERN.sub('', self.html_doc)
         doc_tokens = tokenizer.tokenize_and_tag(text)
         return doc_tokens
 
     def colorize(self, lemmatized_data):
-        ''' Returns the colorized HTML. '''
+        """ Returns the colorized HTML. """
         canonical_token_levels = {t['canonical']: t['level'] for t in lemmatized_data['tokens']}
         self._colorize(canonical_token_levels)
         return str(self.soup)
@@ -65,9 +65,9 @@ class HtmlColorizer:
                     if self.color_attribute == COLOR_ATTR_DATA:
                         element['data-level'] = token_level
                     elif self.color_attribute == COLOR_ATTR_CLASS:
-                        element['class'] = 'wordlevel'+str(token_level_int)
+                        element['class'] = 'wordlevel' + str(token_level_int)
                     elif self.color_attribute == COLOR_ATTR_STYLE:
-                        element['style'] = 'color:'+COLOR_LIST[token_level_int]
+                        element['style'] = 'color:' + COLOR_LIST[token_level_int]
                 else:
                     element = NavigableString(token['token'])
                 token_elements.append(element)

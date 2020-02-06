@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Lemma(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)
     external_id = models.IntegerField(unique=True, blank=True, null=True)
@@ -22,7 +23,7 @@ class Lemma(models.Model):
 
     def __str__(self):
         return "%s [%s:%s] " % (self.lemma, self.pos, self.id, )
-    
+
     def to_dict(self):
         aspect_counterpart = self.aspect_counterpart.split(";") if self.aspect_counterpart else []
         aspect_counterpart = [s.strip() for s in aspect_counterpart]
@@ -52,6 +53,7 @@ class Lemma(models.Model):
         ]
         ordering = ['level', 'rank'] # Order by hand-picked levels and then by more frequently occurring lemma
 
+
 class Inflection(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)
     lemma = models.ForeignKey('Lemma', on_delete=models.PROTECT)
@@ -62,7 +64,7 @@ class Inflection(models.Model):
 
     def __str__(self):
         return "%s [%s:%s]" % (self.form, self.type, self.id)
-    
+
     def to_dict(self):
         return {
             "id": self.id,

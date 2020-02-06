@@ -2,6 +2,7 @@
 import unittest
 from clancy_database import lemmatizer
 
+
 class TestLookupTable(unittest.TestCase):
     # TODO: convert this into a proper fixture
     LOOKUP_TABLE_UNSORTED = {
@@ -55,6 +56,7 @@ class TestLookupTable(unittest.TestCase):
             'рыбы': [661935, 13002, 12997]
         }
     }
+
     def test_sortlookup(self):
         unsorted_lookup = self.LOOKUP_TABLE_UNSORTED["lookup"]
         sorted_lookup = lemmatizer.sortlookup(self.LOOKUP_TABLE_UNSORTED)
@@ -62,5 +64,3 @@ class TestLookupTable(unittest.TestCase):
         expected_form_ids = [12997, 13002, 661935] # sorted by ascending level, ascending rank
         self.assertNotEqual(unsorted_lookup['рыбы'], sorted_lookup['рыбы'])
         self.assertEqual(expected_form_ids, sorted_lookup['рыбы'])
-        
-        
