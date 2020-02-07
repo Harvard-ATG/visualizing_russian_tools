@@ -33,11 +33,13 @@
     <div class="col-md-1"></div>
     <div class="col-md-7 mt-3">
         <h2>Enter Mini-story:</h2>
-        <div id="storytext" class="form-control" style="min-height:200px; overflow: auto; resize: vertical; border-bottom: 5px #ccc;" contenteditable="true"></div>
+        <label for="storytext_input">Write a short story in the box below.</label>
+        <div id="storytext_input" class="form-control" style="min-height:200px; overflow: auto; resize: vertical; border-bottom: 5px #ccc;" contenteditable="true"></div>
     </div>
     <div class="col-md-3 mt-3">
-        <h2>Target vocabulary:</h2>
-        <textarea id="storyvocab" class="form-control" style="min-height:200px;"></textarea>
+        <h2>Vocabulary:</h2>
+        <label for="storyvocab_input">Ener vocabulary, one word per line.</label>
+        <textarea id="storyvocab_input" class="form-control" style="min-height:200px;"></textarea>
     </div>
 </div>
 <div class="row mb-3" style="background-color: #f7f7f7">
@@ -49,28 +51,29 @@
                 <label class="form-check-label" for="option_wordlist">Generate word list</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="option_levels" value="yes">
-                <label class="form-check-label" for="option_levels">Visualize levels</label>
+                <input class="form-check-input" type="checkbox" id="option_colorize" value="yes">
+                <label class="form-check-label" for="option_colorize">Visualize levels</label>
             </div>
         </div>
         <div class="form-group">
-            <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="storyupdatebtn">Check Story Vocabulary <i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
+            <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="storyupdatebtn">Check Story Vocabulary<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
         </div>
         <div id="storyerror" class="mb-3" style="display:none; color: red;"></div>
     </div>
 </div>
-<div class="row mt-3 mb-3">
+<div class="row mt-3">
     <div class="col-md-1"></div>
-    <div class="col-md-7" id="story_text_output"></div>
+    <div class="col-md-7">
+        <div id="storytext_lemmatized"></div>
+    </div>
+    <div class="col-md-3">
+        <div id="storyvocab_lemmatized"></div>
+        <div id="storyvocab_unlemmatized"></div>
+    </div>
 </div>
 <div class="row mt-3">
     <div class="col-md-1"></div>
-    <div class="col-md-7" id="story_lemmas"></div>
-    <div class="col-md-3" id="target_lemmas"></div>
-</div>
-<div class="row mt-3">
-    <div class="col-md-1"></div>
-    <div class="col-md-7" id="story_words"></div>
+    <div class="col-md-7" id="storytext_vocab"></div>
 </div>
 
 {% endblock %}

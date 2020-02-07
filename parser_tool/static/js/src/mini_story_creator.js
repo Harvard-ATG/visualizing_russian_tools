@@ -12,8 +12,8 @@
             this.story_value = ""; // Raw string
             this.story_text = null; // Holds instance of LemmatizedText
             this.story_vocab = null; // Holds instance of LemmatizedText
-            this.option_levels = false; // Optionally display words in the color dictated by the "level" of the lemma
-            this.option_wordlist = false; // Optionally display a vocabulary word list 
+            this.option_colorize = false; // Optionally display words in the color dictated by the "level" of the lemma
+            this.option_wordlist= false; // Optionally display a vocabulary word list 
 
             this.onCheckStory = this.onCheckStory.bind(this);
             this.onPasteMakePlainText = this.onPasteMakePlainText.bind(this);
@@ -32,7 +32,7 @@
 
         // Event handler that pastes formatted text as plain text
         onPasteMakePlainText(e) {
-            if (event.target.id != "storytext") return;
+            if (event.target.id != "storytext_input") return;
             e.preventDefault();
             var text = '';
             if (e.clipboardData || e.originalEvent.clipboardData) {
@@ -65,138 +65,41 @@
         update() {
             // set options immediately that might affect rendering
             this.option_wordlist = document.getElementById('option_wordlist').checked;
-            this.option_levels = document.getElementById('option_levels').checked;
+            this.option_colorize = document.getElementById('option_colorize').checked;
             
             // update and render async, since the update may require a roundtrip to the server
             return this._asyncTask(() => {
-                let p1 = this._updateVocab(document.getElementById("storyvocab").value.trim());
-                let p2 = this._updateStory(document.getElementById("storytext").innerText.trim());
+                let p1 = this._updateVocab(document.getElementById("storyvocab_input").value.trim());
+                let p2 = this._updateStory(document.getElementById("storytext_input").innerText.trim());
                 return Promise.all([p1,p2]).then(() => this.render());
             });
         }
 
         // Renders the view
         render() {
-            this._renderStoryWords();
-            this._renderStoryLemmas();
-            this._renderTargetLemmas();
-            this._renderStoryTextEditor();
+            let views = [
+                new MiniStoryEditorView({
+                    story_text: this.story_text,
+                    vocab_text: this.vocab_text,
+                    colorize: this.option_colorize
+                }),
+                new MiniStoryLemmasView({
+                    story_text: this.story_text,
+                    colorize: this.option_colorize
+                }),
+                new MiniStoryVocabView({
+                    story_text: this.story_text,
+                    vocab_text: this.vocab_text,
+                    colorize: this.option_colorize
+                }),
+                new MiniStoryUniqueWordsView({ 
+                    story_text: this.story_text,
+                    visible: this.option_wordlist,
+                    colorize: this.option_colorize
+                })
+            ];
+            views.forEach((view) => view.render());
             return this;
-        }
-
-        // Shows a list of unique vocabulary words used in the text
-        // Note that this is optional and not displayed by default since it's less useful than the list of lemmas.
-        _renderStoryWords() {
-            document.getElementById("story_words").style.display = (this.option_wordlist ? "" : "none");
-            if(!this.option_wordlist) {
-                return;
-            }
-
-            let story_vocab_stats = this.story_text.vocab_stats();
-            let story_vocab_stats_html = story_vocab_stats
-                .map((item, idx) => {
-                    const level = this.story_text.levelOf(item.word);
-                    return `<tr class="wordlevel${this.option_levels ? level : 0}"><td>${item.word}</td><td>${item.count}</td><td>${level}</td></tr>`
-                })
-                .join("");
-            
-            document.getElementById("story_words").innerHTML = `
-                <h5>Story words (${story_vocab_stats.length}):</h5>
-                <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead class="thead-light"><tr><th>Word</th><th>Count</th><th>Level</th></tr></thead>
-                    ${story_vocab_stats_html}
-                </table>
-                </div>`;
-
-            if(story_vocab_stats.length > 0) {
-                sorttable.makeSortable(document.querySelector("#story_words table"));
-            }
-        }
-
-        // Shows list of lemmas used in the story along with the specific forms associated with each
-        _renderStoryLemmas() {
-            let story_lemma_stats = this.story_text.lemma_stats();
-
-            let story_lemma_stats_html = story_lemma_stats.map((item, idx) => {
-                const level = this.story_text.levelOf(item.word);
-                const words = Object.keys(item.words).map(w => {
-                    if(item.words[w] > 1) {
-                        return w + `(×${item.words[w]})`;
-                    }
-                    return w;
-                }).join(", ");
-                return `<tr class="wordlevel${this.option_levels ? level : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td><td>${level}</td></tr>`
-            }).join("");
-
-            document.getElementById("story_lemmas").innerHTML = `
-                <h5>Story lemmas (${story_lemma_stats.length}):</h5>
-                <div class="table-responsive">
-                <table class="sortable table table-sm">
-                    <thead class="thead-light"><tr><th>Lemma</th><th>Forms <small>(in order of appearance)</small></th><th>Count</th><th>Level</th></tr></thead>
-                    ${story_lemma_stats_html}
-                </table>
-                </div>`;
-
-            if(story_lemma_stats.length > 0) {
-                sorttable.makeSortable(document.querySelector("#story_lemmas table"));
-            }
-        }
-
-        // Compares target vocabulary lemmas against lemmas used in the text 
-        _renderTargetLemmas() {
-            let text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
-            let vocab_lemmas = text_compare.leftjoin("lemmas");
-            console.log(vocab_lemmas, text_compare);
-            let vocab_lemmas_html = vocab_lemmas
-                .map((item, idx) => {
-                    const level = this.story_text.levelOf(item.word);
-                    return `<tr class="wordlevel${this.option_levels ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`
-                })
-                .join("");
-            
-            document.getElementById("target_lemmas").innerHTML = `
-                <h5>Target lemmas (${vocab_lemmas.length}):</h5>
-                <div class="table-responsive">
-                <table class="sortable table table-sm">
-                    <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
-                    ${vocab_lemmas_html}
-                </table>
-                </div>`;
-            
-            if(vocab_lemmas.length > 0) {
-                sorttable.makeSortable(document.querySelector("#target_lemmas table"));
-            }
-        }
-
-        // Shows the input text with target vocabulary emphasized based on lemma
-        _renderStoryTextEditor() {
-            let html = this.story_text.mapTokens((token, tokentype, index) => {
-                let output = token;
-                if(tokentype == "RUS") {
-                    let level = this.story_text.levelOf(token);
-                    let words = this.story_text.lemmasOf(token).map((word) => word.label);
-                    let found = this.vocab_text.containsLemmas(words);
-                    if(this.option_levels) {
-                        if(found) {
-                            output = `<b class="wordlevel${level}">${output}</b>`
-                        } else {
-                            output = `<span class="wordlevel${level}">${output}</span>`;
-                        }
-                    } else {
-                        if(found) {
-                            output = `<b>${token}</b>`;
-                        } else {
-                            output = token;
-                        }
-                    }
-                } else {
-                    output = output.replace(/\n/g, '<br>');
-                }
-                return output;
-            }).join("");
-
-            document.getElementById("storytext").innerHTML = html;
         }
 
         // Executes a function that returns a promise, taking care to show the loading indicator 
@@ -249,10 +152,159 @@
             const story = `Мы ждали на автобусном остановке. Мы здесь ждем каждый день, потому что мы ездим на работу на автобусе. Вчера я был на работе, а Лена была дома. Я работал весь день, потом поехал домой. Я всегда езжу на автобусе. Лена иногда ходит пешком на работу или ездит на велосипеде.`;
             const vocab = `ждать ездить быть потом работа пешком`;
     
-            document.getElementById("storytext").innerText = story.trim();
-            document.getElementById("storyvocab").value = vocab.trim().split(" ").join("\n");
+            document.getElementById("storytext_input").innerText = story.trim();
+            document.getElementById("storyvocab_input").value = vocab.trim().split(" ").join("\n");
         }
     }
+
+
+    class MiniStoryEditorView {
+        constructor({ story_text, vocab_text, colorize }) {
+            this.selector = "#storytext_input";
+            this.story_text = story_text;
+            this.vocab_text = vocab_text;
+            this.colorize = colorize;
+        }
+        // Shows the input text with target vocabulary emphasized based on lemma
+        render() {
+            const token2html = (token, tokentype, index) => {
+                let output = token;
+                if(tokentype == "RUS") {
+                    let level = this.story_text.levelOf(token);
+                    let words = this.story_text.lemmasOf(token).map((word) => word.label);
+                    let found = this.vocab_text.containsLemmas(words);
+                    if(this.colorize) {
+                        if(found) {
+                            output = `<b class="wordlevel${level}">${output}</b>`
+                        } else {
+                            output = `<span class="wordlevel${level}">${output}</span>`;
+                        }
+                    } else {
+                        if(found) {
+                            output = `<b>${token}</b>`;
+                        } else {
+                            output = token;
+                        }
+                    }
+                } else {
+                    output = output.replace(/\n/g, '<br>');
+                }
+                return output;
+            };
+
+            let html = this.story_text.mapTokens(token2html).join("");
+
+            document.querySelector(this.selector).innerHTML = html;
+        }
+    }
+
+
+    class MiniStoryLemmasView {
+        constructor({ story_text, colorize }) {
+            this.selector = "#storytext_lemmatized";
+            this.story_text = story_text;
+            this.colorize = colorize;
+        }
+        // Shows list of lemmas used in the story along with the specific forms associated with each
+        render() {
+            let story_lemma_stats = this.story_text.lemma_stats();
+
+            let story_lemma_stats_html = story_lemma_stats.map((item, idx) => {
+                const level = this.story_text.levelOf(item.word);
+                const words = Object.keys(item.words).map(w => {
+                    if(item.words[w] > 1) {
+                        return w + `(×${item.words[w]})`;
+                    }
+                    return w;
+                }).join(", ");
+                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td><td>${level}</td></tr>`
+            }).join("");
+
+            document.querySelector(this.selector).innerHTML = `
+                <h5>Story lemmas (${story_lemma_stats.length}):</h5>
+                <div class="table-responsive">
+                <table class="sortable table table-sm">
+                    <thead class="thead-light"><tr><th>Lemma</th><th>Forms <small>(in order of appearance)</small></th><th>Count</th><th>Level</th></tr></thead>
+                    ${story_lemma_stats_html}
+                </table>
+                </div>`;
+
+            if(story_lemma_stats.length > 0) {
+                sorttable.makeSortable(document.querySelector(this.selector + " table"));
+            }
+        }
+    }
+
+
+    class MiniStoryVocabView {
+        constructor({ story_text, vocab_text, colorize }) {
+            this.selector = "#storyvocab_lemmatized";
+            this.story_text = story_text;
+            this.vocab_text = vocab_text;
+            this.colorize = colorize;
+        }
+        // Compares target vocabulary lemmas against lemmas used in the text 
+        render() {
+            let text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
+
+            let vocab_lemmas = text_compare.leftjoin("lemmas");
+            
+            let vocab_lemmas_html = vocab_lemmas.map((item, idx) => {
+                const level = this.story_text.levelOf(item.word);
+                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`
+            }).join("");
+            
+            document.querySelector(this.selector).innerHTML = `
+                <h5>Target vocabulary lemmas (${vocab_lemmas.length}):</h5>
+                <div class="table-responsive">
+                <table class="sortable table table-sm">
+                    <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
+                    ${vocab_lemmas_html}
+                </table>
+                </div>`;
+            
+            if(vocab_lemmas.length > 0) {
+                sorttable.makeSortable(document.querySelector(this.selector + " table"));
+            }
+        }
+    }
+
+
+    class MiniStoryUniqueWordsView {
+        constructor({ story_text, visible, colorize }) {
+            this.selector = "#storytext_vocab";
+            this.visible = visible;
+            this.story_text = story_text;
+            this.colorize = colorize;
+        }
+        // Shows a list of unique vocabulary words used in the text
+        // Note that this is optional and not displayed by default since it's less useful than the list of lemmas.
+        render() {
+            let containerEl = document.querySelector(this.selector)
+            containerEl.style.display = (this.visible ? "" : "none");
+
+            let story_vocab_stats = this.story_text.vocab_stats();
+
+            let story_vocab_stats_html = story_vocab_stats.map((item, idx) => {
+                const level = this.story_text.levelOf(item.word);
+                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.count}</td><td>${level}</td></tr>`
+            }).join("");
+            
+            containerEl.innerHTML = `
+                <h5>Story words (${story_vocab_stats.length}):</h5>
+                <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead class="thead-light"><tr><th>Word</th><th>Count</th><th>Level</th></tr></thead>
+                    ${story_vocab_stats_html}
+                </table>
+                </div>`;
+
+            if(story_vocab_stats.length > 0) {
+                sorttable.makeSortable(document.querySelector(this.selector + " table"));
+            }
+        }
+    }
+
 
     window.addEventListener('DOMContentLoaded', (event) => {
         console.log('DOM fully loaded and parsed');
