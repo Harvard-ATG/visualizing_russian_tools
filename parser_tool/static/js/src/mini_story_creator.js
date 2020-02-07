@@ -246,34 +246,20 @@
         // Compares target vocabulary lemmas against lemmas used in the text 
         render() {
             let lemmatized_text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
-
             let vocab_lemmas = lemmatized_text_compare.compare();
-
-            let num_lemmas = vocab_lemmas.filter(o => o.lemma).length;
-            let num_not_lemmas = vocab_lemmas.filter(o => !o.lemma).length;
             
-            let lemmas_html = vocab_lemmas.filter(o => o.lemma).map((item, idx) => {
+            let html = vocab_lemmas.map((item, idx) => {
                 const level = this.story_text.levelOf(item.word);
-                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`
+                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td><td>${item.lemma?"&#x2705;":"&#x274C;"}</td></tr>`
             }).join("");
 
-            let not_lemmas_html = vocab_lemmas.filter(o => !o.lemma).map((item, idx) => {
-                return `<tr class="wordlevel0"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`
-            }).join("");
-
-            
             document.querySelector(this.selector).innerHTML = `
-                <h5>Lemmas used (${num_lemmas}):</h5>
+                <h5>Vocabulary usage (${vocab_lemmas.length}):</h5>
                 <div class="table-responsive">
                 <table class="sortable table table-sm">
-                    <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
-                    ${lemmas_html}
+                    <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th><th>Lemma?</th></tr></thead>
+                    ${html}
                 </table>
-                <h5>Words used (${num_not_lemmas}):</h5>
-                <table class="sortable table table-sm">
-                    <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
-                    ${not_lemmas_html}
-                </div>
             `;
             
             if(vocab_lemmas.length > 0) {
