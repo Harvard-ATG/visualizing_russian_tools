@@ -1,31 +1,8 @@
 (function($) {
   "use strict";
 
-  /**
-   * Utilities
-   */
-  var utils = {
-    htmlEntities: function(str) {
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    },
-    unique: function(arr) {
-      var onlyUnique = function(value, index, self) { 
-        return self.indexOf(value) === index;
-      };
-      return arr.filter(onlyUnique);
-    },
-    logEvent: function(fn) {
-      return function(e) {
-        console.log("event: ", e.type, e.target, e);
-        return fn(e);
-      };
-    },
-    scrollTo: function(selector) {
-      var scrollTop = $(selector).offset().top;
-      $([document.documentElement, document.body]).animate({scrollTop: scrollTop}, 1000);
-    }
-  };
-  
+  // Imports
+  const utils = window.app.utils;
 
   /**
    * Parse Service
