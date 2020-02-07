@@ -87,7 +87,7 @@
                     story_text: this.story_text,
                     colorize: this.option_colorize
                 }),
-                new MiniStoryVocabView({
+                new MiniStoryVocabUsageView({
                     story_text: this.story_text,
                     vocab_text: this.vocab_text,
                     colorize: this.option_colorize
@@ -236,7 +236,7 @@
     }
 
 
-    class MiniStoryVocabView {
+    class MiniStoryVocabUsageView {
         constructor({ story_text, vocab_text, colorize }) {
             this.selector = "#storyvocab_lemmatized";
             this.story_text = story_text;
@@ -245,23 +245,36 @@
         }
         // Compares target vocabulary lemmas against lemmas used in the text 
         render() {
-            let text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
+            let lemmatized_text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
 
-            let vocab_lemmas = text_compare.leftjoin("lemmas");
+            let vocab_lemmas = lemmatized_text_compare.compare();
+
+            let num_lemmas = vocab_lemmas.filter(o => o.lemma).length;
+            let num_not_lemmas = vocab_lemmas.filter(o => !o.lemma).length;
             
-            let vocab_lemmas_html = vocab_lemmas.map((item, idx) => {
+            let lemmas_html = vocab_lemmas.filter(o => o.lemma).map((item, idx) => {
                 const level = this.story_text.levelOf(item.word);
                 return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`
             }).join("");
+
+            let not_lemmas_html = vocab_lemmas.filter(o => !o.lemma).map((item, idx) => {
+                return `<tr class="wordlevel0"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`
+            }).join("");
+
             
             document.querySelector(this.selector).innerHTML = `
-                <h5>Target vocabulary lemmas (${vocab_lemmas.length}):</h5>
+                <h5>Lemmas used (${num_lemmas}):</h5>
                 <div class="table-responsive">
                 <table class="sortable table table-sm">
                     <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
-                    ${vocab_lemmas_html}
+                    ${lemmas_html}
                 </table>
-                </div>`;
+                <h5>Words used (${num_not_lemmas}):</h5>
+                <table class="sortable table table-sm">
+                    <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
+                    ${not_lemmas_html}
+                </div>
+            `;
             
             if(vocab_lemmas.length > 0) {
                 sorttable.makeSortable(document.querySelector(this.selector + " table"));

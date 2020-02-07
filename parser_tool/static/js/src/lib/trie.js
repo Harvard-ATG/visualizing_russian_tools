@@ -53,6 +53,9 @@
             return [d, node];
         }
         find(key) {
+            if(typeof key !== "string") {
+                return [-1, null];
+            }
             key = this.normalize(key);
 
             let node = this.root;

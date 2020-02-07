@@ -62,9 +62,14 @@
             return this._tokens.map(o => o.token);
         }
 
-        // returns the words
+        // returns a list of words in the order they appear (may include duplicates)
         words() {
             return this._tokens.filter(o => o.tokentype == "RUS").map(o => o.token);
+        }
+
+        // returns a list of words in the order they appear, with no matching lemma (may include duplicates)
+        wordsNotLemmatized() {
+            return this._tokens.filter(o => o.tokentype == "RUS" && o.form_ids.length == 0).map(o => o.token)
         }
 
         // returns the set of lemmas or headwords in the text
@@ -375,6 +380,19 @@
 
             text_a_vocab.forEach((word_a) => {
                 let text_a_lemmas = this.text_a.lemmasOf(word_a);
+
+                // when there are multiple lemmas for a word, we can filter if the lemma matches the word form precisely,
+                // otherwise it's ambiguous which lemma to use, so we just keep all of them.
+                let matching_lemmas = [];
+                for(let i = 0; i < text_a_lemmas.length; i++) {
+                    if(word_a.localeCompare(text_a_lemmas[i].label, "ru-RU", {sensitivity: "base"})) {
+                        matching_lemmas.push(text_a_lemmas[i]);
+                    }
+                }
+                if(matching_lemmas.length > 0) {
+                    text_a_lemmas = matching_lemmas;
+                }
+                
                 // iterate over TextA lemmas
                 for(let i = 0, len_a = text_a_lemmas.length; i < len_a; i++) {
                     let lemma_a = text_a_lemmas[i].label;
@@ -391,7 +409,14 @@
                 }
             });
 
-            return intersect;
+            let intersect_lemmas = {};
+            for(let lemma in intersect) {
+                if(intersect.hasOwnProperty(lemma)) {
+                    intersect_lemmas[lemma] = {word: lemma, intersects: intersect[lemma], lemma: true};
+                }
+            }
+
+            return intersect_lemmas;
         }
 
         // Returns a dict showing for each vocab word in TextA, its count in TextB.
@@ -413,14 +438,20 @@
                 }
             });
 
-            return intersect;
+            let intersect_vocab = {};
+            for(let vocab in intersect) {
+                if(intersect.hasOwnProperty(vocab)) {
+                    intersect_vocab[vocab] = {word: vocab, intersects: intersect[vocab], lemma: false};
+                }
+            }
+
+            return intersect_vocab;
         }
 
         // Returns list of all lemmas/vocab in TextA and whether they are in TextB or not.
-        leftjoin(word_type) {
-            word_type = word_type || "lemmas";
-
+        compare(word_type) {
             let intersect = {};
+
             switch(word_type) {
                 case "lemmas":
                     intersect = this.intersect_lemmas();
@@ -429,11 +460,24 @@
                     intersect = this.intersect_vocab();
                     break;
                 default:
-                    throw new Error("invalid word_type: "+word_type);
+                    let intersect_lemmas = this.intersect_lemmas();
+                    let intersect_vocab = this.intersect_vocab();
+
+                    for(let lemma in intersect_lemmas) {
+                        if(intersect_lemmas.hasOwnProperty(lemma)) {
+                            intersect[lemma] = intersect_lemmas[lemma];
+                        }
+                    }
+                    for(let vocab in intersect_vocab) {
+                        if(intersect_vocab.hasOwnProperty(vocab) && !intersect.hasOwnProperty(vocab)) {
+                            intersect[vocab] = intersect_vocab[vocab];
+                        }
+                    }
+                    break;
             }
 
             let results = Object.keys(intersect)
-                .map((w) => ({ word: w, intersects: intersect[w]}))
+                .map((w) => intersect[w])
                 .sort((a,b) => {
                     if(a.intersects && b.intersects) {
                         return a.word - b.word;
@@ -447,11 +491,6 @@
                 });
 
             return results;
-        }
-
-        // Returns only list of lemmas/vocab from TextA that are also in TextB
-        innerjoin(word_type) {
-            return this.leftjoin(word_type).filter((w) => w.intersects);
         }
     }
 
