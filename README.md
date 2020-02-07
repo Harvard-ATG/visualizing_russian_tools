@@ -46,6 +46,7 @@ To import a SQL dump:
 
 ```
 $ ./manage.py import_clancy_sqldump --sqlfile NewVisualizingRussian21January2019.sql
+```
 
 ## Running unit tests
 
@@ -60,8 +61,6 @@ Javascript:
 ```
 $ open ./parser_tool/static/js/tests/SpecRunner.html
 ```
-
-_Just open the standalone spec runner in your browser to run the tests._
 
 To update the coverage badge:
 
