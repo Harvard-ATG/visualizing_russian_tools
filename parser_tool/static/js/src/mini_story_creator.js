@@ -1,19 +1,10 @@
-(function(global, $) {
+(function() {
     "use strict";
 
     // Imports
-    const LemmatizedText = global.app.LemmatizedText;
-    const LemmatizedTextCompare = global.app.LemmatizedTextCompare;
-    const sorttable = global.sorttable; // sorttable.js library (https://kryogenix.org/code/browser/sorttable/)
-
-    const debounce = (fn, time) => {
-        let timeout;
-        return function() {
-          const functionCall = () => fn.apply(this, arguments);
-          clearTimeout(timeout);
-          timeout = setTimeout(functionCall, time);
-        }
-    }
+    const LemmatizedText = window.app.LemmatizedText;
+    const LemmatizedTextCompare = window.app.LemmatizedTextCompare;
+    const sorttable = window.sorttable; // sorttable.js library (https://kryogenix.org/code/browser/sorttable/)
 
     class MiniStoryController {
         constructor() {
@@ -30,6 +21,7 @@
 
         // Event handler that calls the update() method
         onCheckStory(e) {
+            if (event.target.id != "storyupdatebtn") return;
             try {
                 this.update();
             } catch(e) {
@@ -40,6 +32,7 @@
 
         // Event handler that pastes formatted text as plain text
         onPasteMakePlainText(e) {
+            if (event.target.id != "storytext") return;
             e.preventDefault();
             var text = '';
             if (e.clipboardData || e.originalEvent.clipboardData) {
@@ -56,14 +49,16 @@
 
         // Setup listeners on the page to react to events
         listen() {
-            $(document).on('click', '#storyupdatebtn', this.onCheckStory);
-            $(document).on('paste', "#storytext", this.onPasteMakePlainText);
+            document.addEventListener('click', this.onCheckStory, false);
+            document.addEventListener('paste', this.onPasteMakePlainText, false);
         }
 
         // Displays an error message
         error(err) {
             console.error(err);
-            $("#storyerror").show().html("An error occurred. Particulars: "+String(e));
+            let el = document.getElementById("storyerror");
+            el.style.display = "";
+            el.innerHTML = "An error occurred. Particulars: "+String(e);
         }
 
         // Handles updating the view after pulling any changes from the inputs
@@ -92,24 +87,27 @@
         // Shows a list of unique vocabulary words used in the text
         // Note that this is optional and not displayed by default since it's less useful than the list of lemmas.
         _renderStoryWords() {
-            $("#story_words")[this.option_wordlist?"show":"hide"]();
+            document.getElementById("story_words").style.display = (this.option_wordlist ? "" : "none");
             if(!this.option_wordlist) {
                 return;
             }
 
             let story_vocab_stats = this.story_text.vocab_stats();
             let story_vocab_stats_html = story_vocab_stats
-                .map((item, idx) => `<tr class="wordlevel${this.option_levels ? this.story_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${item.count}</td></tr>`)
+                .map((item, idx) => {
+                    const level = this.story_text.levelOf(item.word);
+                    return `<tr class="wordlevel${this.option_levels ? level : 0}"><td>${item.word}</td><td>${item.count}</td><td>${level}</td></tr>`
+                })
                 .join("");
             
-            $("#story_words").html(`
+            document.getElementById("story_words").innerHTML = `
                 <h5>Story words (${story_vocab_stats.length}):</h5>
                 <div class="table-responsive">
                 <table class="table table-sm">
-                    <thead class="thead-light"><tr><th>Word</th><th>Count</th></tr></thead>
+                    <thead class="thead-light"><tr><th>Word</th><th>Count</th><th>Level</th></tr></thead>
                     ${story_vocab_stats_html}
                 </table>
-                </div>`);
+                </div>`;
 
             if(story_vocab_stats.length > 0) {
                 sorttable.makeSortable(document.querySelector("#story_words table"));
@@ -121,23 +119,24 @@
             let story_lemma_stats = this.story_text.lemma_stats();
 
             let story_lemma_stats_html = story_lemma_stats.map((item, idx) => {
-                let words = Object.keys(item.words).map(w => {
+                const level = this.story_text.levelOf(item.word);
+                const words = Object.keys(item.words).map(w => {
                     if(item.words[w] > 1) {
                         return w + `(×${item.words[w]})`;
                     }
                     return w;
                 }).join(", ");
-                return `<tr class="wordlevel${this.option_levels ? this.story_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td></tr>`
+                return `<tr class="wordlevel${this.option_levels ? level : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td><td>${level}</td></tr>`
             }).join("");
 
-            $("#story_lemmas").html(`
+            document.getElementById("story_lemmas").innerHTML = `
                 <h5>Story lemmas (${story_lemma_stats.length}):</h5>
                 <div class="table-responsive">
                 <table class="sortable table table-sm">
-                    <thead class="thead-light"><tr><th>Lemma</th><th>Forms <small>(in order of appearance)</small></th><th>Count</th></tr></thead>
+                    <thead class="thead-light"><tr><th>Lemma</th><th>Forms <small>(in order of appearance)</small></th><th>Count</th><th>Level</th></tr></thead>
                     ${story_lemma_stats_html}
                 </table>
-                </div>`);
+                </div>`;
 
             if(story_lemma_stats.length > 0) {
                 sorttable.makeSortable(document.querySelector("#story_lemmas table"));
@@ -148,18 +147,22 @@
         _renderTargetLemmas() {
             let text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
             let vocab_lemmas = text_compare.leftjoin("lemmas");
+            console.log(vocab_lemmas, text_compare);
             let vocab_lemmas_html = vocab_lemmas
-                .map((item, idx) => `<tr class="wordlevel${this.option_levels ? this.vocab_text.levelOf(item.word) : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`)
+                .map((item, idx) => {
+                    const level = this.story_text.levelOf(item.word);
+                    return `<tr class="wordlevel${this.option_levels ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td></tr>`
+                })
                 .join("");
             
-            $("#target_lemmas").html(`
+            document.getElementById("target_lemmas").innerHTML = `
                 <h5>Target lemmas (${vocab_lemmas.length}):</h5>
                 <div class="table-responsive">
                 <table class="sortable table table-sm">
                     <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th></tr></thead>
                     ${vocab_lemmas_html}
                 </table>
-                </div>`);
+                </div>`;
             
             if(vocab_lemmas.length > 0) {
                 sorttable.makeSortable(document.querySelector("#target_lemmas table"));
@@ -200,12 +203,12 @@
         // and report any errors.
         _asyncTask(fn) {
             let before_task = () => {
-                $("#ministoryerror").hide();
-                $("#processing_indicator").show();
+                document.getElementById("storyerror").style.display = "none";
+                document.getElementById("processing_indicator").style.display = "";
             };
             let after_task = () => {
-                $("#ministoryerror").hide();
-                $("#processing_indicator").hide();
+                document.getElementById("storyerror").style.display = "none";
+                document.getElementById("processing_indicator").style.display = "none";
             };
 
             before_task();
@@ -246,20 +249,19 @@
             const story = `Мы ждали на автобусном остановке. Мы здесь ждем каждый день, потому что мы ездим на работу на автобусе. Вчера я был на работе, а Лена была дома. Я работал весь день, потом поехал домой. Я всегда езжу на автобусе. Лена иногда ходит пешком на работу или ездит на велосипеде.`;
             const vocab = `ждать ездить быть потом работа пешком`;
     
-            $("#storytext")[0].innerText = story.trim();
-            $("#storyvocab")[0].value = vocab.trim().split(" ").join("\n");
+            document.getElementById("storytext").innerText = story.trim();
+            document.getElementById("storyvocab").value = vocab.trim().split(" ").join("\n");
         }
     }
 
-    $(document).ready(function() {
+    window.addEventListener('DOMContentLoaded', (event) => {
+        console.log('DOM fully loaded and parsed');
         const ctrl = new MiniStoryController();
         ctrl.listen();
 
         // allow global access to controller for debugging / demo purposes
-        global.storyctrl = ctrl; 
-        global.storydemo = MiniStoryController.storydemo;
+        window.storyctrl = ctrl; 
+        window.demo = MiniStoryController.storydemo;
     });
 
-    
-
-})(window, jQuery);
+})();

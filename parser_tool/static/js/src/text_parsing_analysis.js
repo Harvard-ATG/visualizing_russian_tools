@@ -1,4 +1,4 @@
-(function(global, $) {
+(function($) {
   "use strict";
 
   /**
@@ -402,4 +402,4 @@
     $(document).on('click', '#textinfocopy', utils.logEvent(mainCtrl.onClickCopyTextInfo));
   });
 
-})(window, jQuery);
+})(jQuery);
