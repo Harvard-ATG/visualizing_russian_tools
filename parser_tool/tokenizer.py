@@ -158,12 +158,18 @@ def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_
 
 
 def merge_multiwordexpr(tokens):
-    # Find multi-word expressions that should be treated as a single token.
-    # Depends on a global variable that hard-codes a few frequent MWEs.
-    # NOTE: this implementation is naive (check each token for the start of a MWE).
-    # TODO: consider using a trie data structure for better performance and to handle more MWEs.
+    """
+    Find multi-word expressions that should be treated as a single token.
+    Naive implementation for handling a few select/high-frequency MWEs.
+
+    >>> merge_multiwordexpr(['это', ' ', 'только', ' ', 'потому', ',', ' ', 'что', ' ', 'боитесь', ' ', 'меня'])
+    ['это', ' ', 'только', ' ', 'потому, что', ' ', 'боитесь', ' ', 'меня']
+    >>> merge_multiwordexpr(['потому', ' ', 'что', ' ', 'в', ' ', 'теплоте'])
+    ['потому что', ' ', 'в', ' ', 'теплоте']
+    """
     new_tokens = []
     i = 0
+    # TODO: consider a trie data structure for better performance
     while i < len(tokens):
         token = tokens[i]
         merged = False

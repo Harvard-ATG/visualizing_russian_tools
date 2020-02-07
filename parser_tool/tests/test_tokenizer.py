@@ -39,6 +39,13 @@ class TestTokenizer(unittest.TestCase):
         self.assertEqual(expected_tokens, actual_tokens)
         self.assertEqual(text, ''.join(actual_tokens))
 
+    def test_tokenize_sentence_with_multi_word_expression(self):
+        text = 'это только потому, что боитесь меня'
+        expected_tokens = ['это', ' ', 'только', ' ', 'потому, что', ' ', 'боитесь', ' ', 'меня']
+        actual_tokens = tokenizer.tokenize(text)
+        self.assertEqual(expected_tokens, actual_tokens)
+        self.assertEqual(text, ''.join(actual_tokens))
+
     def test_tokenizer_sentence_with_mixed_english_and_punctuation(self):
         text = "A typical seventeen-year-old первоку́рсник | первоку́рсница (first-year student) in the филологи́ческий факульте́т (филфа́к) (Philology Faculty) has 23 па́ры"
         expected_tokens = ['A', ' ', 'typical', ' ', 'seventeen', '-', 'year', '-', 'old', ' ', 'первоку́рсник', ' ', '|', ' ', 'первоку́рсница', ' ', '(', 'first', '-', 'year', ' ', 'student', ')', ' ', 'in', ' ', 'the', ' ', 'филологи́ческий', ' ', 'факульте́т', ' ', '(', 'филфа́к', ')', ' ', '(', 'Philology', ' ', 'Faculty', ')', ' ', 'has', ' ', '23', ' ', 'па́ры']
