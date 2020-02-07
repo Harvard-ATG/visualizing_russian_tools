@@ -3,6 +3,7 @@
 .virtualenv
 .venv
 .vscode
+.coverage
 *.pyc
 *.db
 *.sqlite
