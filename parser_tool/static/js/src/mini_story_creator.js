@@ -148,7 +148,7 @@
         }
 
         // Generates a story and vocabulary for demo purposes
-        static storydemo() {
+        static demo() {
             const story = `Мы ждали на автобусном остановке. Мы здесь ждем каждый день, потому что мы ездим на работу на автобусе. Вчера я был на работе, а Лена была дома. Я работал весь день, потом поехал домой. Я всегда езжу на автобусе. Лена иногда ходит пешком на работу или ездит на велосипеде.`;
             const vocab = `ждать ездить быть потом работа пешком`;
     
@@ -310,9 +310,8 @@
         const ctrl = new MiniStoryController();
         ctrl.listen();
 
-        // allow global access to controller for debugging / demo purposes
-        window.storyctrl = ctrl; 
-        window.demo = MiniStoryController.storydemo;
+        // To run a demo, type demo() in your javascript console....
+        window.demo = MiniStoryController.demo;
     });
 
 })();
