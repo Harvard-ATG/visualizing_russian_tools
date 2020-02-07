@@ -73,18 +73,20 @@ HYPHENATED_WORDS = (
 # Multi-word expressions
 MWES = (
     'потому, что',
-    ', потому что',
     'потому что',
-    'несмотря на то, что',
-    'несмотря на',
-    'после того как',
-    'после того, как',
-    'до того как',
-    'до того, как',
-    'перед тем как',
-    'перед тем, как',
-    'в течение',
+    # 'после того, как',
+    # 'после того как',
+    # 'до того, как',
+    # 'до того как',
+    # 'перед тем, как',
+    # 'перед тем как',
 )
+
+# Tokenized multi-word expressions
+MWES_TOKENIZED = [
+    (mwe, [s for s in re.split(r'([ ,])', mwe) if s != ""])
+    for mwe in MWES
+]
 
 # Translators
 TRANSLATOR_PUNCT_REMOVE = str.maketrans('', '', RUS_PUNCT)
@@ -156,8 +158,25 @@ def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_
 
 
 def merge_multiwordexpr(tokens):
-    # TODO: use trie data structure to detect and merge MWEs
-    return tokens
+    # Find multi-word expressions that should be treated as a single token.
+    # Depends on a global variable that hard-codes a few frequent MWEs.
+    # NOTE: this implementation is naive (check each token for the start of a MWE).
+    # TODO: consider using a trie data structure for better performance and to handle more MWEs.
+    new_tokens = []
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+        merged = False
+        for (mwe_str, mwe_tokens) in MWES_TOKENIZED:
+            token_mwe_str = "".join(tokens[i:i + len(mwe_tokens)])
+            if token.lower() == mwe_tokens[0] and token_mwe_str.lower() == mwe_str:
+                new_tokens.append(token_mwe_str)
+                i += len(mwe_tokens)
+                merged = True
+        if not merged:
+            new_tokens.append(token)
+            i += 1
+    return new_tokens
 
 
 def tag(tokens):

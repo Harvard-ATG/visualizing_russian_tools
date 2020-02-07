@@ -23,8 +23,8 @@ DATABASES = {
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Cache
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-#    }
-#}
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}

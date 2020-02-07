@@ -32,9 +32,16 @@ def variant_forms(form):
     For example, зачёт may be written as зачет, in which case it's understood that the е is really ё.
     """
     variant_forms = [form.capitalize(), form.lower()]
+
+    # check ё/е alternate spelling
     if CYRILLIC_SMALL_LETTER_IO in form:
         disguised_io_as_ie_form = form.replace(CYRILLIC_SMALL_LETTER_IO, CYRILLIC_SMALL_LETTER_IE)
         variant_forms.append(disguised_io_as_ie_form)
+
+    # check multi-word expressions with or without comma
+    if ' ' in form and ',' in form:
+        variant_forms.append(form.replace(',', ''))
+
     return variant_forms
 
 
