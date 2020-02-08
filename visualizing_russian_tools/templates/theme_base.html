@@ -15,8 +15,8 @@
     {% block style_base %}
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato" >
         <link rel="stylesheet" type="text/css" href="{% static 'vendor/bootstrap-4.3.1/css/bootstrap.css' %}" />
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.1.0/css/all.css"/>
-        <link rel="stylesheet" type="text/css" href="{% static 'vendor/c3/c3.min.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'vendor/fontawesome-5.1.0/all.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'vendor/c3-0.7.13/c3.min.css' %}"/>
         <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
         {% block extra_style %}{% endblock %}
     {% endblock %}
@@ -56,8 +56,8 @@
         <script src="{% static 'vendor/jquery-3.3.1/jquery.min.js' %}"></script>
         <script src="{% static 'vendor/popper-1.14.3/popper.min.js' %}"></script>
         <script src="{% static 'vendor/bootstrap-4.3.1/js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'vendor/d3/d3.v3.js' %}"></script>
-        <script src="{% static 'vendor/c3/c3.min.js' %}"></script>
+        <script src="{% static 'vendor/d3-5.15.0/d3.min.js' %}"></script>
+        <script src="{% static 'vendor/c3-0.7.13/c3.min.js' %}"></script>
         {% block extra_script %}{% endblock %}
     {% endblock %}
 

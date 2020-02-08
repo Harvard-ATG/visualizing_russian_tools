@@ -304,14 +304,17 @@
         }
     }
 
+    // To run a demo, type demo() in your javascript console....
+    window.demo = MiniStoryController.demo;
 
     window.addEventListener('DOMContentLoaded', (event) => {
         console.log('DOM fully loaded and parsed');
         const ctrl = new MiniStoryController();
         ctrl.listen();
 
-        // To run a demo, type demo() in your javascript console....
-        window.demo = MiniStoryController.demo;
+        if(window.location.hash == "#demo") {
+            window.demo();
+        }
     });
 
 })();

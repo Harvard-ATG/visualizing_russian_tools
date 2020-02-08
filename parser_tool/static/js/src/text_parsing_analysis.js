@@ -197,53 +197,93 @@
           counts[parseInt($(el).attr("data-level")[0])] += 1;
       });
       counts[0] = $('.word').length - $('.word[data-level]').length;
+      counts.total = counts[0] + counts[1] + counts[2] + counts[3] + counts[4];
       return counts;
     },
     generateChart: function() {
       var self = this;
       var counts = this.counts;
-      var chart = c3.generate({
-        bindto: '#levels',
+      var colors = {L_: '#333333', L1: 'green', 'L1-2': 'green', L2: 'blue', L3: '#8000ff',L4: 'orange' };
+      
+      var onclick = function (d, i) { 
+        console.log("onclick", d, i); 
+        var levelnum = d.id.charAt(1);
+        var $word = $(".word");
+
+        if(self.levelnum == levelnum) {
+          $word.removeClass("masklevel");
+        } else {
+          if(parseInt(levelnum, 10)) {
+            $word.removeClass("masklevel");
+            $word.not(".level"+levelnum).addClass("masklevel");
+          } else if(levelnum == "_") {
+            $word.addClass("masklevel");
+          }
+        }
+        self.levelnum = levelnum;
+      };
+
+      var order = function(a, b) {
+        var a_level = a.id.charAt(1);
+        var b_level = b.id.charAt(1);
+        if(a_level == "_") {
+          return 1;
+        } else if(b_level == "_") {
+          return -1;
+        }
+        return parseInt(a_level, 10) - parseInt(b_level, 10);
+      };
+
+      var char1 = c3.generate({
+        bindto: '#chart-bar',
         data: {
-            type: 'pie',
+            type: 'bar',
             columns: [
-                ['L_', counts[0]],
                 ['L1', counts[1]],
                 ['L2', counts[2]],
                 ['L3', counts[3]],
-                ['L4', counts[4]]
+                ['L4', counts[4]],
+                ['L_', counts[0]],
             ],
-            colors: { 
-              L_: '#333333', 
-              L1: 'green', 
-              L2: 'blue', 
-              L3: '#8000ff' ,
-              L4: 'orange' 
+            groups: [
+              ['L1'],
+              ['L2'],
+              ['L3'],
+              ['L4'],
+              ['L_']
+            ],
+            labels: {
+              format: function(v, id, i, j) { return (v / counts.total * 100).toFixed(1) + '%'; }
             },
-            onclick: function (d, i) { 
-              console.log("onclick", d, i); 
-              var levelnum = d.id.charAt(1);
-              var $word = $(".word");
-
-              if(self.levelnum == levelnum) {
-                $word.removeClass("masklevel");
-              } else {
-                if(parseInt(levelnum, 10)) {
-                  $word.removeClass("masklevel");
-                  $word.not(".level"+levelnum).addClass("masklevel");
-                } else if(levelnum == "_") {
-                  $word.addClass("masklevel");
-                }
-              }
-              self.levelnum = levelnum;
-            }
+            order: order,
+            colors: colors,
+            onclick: onclick,
+        },
+        tooltip: {
+          show: false
         }
       });
+
+      var char2 = c3.generate({
+        bindto: '#chart-pie',
+        data: {
+            type: 'pie',
+            columns: [
+                ['L1-2', counts[1]+counts[2]],
+                ['L3', counts[3]],
+                ['L4', counts[4]],
+                ['L_', counts[0]],
+            ],
+            colors: colors,
+            onclick: onclick,
+            order: order
+        }
+      }); 
     },
     showTextInfo: function() {
       var counts = this.counts;
       var wl = $('.word').length;
-      var html = "";
+      var html = '';
       html += '<div>Word Count: <span class="numbers mr-4"> ' + wl + '</span></div>';
       html += '<div>Unparsed Count: <span class="numbers mr-4"> ' + counts[0] + '</span></div>';
       html += '<div>L1 Count: <span class="numbers mr-4"> ' + counts[1] + '</span></div>';
@@ -377,7 +417,9 @@
     $(document).on('click', '.word.parsed', utils.logEvent(mainCtrl.onClickWord));  
     $(document).on('click', '.lemma-toggle', utils.logEvent(mainCtrl.onClickLemmaToggle));
     $(document).on('click', '#textinfocopy', utils.logEvent(mainCtrl.onClickCopyTextInfo));
-
+    if(window.location.hash == "#demo") {
+      window.demo();
+    }
   });
 
     // To run a demo, type demo() in your javascript console....
