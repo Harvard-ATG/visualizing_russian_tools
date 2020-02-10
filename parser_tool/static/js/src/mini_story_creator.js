@@ -2,6 +2,7 @@
     "use strict";
 
     // Imports
+    const ApiClient = window.app.ApiClient;
     const LemmatizedText = window.app.LemmatizedText;
     const LemmatizedTextCompare = window.app.LemmatizedTextCompare;
     const sorttable = window.sorttable; // sorttable.js library (https://kryogenix.org/code/browser/sorttable/)
@@ -129,7 +130,7 @@
                 return Promise.resolve(this.vocab_text); 
             }
             this.vocab_value = vocab_value;
-            return LemmatizedText.asyncFromString(vocab_value).then((vocab_text) => {
+            return LemmatizedText.asyncFromString({ api: new ApiClient(), text: vocab_value}).then((vocab_text) => {
                 this.vocab_text = vocab_text;
                 return this.vocab_text;
             });
@@ -141,7 +142,7 @@
                 return Promise.resolve(this.story_text);
             }
             this.story_value = story_value;
-            return LemmatizedText.asyncFromString(story_value).then((story_text) => {
+            return LemmatizedText.asyncFromString({ api: new ApiClient(), text: story_value}).then((story_text) => {
                 this.story_text = story_text;
                 return this.story_text;
             });

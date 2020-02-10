@@ -1,7 +1,6 @@
 (function(global) {
     "use strict";
 
-    const ApiClient = global.app.ApiClient;
     const LemmaTrie = global.app.LemmaTrie;
 
     // utility that returns the distinct or unique values in an array
@@ -15,6 +14,9 @@
         }
         return items;
     }
+
+    const LOCALE_NAME = "ru-RU";
+    const LOCALE_COMPARE = {sensitivity: "base", ignorePunctuation: true};
 
     class LemmatizedText {
 
@@ -30,12 +32,12 @@
         }
 
         // returns a promise with an instance of a lemmatized text
-        static asyncFromString(text) {
+        static asyncFromString({ api, text }) {
             text = text.trim();
             if(!text) {
                 return Promise.resolve(new LemmatizedText());
             }
-            let api = new ApiClient();
+            // async request to lemmatize the text using the API client 
             return api.lemmatizetext(text).then((res) => {
                 return new LemmatizedText(res.data);
             });
@@ -67,17 +69,28 @@
             this._trie = trie;
         }
 
+        // returns true if there are zero tokens
+        empty() {
+            return this._tokens.length == 0;
+        }
+
         // returns a copy of the individual tokens from the lemmatized text
         tokens() {
             return this._tokens.map(o => o.token);
         }
 
-        // returns a list of words in the order they appear (may include duplicates)
+        // returns a list of russian words in the order they appear (may contain duplicates)
         words() {
             return this._tokens.filter(o => o.tokentype == "RUS").map(o => o.token);
         }
 
-        // returns a list of words in the order they appear, with no matching lemma (may include duplicates)
+        // returns a list of words that have been lemmatized (may contain duplicates)
+        wordsLemmatized() {
+            return this._tokens.filter(o => o.tokentype == "RUS" && o.form_ids.length > 0).map(o => o.token);
+        }
+
+        // returns a list of words that have not been lemmatized because there was no matching
+        // form in the database ((may contain duplicates)
         wordsNotLemmatized() {
             return this._tokens.filter(o => o.tokentype == "RUS" && o.form_ids.length == 0).map(o => o.token)
         }
@@ -85,14 +98,13 @@
         // returns the set of lemmas or headwords in the text
         lemmas() {
             let lemmas = Object.values(this._lemmas).map(o => o.label);
-            lemmas.sort((a, b) => a.localeCompare(b), "ru-RU", {sensitivity: "base", ignorePunctuation: true});
+            lemmas.sort((a, b) => a.localeCompare(b), LOCALE_NAME, LOCALE_COMPARE);
             return lemmas;
         }
 
         // returns the set of unique words in the text
         vocab() {
-            let compare_options = {sensitivity: "base", ignorePunctuation: true};
-            let vocab = unique(this.words()).sort((a, b) => a.localeCompare(b), "ru-RU", compare_options);
+            let vocab = unique(this.words()).sort((a, b) => a.localeCompare(b, LOCALE_NAME, LOCALE_COMPARE));
             return vocab;
         }
 
@@ -200,7 +212,7 @@
 
             for(let i = 0; i < _forms.length; i++) {
                 let form_obj = _forms[i];
-                if(form_obj.label.localeCompare(word, "ru-RU", {sensitivity: "base", ignorePunctuation: true}) == 0) {
+                if(form_obj.label.localeCompare(word, LOCALE_NAME, LOCALE_COMPARE) == 0) {
                     word_forms.push(form_obj);
                 }
             }
@@ -298,7 +310,7 @@
         count(word) {
             let count = 0;
             this.forEachWord((iter_word) => {
-                if(iter_word.localeCompare(word, "ru-RU", {sensitivity: "base"}) == 0) {
+                if(iter_word.localeCompare(word, LOCALE_NAME, LOCALE_COMPARE) == 0) {
                     count++;
                 }
             });
@@ -409,7 +421,7 @@
                     // otherwise it's ambiguous which lemma to use, so we just keep all of them.
                     let matching_lemmas = [];
                     for(let i = 0; i < text_a_lemmas.length; i++) {
-                        if(word_a.localeCompare(text_a_lemmas[i].label, "ru-RU", {sensitivity: "base"})) {
+                        if(word_a.localeCompare(text_a_lemmas[i].label, LOCALE_NAME, LOCALE_COMPARE)) {
                             matching_lemmas.push(text_a_lemmas[i]);
                         }
                     }
@@ -449,7 +461,7 @@
                 }
                 for(let i = 0, len = text_b_vocab.length; i < len; i++) {
                     let word_b = text_b_vocab[i];
-                    if(word_b.localeCompare(word_a, "ru-RU", {sensitivity: "base"}) == 0) {
+                    if(word_b.localeCompare(word_a, LOCALE_NAME, LOCALE_COMPARE) == 0) {
                         intersect[word_a]++;
                     }
                 }
