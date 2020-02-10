@@ -264,19 +264,32 @@
                 let lemma = (lemma_records.length > 0 ? lemma_records[0] : false);
                 if(lemma) {
                     if(!counter.hasOwnProperty(lemma.label)) {
-                        counter[lemma.label] = {count: 0, words: {}};
+                        counter[lemma.label] = {lemmatized: true, count: 0, words: {}};
                     }
                     counter[lemma.label].count++
                     if(!counter[lemma.label].words.hasOwnProperty(word_normalized)) {
                         counter[lemma.label].words[word_normalized] = 0;
                     }
                     counter[lemma.label].words[word_normalized]++;
+                } else {
+                    if(!counter.hasOwnProperty(word)) {
+                        counter[word] = {lemmatized: false, count: 0, words: {}};
+                    }
+                    counter[word].count++;
                 }
             });
 
             let stats = Object.keys(counter)
-                .map((w) => ({word: w, count: counter[w].count, words: counter[w].words}))
-                .sort((a, b) => b.count - a.count);
+                .map((w) => ({word: w, count: counter[w].count, words: counter[w].words, lemmatized: counter[w].lemmatized}))
+                .sort((a, b) => {
+                    // lemmatized entries should come first, and then sort based on count
+                    if(a.lemmatized && !b.lemmatized) {
+                        return -1;
+                    } else if(!a.lemmatized && b.lemmatized) {
+                        return 1;
+                    }
+                    return b.count - a.count;
+                });
 
             return stats;
         }
@@ -375,56 +388,56 @@
             this.text_b = text_b;
         }
 
-        // Returns a dict showing for each lemma in TextA, whether it is also in TextB.
-        //      {lemma1:true, lemma2:false, ...}
+        // Returns a dict showing for each word in TextA, whether it has a lemma also appearing in TextB.
         intersect_lemmas() {
             let intersect = {};
             let text_a_vocab = this.text_a.vocab();
             let text_b_lemmas = this.text_b.lemmas();
 
             text_a_vocab.forEach((word_a) => {
-                let text_a_lemmas = this.text_a.lemmasOf(word_a);
-
-                // when there are multiple lemmas for a word, we can filter if the lemma matches the word form precisely,
-                // otherwise it's ambiguous which lemma to use, so we just keep all of them.
-                let matching_lemmas = [];
-                for(let i = 0; i < text_a_lemmas.length; i++) {
-                    if(word_a.localeCompare(text_a_lemmas[i].label, "ru-RU", {sensitivity: "base"})) {
-                        matching_lemmas.push(text_a_lemmas[i]);
-                    }
+                if(!intersect.hasOwnProperty(word_a)) {
+                    intersect[word_a] = {word: word_a, intersects: false, lemma: false, lemmas: []};
                 }
-                if(matching_lemmas.length > 0) {
-                    text_a_lemmas = matching_lemmas;
+
+                let text_a_lemmas = this.text_a.lemmasOf(word_a);
+                
+                // no lemmas were found for word A, so we can't compare it to lemmas in text B
+                if(text_a_lemmas.length == 0) {
+                    return;
+                } else if(text_a_lemmas.length > 1) {
+                    // when there are multiple lemmas for a word, we can filter if the lemma matches the word form precisely,
+                    // otherwise it's ambiguous which lemma to use, so we just keep all of them.
+                    let matching_lemmas = [];
+                    for(let i = 0; i < text_a_lemmas.length; i++) {
+                        if(word_a.localeCompare(text_a_lemmas[i].label, "ru-RU", {sensitivity: "base"})) {
+                            matching_lemmas.push(text_a_lemmas[i]);
+                        }
+                    }
+                    if(matching_lemmas.length > 0) {
+                        text_a_lemmas = matching_lemmas;
+                    }
                 }
                 
                 // iterate over TextA lemmas
                 for(let i = 0, len_a = text_a_lemmas.length; i < len_a; i++) {
                     let lemma_a = text_a_lemmas[i].label;
-                    if(!intersect.hasOwnProperty(lemma_a)) {
-                        intersect[lemma_a] = false;
-                    }
-                    // iterate over TextB lemas and match
+
+                    // iterate over TextB lemmas and match
                     for(let j = 0, len_b = text_b_lemmas.length; j < len_b; j++) {
                         let lemma_b = text_b_lemmas[j];
-                        if(lemma_b == lemma_a) {
-                            intersect[lemma_a] = true;
+                        if(lemma_a == lemma_b) {
+                            intersect[word_a].intersects = true;
+                            intersect[word_a].lemma = true;
+                            intersect[word_a].lemmas.push(lemma_a);
                         }
                     }
                 }
             });
 
-            let intersect_lemmas = {};
-            for(let lemma in intersect) {
-                if(intersect.hasOwnProperty(lemma)) {
-                    intersect_lemmas[lemma] = {word: lemma, intersects: intersect[lemma], lemma: true};
-                }
-            }
-
-            return intersect_lemmas;
+            return intersect;
         }
 
         // Returns a dict showing for each vocab word in TextA, its count in TextB.
-        //      {word1:count1, word2:count2, ...}
         intersect_vocab() {
             let intersect = {};
             let text_a_vocab = this.text_a.vocab();
@@ -453,31 +466,17 @@
         }
 
         // Returns list of all lemmas/vocab in TextA and whether they are in TextB or not.
-        compare(word_type) {
-            let intersect = {};
-
-            switch(word_type) {
-                case "lemmas":
-                    intersect = this.intersect_lemmas();
-                    break;
-                case "vocab":
-                    intersect = this.intersect_vocab();
-                    break;
-                default:
-                    let intersect_lemmas = this.intersect_lemmas();
-                    let intersect_vocab = this.intersect_vocab();
-
-                    for(let lemma in intersect_lemmas) {
-                        if(intersect_lemmas.hasOwnProperty(lemma)) {
-                            intersect[lemma] = intersect_lemmas[lemma];
-                        }
-                    }
-                    for(let vocab in intersect_vocab) {
-                        if(intersect_vocab.hasOwnProperty(vocab) && !intersect.hasOwnProperty(vocab)) {
-                            intersect[vocab] = intersect_vocab[vocab];
-                        }
-                    }
-                    break;
+        compare() {
+            let intersect = this.intersect_lemmas();
+            let intersect_vocab = this.intersect_vocab();
+            
+            for(let w in intersect_vocab) {
+                if(!intersect.hasOwnProperty(w)) {
+                    intersect[w] = {word: w, intersects: false, lemma: false};
+                }
+                if(intersect_vocab.hasOwnProperty(w)) {
+                    intersect[w].intersects = intersect[w].intersects || intersect_vocab[w].intersects;
+                }
             }
 
             let results = Object.keys(intersect)
@@ -493,7 +492,6 @@
                         return a.word - b.word;
                     }
                 });
-
             return results;
         }
     }

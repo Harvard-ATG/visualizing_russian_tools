@@ -250,14 +250,14 @@
             
             let html = vocab_lemmas.map((item, idx) => {
                 const level = this.story_text.levelOf(item.word);
-                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td><td>${item.lemma?"&#x2705;":"&#x274C;"}</td></tr>`
+                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td><td>${item.lemmas.join(", ")}</td></tr>`
             }).join("");
 
             document.querySelector(this.selector).innerHTML = `
                 <h5>Vocabulary usage (${vocab_lemmas.length}):</h5>
                 <div class="table-responsive">
                 <table class="sortable table table-sm">
-                    <thead class="thead-light"><tr><th>Word</th><th>Used in story?</th><th>Lemma?</th></tr></thead>
+                    <thead class="thead-light"><tr><th>Word</th><th>Used?</th><th>Matching Lemma(s)</th></tr></thead>
                     ${html}
                 </table>
             `;
