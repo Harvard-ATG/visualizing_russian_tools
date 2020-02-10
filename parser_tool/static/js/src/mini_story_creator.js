@@ -281,6 +281,9 @@
         render() {
             let containerEl = document.querySelector(this.selector)
             containerEl.style.display = (this.visible ? "" : "none");
+            if(!this.visible) {
+                return;
+            }
 
             let story_vocab_stats = this.story_text.vocab_stats();
 

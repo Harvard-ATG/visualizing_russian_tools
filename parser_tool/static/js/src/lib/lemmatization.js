@@ -46,12 +46,22 @@
 
             let _forms = Object.values(this._forms);
             for(let i = 0; i < _forms.length; i++) {
-                trie.insert(_forms[i].label, {type:"form", id:_forms[i].id});
+                let data = {
+                    type: "form",
+                    id:_forms[i].id,
+                    capitalized: (_forms[i].label.charAt(0) == _forms[i].label.charAt(0).toUpperCase()),
+                };
+                trie.insert(_forms[i].label, data);
             }
 
             let _lemmas = Object.values(this._lemmas);
             for(let i = 0; i < _lemmas.length; i++) {
-                trie.insert(_lemmas[i].label, {type:"lemma", id:_lemmas[i].id});
+                let data = {
+                    type: "lemma", 
+                    id:_lemmas[i].id,
+                    capitalized: (_lemmas[i].label.charAt(0) == _lemmas[i].label.charAt(0).toUpperCase())
+                };
+                trie.insert(_lemmas[i].label, data);
             }
 
             this._trie = trie;
@@ -202,22 +212,16 @@
 
         // returns true if the form is intended to be capitalized (e.g. proper name)
         isCapitalized(word) {
-            let forms = this.formsOf(word);
-            if(forms.length == 0) {
-                return false;
-            }
-            forms.sort((a, b) => {
-                if(a.label < b.label) {
-                    return -1;
-                } else if(a.label == b.label) {
-                    return 0;
-                } else {
-                    return 1;
+            let [d, node] = this._trie.find(word);
+            if(d !== -1) {
+                for(let i = 0; i < node.value.length; i++) {
+                    let nodedata = node.value[i];
+                    if(nodedata.capitalized) {
+                        return true;
+                    }
                 }
-            });
-            let first_letter = forms[0].label.charAt(0);
-            let is_capitalized = (first_letter === first_letter.toUpperCase());
-            return is_capitalized;
+            }
+            return false;
         }
 
         // Returns true if the lemmas are represented in the text, false otherwise.
