@@ -201,26 +201,19 @@
       return counts;
     },
     generateChart: function() {
-      var self = this;
       var counts = this.counts;
-      var colors = {L_: '#333333', L1: 'green', 'L1-2': 'green', L2: 'blue', L3: '#8000ff',L4: 'orange' };
+      var colors = {L_: '#333333', L1: 'green', 'L1-2': 'green', L2: 'blue', L3: '#8000ff', L4: 'orange', L5: 'orange' };
+      var maskCls = {L_: "level0", L1: "level1", 'L1-2': 'level1-2', L2: 'level2', L3: 'level3', L4: 'level4', L5: 'level5'};
       
       var onclick = function (d, i) { 
         console.log("onclick", d, i); 
-        var levelnum = d.id.charAt(1);
-        var $word = $(".word");
-
-        if(self.levelnum == levelnum) {
-          $word.removeClass("masklevel");
+        var cls = maskCls[d.id]
+        var el = document.querySelector(".words");
+        if(el.classList.contains(cls)) {
+          el.className = "words";
         } else {
-          if(parseInt(levelnum, 10)) {
-            $word.removeClass("masklevel");
-            $word.not(".level"+levelnum).addClass("masklevel");
-          } else if(levelnum == "_") {
-            $word.addClass("masklevel");
-          }
+          el.className = "words mask " + cls;
         }
-        self.levelnum = levelnum;
       };
 
       var order = function(a, b) {
@@ -253,7 +246,7 @@
               ['L_']
             ],
             labels: {
-              format: function(v, id, i, j) { return (v / counts.total * 100).toFixed(1) + '%'; }
+              format: function(v, id, i, j) { return d3.format('.1%')(v / counts.total) }
             },
             order: order,
             colors: colors,

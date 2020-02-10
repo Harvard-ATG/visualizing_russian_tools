@@ -6,7 +6,7 @@
     color: black; /* Ensure that non-word characters (e.g. space and punctuation) is black */
 }
 pre.words {
-    color: #000000;
+    color: black;
     font-size: 18px;
     tab-size: 8; /* tab entities - &x9; or &tab; - only render in "pre" elements */
     font-family: Lato, sans-serif;
@@ -16,6 +16,19 @@ pre.words {
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+
+pre.words.mask.level0 .word.parsed {
+    color: #999 !important;
+}
+pre.words.mask.level1 .word:not(.level1), 
+pre.words.mask.level1-2 .word:not(.level1):not(.level2),
+pre.words.mask.level2 .word:not(.level2),
+pre.words.mask.level3 .word:not(.level3),
+pre.words.mask.level4 .word:not(.level4)
+{
+    color: inherit !important; /* mask the color of words for particular levels*/
+}
+
 #textinfo {
     font-size: 125%;
     padding: 18px;
@@ -30,9 +43,6 @@ pre.words {
 #wordinfo {
     position: relative;
 }
-.word.masklevel {
-    color: inherit !important;
-}
 .word.parsed:hover {
     background-color: yellow;
     cursor: pointer;
@@ -40,6 +50,7 @@ pre.words {
 .word.parsed.highlight {
     background-color: yellow;
 }
+
  .btn-red {
     background-color: #990000;
     color: #DEDEDE;
@@ -53,6 +64,7 @@ pre.words {
     background-color: #DEDEDE;
     color: #990000;
  }
+
 .textinfoval {
     color: #990000;
     font-weight: bold;

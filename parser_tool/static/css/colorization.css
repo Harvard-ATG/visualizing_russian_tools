@@ -1,5 +1,5 @@
 .word.level0, .wordlevel0, [data-level='0'] {
-    color: inherit;
+    color: black;
 }
 .word.level1, .wordlevel1, [data-level='1E'] {
     color: green;
