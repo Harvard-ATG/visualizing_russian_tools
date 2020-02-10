@@ -284,16 +284,22 @@
       html += '<div>L3 Count: <span class="numbers mr-4"> ' + counts[3] + '</span></div>';
       html += '<div>L4 Count: <span class="numbers mr-4"> ' + counts[4] + '</span></div>';
       html += '<button type="button" id="textinfocopy" class="btn btn-secondary btn-sm">Copy to clipboard</button>';
+      html += '<div id="textinfocsv" style="display:none;">';
+      html += ['Word Count', 'Unparsed', 'L1', 'L2', 'L3', 'L4'].join(",") + "<br>";
+      html += [wl, counts[0], counts[1], counts[2], counts[3], counts[4]].join(",") + "\n";
+      html += '</div>'; 
       $('#textinfo').html(html);
     },
     copyToClipboard: function() {
-      var copyText = document.querySelector("#textinfo");
+      var copyText = document.querySelector("#textinfocsv");
+      copyText.style.display = "";
       var range = document.createRange();
       range.selectNode(copyText)
       window.getSelection().removeAllRanges();
       window.getSelection().addRange(range);
       document.execCommand("copy");
       window.getSelection().removeAllRanges();
+      copyText.style.display = "none";
     }
   };
 
