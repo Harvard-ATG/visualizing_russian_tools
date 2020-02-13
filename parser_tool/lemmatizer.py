@@ -15,6 +15,10 @@ def lookup_lemma_by_id(lemma_id):
     return queries.lookup_lemma(lemma_id=lemma_id)
 
 
+def lemmatize_word(word):
+    return queries.lemmatize(word)
+
+
 def lemmatize_text(text):
     """
     Lemmatizes a text.

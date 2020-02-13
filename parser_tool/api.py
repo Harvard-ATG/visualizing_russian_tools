@@ -137,7 +137,7 @@ class LemmatizeAPIView(View):
             lemmas = []
             if word:
                 word = tokenizer.canonical(word)
-                lemmas = lemmatizer.lemmatize(word)
+                lemmas = lemmatizer.lemmatize_word(word)
             else:
                 status = "fail"  # no word was submitted
         except Exception as e:
