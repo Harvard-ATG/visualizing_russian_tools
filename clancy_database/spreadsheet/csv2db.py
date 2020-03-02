@@ -143,73 +143,84 @@ def create_schema(cursor):
 def process_data(cursor, filename, verbose=False):
     with open(filename, encoding='utf-8') as csvfile:
         csvreader = csv.DictReader(csvfile, fieldnames=CSV_FIELD_NAMES)
+        lemma_to_sheet_row = {}
         for rowid, row in enumerate(csvreader, start=1):
             if rowid == 1:
                 continue
             lemma = insert_lemma(cursor, row, verbose=verbose)
-            insert_inflections(cursor, lemma['id'], row, verbose=verbose)
+            lemma_pk = lemma['id']
+            lemma_to_sheet_row[lemma_pk] = row
+            insert_inflections(cursor, lemma_pk, row, verbose=verbose)
+        insert_aspect_pairs(cursor, verbose, lemma_to_sheet_row)
 
 
-def post_process(cursor, verbose=False):
-    insert_aspect_pairs(cursor, verbose)
-
-
-def insert_aspect_pairs(cursor, verbose=False):
+def insert_aspect_pairs(cursor, verbose=False, lemma_to_sheet_row=None):
     '''
     Inserts relations for imperfective/perfective aspect pairs for verbs
-    (as identified by "Aspectual_Counterpart" in the original spreadsheet).
+    (as identified by "SecondRussian" in the original spreadsheet).
     '''
+    if lemma_to_sheet_row is None:
+        lemma_to_sheet_row = {}
 
     # collect aspect pairs from existing lemma data
-    aspect_pairs = {"imperfective": {}, "perfective": {}}
-    query = "SELECT id, lemma, aspect, aspect_counterpart FROM lemma WHERE aspect IS NOT NULL AND aspect IN ('imperfective', 'perfective')"
-    cursor.execute(query)
+    imperfectives = {}
+    query = "SELECT id, lemma, aspect FROM lemma WHERE aspect IS NOT NULL AND aspect = ?"
+    cursor.execute(query, ['imperfective'])
     rows = cursor.fetchall()
     for row in rows:
-        (lemma_id, lemma, aspect, aspect_counterpart) = row
-        normalized_lemma = unicodedata.normalize('NFKC', unicodedata.normalize('NFKD', lemma))
-        normalized_counterpart = unicodedata.normalize('NFKC', unicodedata.normalize('NFKD', aspect_counterpart))
-        aspect_pairs[aspect][normalized_lemma] = normalized_counterpart
+        (lemma_id, lemma, aspect) = row
+        sheet_row = lemma_to_sheet_row[lemma_id]
+        second_russian = sheet_row['SecondRussian'].strip()
+        if second_russian == "0" or second_russian == "" or lemma == second_russian:
+            continue
 
-    aspect_pairs_set = set()
-    for (imperfective, perfective) in aspect_pairs["imperfective"].items():
-        if perfective in aspect_pairs["perfective"] and aspect_pairs["perfective"][perfective] == imperfective:
-            aspect_pairs_set.add((imperfective, perfective))
-        if verbose:
-            if perfective in aspect_pairs["perfective"] and aspect_pairs["perfective"][perfective] != imperfective:
-                print("MISMATCH: imperfective (</)==> perfective: (%s,%s)" % (imperfective, perfective))
-            elif perfective not in aspect_pairs["perfective"]:
-                print("UNMATCHED: imperfective ==(/>) perfective: (%s,%s)" % (imperfective, perfective))
+        lemma = unicodedata.normalize('NFKC', unicodedata.normalize('NFKD', lemma))
+        second_russian = unicodedata.normalize('NFKC', unicodedata.normalize('NFKD', second_russian))
+
+        if ";" in second_russian:
+            # TODO: handle motion verbs
+            # For now, just take the first verb if there are multiple entries
+            multiple_second_russian = [s.strip() for s in second_russian.split(";") if s.strip() != lemma]
+            if len(multiple_second_russian) > 0:
+                perfective_verb = multiple_second_russian[0]
+        elif " " in second_russian:
+            continue
+        else:
+            perfective_verb = second_russian
+
+        imperfectives[lemma] = perfective_verb
 
     # insert into the aspect_pairs table
     pair_id = 0
     inserts = []
-    for (imperfective, perfective) in aspect_pairs_set:
+    for (imperfective_verb, perfective_verb) in imperfectives.items():
+        aspect_pair = [imperfective_verb, perfective_verb]
         pair_id += 1
-        pair_name = "%s-%s" % (imperfective, perfective)
+        pair_name = "-".join(aspect_pair)
 
-        cursor.execute("SELECT id FROM lemma WHERE lemma = ?", [imperfective])
-        row = cursor.fetchone()
-        imperfective_lemma_id = row[0]
+        aspect_pair_inserts = []
+        for verb in aspect_pair:
+            cursor.execute("SELECT id, aspect, count FROM lemma WHERE lemma = ? AND aspect in ('imperfective', 'perfective')", [verb])
+            row = cursor.fetchone()
+            if row is None:
+                # print("WARNING: verb %s not found in database for pair %s" % (verb, pair_name))
+                continue
+            (lemma_id, aspect, lemma_count) = row
+            aspect_pair_inserts.append([pair_id, pair_name, aspect, lemma_id, verb, lemma_count])
 
-        cursor.execute("SELECT id FROM lemma WHERE lemma = ?", [perfective])
-        row = cursor.fetchone()
-        perfective_lemma_id = row[0]
+        # for now, we are requiring pairs of verbs
+        if len(aspect_pair_inserts) == 2:
+            inserts.extend(aspect_pair_inserts)
 
-        inserts.append([pair_id, pair_name, imperfective_lemma_id, imperfective, "imperfective"])
-        inserts.append([pair_id, pair_name, perfective_lemma_id, perfective, "perfective"])
-
-    sql = "INSERT INTO aspect_pair (pair_id, pair_name, lemma_id, lemma_label, aspect) VALUES (?, ?, ?, ?, ?)"
+    sql = "INSERT INTO aspect_pair (pair_id, pair_name, aspect, lemma_id, lemma_label, lemma_count) VALUES (?, ?, ?, ?, ?, ?)"
     for insert in inserts:
         try:
+            if verbose:
+                print("Insert aspect_pair: %s" % insert)
             cursor.execute(sql, insert)
         except sqlite3.Error as e:
             logging.exception("aspect_pair: %s" % insert)
             raise e
-
-    if verbose:
-        print("Inserted aspect_pairs ({total}):".format(total=len(inserts)))
-        print("\n\t" + "\n\t".join([insert[1] for insert in inserts]))
 
 
 def insert_lemma(cursor, row, verbose=False):
@@ -229,7 +240,6 @@ def insert_lemma(cursor, row, verbose=False):
         'ending':             row['ending'].strip(),
         'domain':             row['Domain'].strip(),
         'aspect':             row['Aspect'].strip(),
-        'aspect_counterpart': row['Aspectual_Counterpart'].strip(),
         'transitivity':       row['Transitivity'].strip(),
     }
     items = data.items()
@@ -402,7 +412,6 @@ def main(csvfile, dbfile, verbose=False):
     cursor = CONN.cursor()
     create_schema(cursor)
     process_data(cursor, csvfile, verbose=verbose)
-    post_process(cursor, verbose=verbose)
     CONN.commit()
     CONN.close()
 

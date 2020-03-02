@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS lemma (
   ending                TEXT NOT NULL,
   domain                TEXT NOT NULL,
   aspect                TEXT NOT NULL,
-  aspect_counterpart    TEXT NOT NULL,
   transitivity          TEXT,
   rank                  INTEGER NOT NULL DEFAULT -1,
   count                 REAL,
@@ -45,13 +44,14 @@ CREATE TABLE IF NOT EXISTS inflection (
 );
 CREATE INDEX inflection_form_index ON inflection(form);
 
--- Aspectual pair table for linking imperfective and perfective verbs
+-- Aspect pair table for relating imperfective and perfective verbs
 CREATE TABLE IF NOT EXISTS aspect_pair (
   id                     INTEGER PRIMARY KEY,
   pair_id                INTEGER NOT NULL,
   pair_name              TEXT NOT NULL,
-  lemma_id               INTEGER NOT NULL UNIQUE,
+  lemma_id               INTEGER NOT NULL,
   lemma_label            TEXT NOT NULL,
+  lemma_count            REAL, -- This value should come from the lemma table; duplicated here for performance reasons
   aspect                 TEXT NOT NULL,
 
   FOREIGN KEY (lemma_id) REFERENCES lemma(id) ON DELETE CASCADE ON UPDATE CASCADE,

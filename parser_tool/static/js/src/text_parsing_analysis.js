@@ -3,6 +3,8 @@
 
   // Imports
   const utils = window.app.utils;
+  const ApiClient = window.app.ApiClient;
+  const FrequencyGauge = window.app.FrequencyGauge;
 
   /**
    * Parse Service
@@ -55,6 +57,7 @@
       if(!data || !form_ids || form_ids.length == 0) {
         return null;
       }
+      var distinct_lemmas = {};
       var word_info = {forms: [], lemmas: []};
       var form_id, form, lemma;
       for(var i = 0; i < form_ids.length; i++) {
@@ -62,7 +65,12 @@
         form = data.forms[form_id];
         lemma = data.lemmas[form.lemma_id];
         word_info.forms.push(form);
-        word_info.lemmas.push(lemma);
+        distinct_lemmas[lemma.id] = lemma;
+      }
+      for(var lemma_id in distinct_lemmas) {
+        if(distinct_lemmas.hasOwnProperty(lemma_id)) {
+          word_info.lemmas.push(distinct_lemmas[lemma_id]);
+        }
       }
       return word_info;
     }
@@ -131,18 +139,16 @@
    * Responsible for rendering word information alongside the parsed text.
    */
   var wordInfoCtrl = {
-    render: function(data) {
-      var form_ids = data.form_ids;
-      var word_info = null;
-      var html = '';
-      if(form_ids) {
-        word_info = parseService.getWordInfo(form_ids);
-        if(word_info) {
-          html = this.template(word_info);
-        }
+    render: function(word_info) {
+      if(word_info) {
+        $("#worddetails").html(this.template(word_info));
+        $("#wordvis").html("");
+        this.updateVis(word_info);
+      } else {
+        $("#worddetails").html("");
+        $("#wordvis").html("");
       }
-      console.log("form_ids", form_ids, "word_info", word_info);
-      $("#wordinfo").html(html);
+      
     },
     setPosition: function(position) {
       var top = parseInt(position.top, 10);
@@ -153,7 +159,8 @@
       }
     },
     reset: function() {
-      $("#wordinfo").html("Click on a word.");
+      $("#worddetails").html("Click on a word.");
+      $("#wordvis").html("");
     },
     template: function(word_info) {
       var form = word_info.forms[0].label;
@@ -172,6 +179,28 @@
       html += '<span>Inflections:</span> <span class="textinfoval">' + types.join(", ") + "</span><br>";
       html += '<span>Translation:</span> <span class="textinfoval">' + translations.join(", ") + "</span><br>";
       return html;
+    },
+    updateVis: function(word_info) {
+      if(word_info.lemmas.length != 1) {
+        return;
+      }
+      var lemma = word_info.lemmas[0];
+      this._updateVerbFrequencyGauge(lemma);
+    },
+    _updateVerbFrequencyGauge: function(lemma) {
+      var vis_data = [];
+      if(lemma.pos == "verb") {
+        var aspect_pair = (lemma.aspect_pair && lemma.aspect_pair.length == 2) ? lemma.aspect_pair : [];
+        vis_data = aspect_pair.map((v) => { 
+          return {"label": v.lemma_label, "value": v.lemma_count, "description": v.aspect}
+        });
+        var gauge = new FrequencyGauge({ 
+          parentElement: "#wordvis", 
+          config: {firstColor: "#377eb8", secondColor: '#ffa600'}
+        });
+        gauge.setData(vis_data);
+        gauge.updateVis();
+      } 
     }
   };
 
@@ -353,6 +382,7 @@
    * for further processing and rendering as appropriate.
    */
   var mainCtrl = {
+    api: new ApiClient(),
     onClickParse: function(e) {
       var text = inputTextCtrl.getInputText();
       console.log("parse text: ", text);
@@ -384,8 +414,9 @@
         $(".word.highlight").removeClass("highlight");
         $el.addClass("highlight");
         var form_ids = parsedTextCtrl.getElementDataFormIds($el);
-        wordInfoCtrl.render({form_ids: form_ids});
+        var word_info = parseService.getWordInfo(form_ids)
         wordInfoCtrl.setPosition({top: $el.position().top });
+        wordInfoCtrl.render(word_info);
       }
       return false;
     },

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Subquery
 
 
 class Lemma(models.Model):
@@ -16,17 +17,21 @@ class Lemma(models.Model):
     ending = models.TextField()
     domain = models.TextField()
     aspect = models.TextField()
-    aspect_counterpart = models.TextField()
     transitivity = models.TextField()
     rank = models.IntegerField()
     count = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        return "%s [%s:%s] " % (self.lemma, self.pos, self.id, )
+        return "%s [%s:%s] " % (self.lemma, self.pos, self.id)
+
+    def get_aspect_pair(self):
+        pair_id_subquery = AspectPair.objects.filter(lemma_id=self.id).values('pair_id')
+        aspect_pair_qs = AspectPair.objects.filter(pair_id__in=Subquery(pair_id_subquery))
+        if len(aspect_pair_qs) == 2:
+            return [aspect_pair.to_dict() for aspect_pair in aspect_pair_qs]
+        return []
 
     def to_dict(self):
-        aspect_counterpart = self.aspect_counterpart.split(";") if self.aspect_counterpart else []
-        aspect_counterpart = [s.strip() for s in aspect_counterpart]
         data = {
             "id": self.id,
             "label": self.lemma,
@@ -39,10 +44,12 @@ class Lemma(models.Model):
             "rank": self.rank,
             "animacy": self.animacy,
             "aspect": self.aspect,
-            "aspect_counterpart": aspect_counterpart,
+            "aspect_pair": [],
             "transitivity": self.transitivity,
             "reverse": "",
         }
+        if self.pos == "verb":
+            data["aspect_pair"] = self.get_aspect_pair()
         return data
 
     class Meta:
@@ -60,14 +67,28 @@ class AspectPair(models.Model):
     pair_name = models.TextField()
     lemma = models.ForeignKey('Lemma', related_name='+', on_delete=models.CASCADE)
     lemma_label = models.TextField()
+    lemma_count = models.FloatField(blank=True, null=True)
     aspect = models.TextField()
 
+    def to_dict(self):
+        data = {
+            "id": self.id,
+            "pair_id": self.pair_id,
+            "pair_name": self.pair_name,
+            "lemma_label": self.lemma_label,
+            "lemma_id": self.lemma_id,
+            "lemma_count": self.lemma_count,
+            "aspect": self.aspect,
+        }
+        return data
+
     def __str__(self):
-        return "AspectPair(%s)" % (self.id, )
+        return "%s:%s (%s)" % (self.lemma_label, self.pair_name, self.id)
 
     class Meta:
         managed = False
         db_table = 'aspect_pair'
+        ordering = ['pair_id', 'aspect', 'lemma']
 
 
 class Inflection(models.Model):

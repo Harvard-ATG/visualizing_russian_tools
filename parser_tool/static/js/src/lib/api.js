@@ -51,6 +51,13 @@
             return jqXhr;
         }
 
+        getLemmaById(lemma_id) {
+            var url = this._url('/api/lemma');
+            var settings = {method: "GET", data: {id: lemma_id}};
+            var jqXhr = this._ajax(url, settings);
+            return jqXhr;
+        }
+
         parsetext(content, params) {
             params = params || {};
             var url = this._url('/api/parsetext', params);
