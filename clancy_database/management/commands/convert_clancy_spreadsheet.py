@@ -13,11 +13,12 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--csvfile", required=True, help="Input CSV file with russian spreadsheet data.", default="NewVisualizingRussian.csv")
         parser.add_argument("--dbfile", required=False, help="Output SQLite file created as a result of parsing the CSV.", default=settings.DATABASES['default']['NAME'])
+        parser.add_argument("--verbose", help="Increase output verbosity.", action="store_true")
 
     def handle(self, *args, **options):
         csvfile = options['csvfile']
         dbfile = options['dbfile']
-        verbose = False
+        verbose = options['verbose']
 
         if not os.path.exists(csvfile):
             raise CommandError("Input CSV file %s does not exist!" % csvfile)

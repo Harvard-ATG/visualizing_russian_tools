@@ -54,6 +54,22 @@ class Lemma(models.Model):
         ordering = ['level', 'rank'] # Order by hand-picked levels and then by more frequently occurring lemma
 
 
+class AspectPair(models.Model):
+    id = models.IntegerField(primary_key=True, blank=False, null=False)
+    pair_id = models.IntegerField()
+    pair_name = models.TextField()
+    lemma = models.ForeignKey('Lemma', related_name='+', on_delete=models.CASCADE)
+    lemma_label = models.TextField()
+    aspect = models.TextField()
+
+    def __str__(self):
+        return "AspectPair(%s)" % (self.id, )
+
+    class Meta:
+        managed = False
+        db_table = 'aspect_pair'
+
+
 class Inflection(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)
     lemma = models.ForeignKey('Lemma', on_delete=models.PROTECT)

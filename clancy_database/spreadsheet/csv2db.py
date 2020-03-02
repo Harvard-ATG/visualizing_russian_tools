@@ -4,6 +4,7 @@ import os.path
 import sys
 import time
 import logging
+import unicodedata
 
 FILE_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -127,6 +128,7 @@ VERB_CONJUGATIONS = [
 ]
 
 
+
 # ------------------------------------------------------------------
 # Functions
 
@@ -144,8 +146,70 @@ def process_data(cursor, filename, verbose=False):
         for rowid, row in enumerate(csvreader, start=1):
             if rowid == 1:
                 continue
-            pk = insert_lemma(cursor, row, verbose=verbose)
-            insert_inflections(cursor, pk, row, verbose=verbose)
+            lemma = insert_lemma(cursor, row, verbose=verbose)
+            insert_inflections(cursor, lemma['id'], row, verbose=verbose)
+
+
+def post_process(cursor, verbose=False):
+    insert_aspect_pairs(cursor, verbose)
+
+
+def insert_aspect_pairs(cursor, verbose=False):
+    '''
+    Inserts relations for imperfective/perfective aspect pairs for verbs
+    (as identified by "Aspectual_Counterpart" in the original spreadsheet).
+    '''
+
+    # collect aspect pairs from existing lemma data
+    aspect_pairs = {"imperfective": {}, "perfective": {}}
+    query = "SELECT id, lemma, aspect, aspect_counterpart FROM lemma WHERE aspect IS NOT NULL AND aspect IN ('imperfective', 'perfective')"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    for row in rows:
+        (lemma_id, lemma, aspect, aspect_counterpart) = row
+        normalized_lemma = unicodedata.normalize('NFKC', unicodedata.normalize('NFKD', lemma))
+        normalized_counterpart = unicodedata.normalize('NFKC', unicodedata.normalize('NFKD', aspect_counterpart))
+        aspect_pairs[aspect][normalized_lemma] = normalized_counterpart
+
+    aspect_pairs_set = set()
+    for (imperfective, perfective) in aspect_pairs["imperfective"].items():
+        if perfective in aspect_pairs["perfective"] and aspect_pairs["perfective"][perfective] == imperfective:
+            aspect_pairs_set.add((imperfective, perfective))
+        if verbose:
+            if perfective in aspect_pairs["perfective"] and aspect_pairs["perfective"][perfective] != imperfective:
+                print("MISMATCH: imperfective (</)==> perfective: (%s,%s)" % (imperfective, perfective))
+            elif perfective not in aspect_pairs["perfective"]:
+                print("UNMATCHED: imperfective ==(/>) perfective: (%s,%s)" % (imperfective, perfective))
+
+    # insert into the aspect_pairs table
+    pair_id = 0
+    inserts = []
+    for (imperfective, perfective) in aspect_pairs_set:
+        pair_id += 1
+        pair_name = "%s-%s" % (imperfective, perfective)
+
+        cursor.execute("SELECT id FROM lemma WHERE lemma = ?", [imperfective])
+        row = cursor.fetchone()
+        imperfective_lemma_id = row[0]
+
+        cursor.execute("SELECT id FROM lemma WHERE lemma = ?", [perfective])
+        row = cursor.fetchone()
+        perfective_lemma_id = row[0]
+
+        inserts.append([pair_id, pair_name, imperfective_lemma_id, imperfective, "imperfective"])
+        inserts.append([pair_id, pair_name, perfective_lemma_id, perfective, "perfective"])
+
+    sql = "INSERT INTO aspect_pair (pair_id, pair_name, lemma_id, lemma_label, aspect) VALUES (?, ?, ?, ?, ?)"
+    for insert in inserts:
+        try:
+            cursor.execute(sql, insert)
+        except sqlite3.Error as e:
+            logging.exception("aspect_pair: %s" % insert)
+            raise e
+
+    if verbose:
+        print("Inserted aspect_pairs ({total}):".format(total=len(inserts)))
+        print("\n\t" + "\n\t".join([insert[1] for insert in inserts]))
 
 
 def insert_lemma(cursor, row, verbose=False):
@@ -179,25 +243,26 @@ def insert_lemma(cursor, row, verbose=False):
         logging.error(sql)
         logging.exception("lemma insert: %s" % values)
         raise e
-    return cursor.lastrowid
+    data['id'] = cursor.lastrowid
+    return data
 
 
-def insert_inflections(cursor, pk, row, verbose=False):
+def insert_inflections(cursor, lemma_pk, row, verbose=False):
     sql = 'INSERT INTO inflection (lemma_id, form, stressed, type, frequency) VALUES (?, ?, ?, ?, ?)'
     inserts = []
 
     if row['POS'] in POS['inflected']:
-        inserts = handle_inflected_forms(pk, row) # Nouns, Adjectives, Pronouns, Cardinal Numbers, etc
+        inserts = handle_inflected_forms(lemma_pk, row) # Nouns, Adjectives, Pronouns, Cardinal Numbers, etc
     elif row['POS'] in POS['noninflected']:
-        inserts = handle_noninflected_forms(pk, row) # Adverbs, Conjunctions, Particles, etc
+        inserts = handle_noninflected_forms(lemma_pk, row) # Adverbs, Conjunctions, Particles, etc
     elif row['POS'] == 'verb':
-        inserts = handle_verb_forms(pk, row)
+        inserts = handle_verb_forms(lemma_pk, row)
     else:
         raise Exception("Unhandled part of speech!")
 
     # If we did not generate any inserts, add a single word entry for the lemma
     if len(inserts) == 0:
-        inserts = handle_lemma_forms(pk, row)
+        inserts = handle_lemma_forms(lemma_pk, row)
 
     if verbose:
         print("[%s:%s] %s => %d inserts (%s)\n" % (row['UniqueId'], row['POS'], row['Russian'], len(inserts), ",".join([insert[3] for insert in inserts])))
@@ -337,6 +402,7 @@ def main(csvfile, dbfile, verbose=False):
     cursor = CONN.cursor()
     create_schema(cursor)
     process_data(cursor, csvfile, verbose=verbose)
+    post_process(cursor, verbose=verbose)
     CONN.commit()
     CONN.close()
 

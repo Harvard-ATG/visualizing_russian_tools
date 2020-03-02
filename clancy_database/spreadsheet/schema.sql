@@ -1,3 +1,7 @@
+-----------------------------------------------------------------------
+-- MAIN TABLES populated from spreadsheet
+
+-- Lemma table to hold all of the lemmas
 CREATE TABLE IF NOT EXISTS lemma (
   id                    INTEGER PRIMARY KEY,
   external_id           INTEGER UNIQUE,
@@ -27,6 +31,7 @@ CREATE TABLE IF NOT EXISTS lemma (
 );
 CREATE INDEX lemma_lemma_index ON lemma(lemma);
 
+-- Inflection table to hold all the forms
 CREATE TABLE IF NOT EXISTS inflection (
   id                   INTEGER PRIMARY KEY,
   lemma_id             INTEGER NOT NULL,
@@ -40,7 +45,20 @@ CREATE TABLE IF NOT EXISTS inflection (
 );
 CREATE INDEX inflection_form_index ON inflection(form);
 
+-- Aspectual pair table for linking imperfective and perfective verbs
+CREATE TABLE IF NOT EXISTS aspect_pair (
+  id                     INTEGER PRIMARY KEY,
+  pair_id                INTEGER NOT NULL,
+  pair_name              TEXT NOT NULL,
+  lemma_id               INTEGER NOT NULL UNIQUE,
+  lemma_label            TEXT NOT NULL,
+  aspect                 TEXT NOT NULL,
 
+  FOREIGN KEY (lemma_id) REFERENCES lemma(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (aspect) REFERENCES aspect(key) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-----------------------------------------------------------------------
 -- REFERENCE TABLES to enumerate possible values for particular fields
 CREATE TABLE IF NOT EXISTS inflection_type (
   key                  TEXT PRIMARY KEY,
