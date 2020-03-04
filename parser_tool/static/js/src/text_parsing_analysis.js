@@ -164,20 +164,38 @@
     },
     template: function(word_info) {
       var form = word_info.forms[0].label;
-      var lemmas = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.label; }));
-      var translations = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.translation; }));
-      var pos = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.pos; }));
-      var levels = utils.unique(word_info.lemmas.map(function(lemma) { return lemma.level; }));
-      var types = utils.unique(word_info.forms.map(function(form) { return form.type; }));
+      var fields = ['label', 'pos', 'aspect', 'level', 'translation'];
+      var data = {};
+      word_info.lemmas.forEach(function(lemma) {
+        fields.forEach(function(key) {
+          if(!(key in data)) {
+            data[key] = [];
+          }
+          if(lemma[key] && data[key].indexOf(lemma[key]) == -1) {
+            data[key].push(lemma[key]);
+          }
+        });
+      });
+      word_info.forms.forEach(function(form) {
+        if(!("type" in data)) {
+          data.type = [];
+        }
+        if(form.type && data.type.indexOf(form.type) == -1) {
+          data.type.push(form.type);
+        }
+      });
 
       var html = '<h3 class="wordtitle inline d-block">'+form+'</h3>';
-      if(lemmas.length > 0) {
-        html += '<span>Lemma:</span> <span class="textinfoval">' + lemmas.join(", ") + "</span><br>";
+      if(data.label.length > 0) {
+        html += '<span>Lemma:</span> <span class="textinfoval">' + data.label.join(", ") + "</span><br>";
       }
-      html += '<span>Parts of Speech:</span> <span class="textinfoval">' + pos.join(", ") + "</span><br>";
-      html += '<span>Levels:</span> <span class="textinfoval">' + levels.join(", ") + "</span><br>";
-      html += '<span>Inflections:</span> <span class="textinfoval">' + types.join(", ") + "</span><br>";
-      html += '<span>Translation:</span> <span class="textinfoval">' + translations.join(", ") + "</span><br>";
+      html += '<span>Parts of Speech:</span> <span class="textinfoval">' + data.pos.join(", ") + "</span><br>";
+      if(data.aspect.length > 0) {
+        html += '<span>Aspect:</span> <span class="textinfoval">' + data.aspect.join(", ") + "</span><br>";
+      }
+      html += '<span>Levels:</span> <span class="textinfoval">' + data.level.join(", ") + "</span><br>";
+      html += '<span>Inflections:</span> <span class="textinfoval">' + data.type.join(", ") + "</span><br>";
+      html += '<span>Translation:</span> <span class="textinfoval">' + (data.translation.join(", ") || "n/a") + "</span><br>";
       return html;
     },
     updateVis: function(word_info) {
@@ -194,12 +212,12 @@
         vis_data = aspect_pair.map((v) => { 
           return {"label": v.lemma_label, "value": v.lemma_count, "description": v.aspect}
         });
+        $("#wordvis").append("<span>Frequency:</span>");
         var gauge = new FrequencyGauge({ 
-          parentElement: "#wordvis", 
-          config: {firstColor: "#377eb8", secondColor: '#ffa600'}
+          parentElement: "#wordvis",
+          config: { colors: ['#b74c4c', '	#999']} 
         });
-        gauge.setData(vis_data);
-        gauge.updateVis();
+        gauge.data(vis_data).draw();
       } 
     }
   };
