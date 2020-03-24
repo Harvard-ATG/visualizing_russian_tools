@@ -8,7 +8,7 @@
     const input_html = $("#contentinput").val();
     try {
       before_colorize(input_html);
-      const output_html = await api.colorizehtml(input_html);
+      const output_html = await api.colorize_html(input_html);
       after_colorize(output_html);
     } catch(err) {
       error(err);

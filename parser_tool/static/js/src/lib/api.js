@@ -66,14 +66,27 @@
             return jqXhr;
         }
 
-        colorizehtml(html, params) {
+        colorize_html(html, params) {
             params = params || {};
-            var url = this._url('/api/colorizehtml', params);
+            var url = this._url('/api/colorize/html', params);
             var settings = {
                 method: "POST",
                 headers: {'Content-Type':'text/html'},
                 dataType: "text",
                 data: html
+            };
+            var jqXhr = this._ajax(url, settings);
+            return jqXhr;
+        }
+
+        colorize_elements(elements, params) {
+            params = params || {};
+            var url = this._url('/api/colorize/elements', params);
+            var settings = {
+                method: "POST",
+                headers: {'Content-Type':'application/json'},
+                dataType: "json",
+                data: elements
             };
             var jqXhr = this._ajax(url, settings);
             return jqXhr;
