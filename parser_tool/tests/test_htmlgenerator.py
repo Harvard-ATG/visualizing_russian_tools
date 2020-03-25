@@ -2,7 +2,8 @@
 import unittest
 from xml.etree import ElementTree as ET
 
-from parser_tool import tokenizer, htmlgenerator
+from parser_tool import tokenizer
+from parser_tool import htmlgenerator
 
 
 class TestHtmlGenerator(unittest.TestCase):

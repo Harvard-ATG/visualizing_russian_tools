@@ -1,71 +1,51 @@
 from django.core.cache import cache
+from django.utils.decorators import method_decorator
 from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-import hashlib
+
 import json
 import logging
 
 from visualizing_russian_tools.exceptions import JsonBadRequest
-from . import tokenizer, lemmatizer, htmlgenerator, htmlcolorizer
+from . import apicache
+from . import tokenizer
+from . import lemmatizer
+from . import htmlcolorizer
+from . import htmlgenerator
+
 
 logger = logging.getLogger(__name__)
 
-MAX_TEXT_LENGTH = 500000
+
+class BaseAPIView(View):
+    MAX_BODY_SIZE = 500000
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(BaseAPIView, self).dispatch(request, *args, **kwargs)
+
+    def get_request_body_html(self, request):
+        if not request.content_type.startswith("text/html"):
+            raise JsonBadRequest("Expected HTML content type header")
+        if len(request.body.decode('utf-8')) > self.MAX_BODY_SIZE:
+            raise ValueError("Submitted request is too large (maximum {max_size:,} characters).".format(max_size=self.MAX_BODY_SIZE))
+        return request.body.decode('utf-8')
+
+    def get_request_body_json(self, request):
+        if request.content_type != "application/json":
+            raise JsonBadRequest("Expected JSON content type header")
+        if len(request.body.decode('utf-8')) > self.MAX_BODY_SIZE:
+            raise ValueError("Submitted request is too large (maximum {max_size:,} characters).".format(max_size=self.MAX_BODY_SIZE))
+        try:
+            body = json.loads(request.body.decode('utf-8'))
+        except ValueError:
+            raise JsonBadRequest('Invalid JSON')
+        return body
 
 
-def get_request_body_html(request):
-    if not request.content_type.startswith("text/html"):
-        raise JsonBadRequest("Expected HTML content type header")
-    if len(request.body.decode('utf-8')) > MAX_TEXT_LENGTH:
-        raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=MAX_TEXT_LENGTH))
-    return request.body.decode('utf-8')
-
-
-def get_request_body_json(request):
-    if request.content_type != "application/json":
-        raise JsonBadRequest("Expected JSON content type header")
-    if len(request.body.decode('utf-8')) > MAX_TEXT_LENGTH:
-        raise ValueError("Submitted request is too large (maximum {max_text_length:,} characters).".format(max_text_length=MAX_TEXT_LENGTH))
-    try:
-        body = json.loads(request.body.decode('utf-8'))
-    except ValueError:
-        raise JsonBadRequest('Invalid JSON')
-    return body
-
-
-def lemmatize_text_with_cache(text):
-    cache_key = "lemmatize_text:" + hashlib.md5(text.encode()).hexdigest()
-    lemmatized_data = cache.get(cache_key)
-    if lemmatized_data is None:
-        lemmatized_data = lemmatizer.lemmatize_text(text)
-        cache.set(cache_key, lemmatized_data)
-    return lemmatized_data
-
-
-def tokenize_and_tag_with_cache(text):
-    cache_key = "tokenize_and_tag:" + hashlib.md5(text.encode()).hexdigest()
-    tokens = cache.get(cache_key)
-    if tokens is None:
-        tokens = tokenizer.tokenize_and_tag(text)
-        cache.set(cache_key, tokens)
-    return tokens
-
-
-def colorize_html_with_cache(input_html, color_attribute):
-    cache_key = "colorize_html:" + hashlib.md5(color_attribute.encode() + input_html.encode()).hexdigest()
-    output_html = cache.get(cache_key)
-    if output_html is None:
-        h = htmlcolorizer.HtmlColorizer(input_html, color_attribute)
-        doc_tokens = h.get_doc_tokens()
-        lemmatized_data = lemmatizer.lemmatize_tokens(doc_tokens)
-        output_html = h.colorize(lemmatized_data)
-        cache.set(cache_key, output_html)
-    return output_html
-
-
-class LemmaAPIView(View):
+class LemmaAPIView(BaseAPIView):
     def get(self, request):
         status = "success"
         message_for_status = {
@@ -99,16 +79,16 @@ class LemmaAPIView(View):
         return JsonResponse(result, safe=False)
 
 
-class TokenizeAPIView(View):
+class TokenizeAPIView(BaseAPIView):
     def post(self, request):
-        text = get_request_body_json(request)
+        text = self.get_request_body_json(request)
         status = "success"
         message_for_status = {
             "error": "Internal server error"
         }
         tokens = []
         try:
-            tokens = tokenize_and_tag_with_cache(text)
+            tokens = self.tokenize_and_tag(text)
         except Exception as e:
             logger.exception(e)
             status = "error"
@@ -122,9 +102,12 @@ class TokenizeAPIView(View):
         logger.debug("tokenized response data=%s" % result)
 
         return JsonResponse(result, safe=False)
+    
+    def tokenize_and_tag(self, text):
+        return apicache.tokenize_and_tag(text)
 
 
-class LemmatizeAPIView(View):
+class LemmatizeAPIView(BaseAPIView):
     def get(self, request):
         status = "success"
         message_for_status = {
@@ -155,14 +138,14 @@ class LemmatizeAPIView(View):
         return JsonResponse(result, safe=False)
 
     def post(self, request):
-        body = get_request_body_json(request)
+        body = self.get_request_body_json(request)
         status = "success"
         message_for_status = {
             "error": "Internal server error"
         }
         try:
             text = body.get("text", "")
-            lemmatized_data = lemmatize_text_with_cache(text)
+            lemmatized_data = self.lemmatize_text(text)
         except Exception as e:
             logger.exception(e)
             status = "error"
@@ -180,37 +163,83 @@ class LemmatizeAPIView(View):
         logger.debug("lemmatize response data=%s" % result)
 
         return JsonResponse(result, safe=False)
+    
+    def lemmatize_text(self, text):
+        return apicache.lemmatize_text(text)
 
 
-class TextParserAPIView(View):
+class TextParserAPIView(BaseAPIView):
     def post(self, request):
-        body = get_request_body_json(request)
+        body = self.get_request_body_json(request)
         text = body.get("text", "")
-        lemmatized_data = lemmatize_text_with_cache(text)
+        lemmatized_data = self.lemmatize_text(text)
         render_html = request.GET.get('html', 'n') != 'n'
         if render_html:
             lemmatized_data["html"] = htmlgenerator.tokens2html(tokens=lemmatized_data["tokens"])
         return JsonResponse(lemmatized_data, safe=False)
 
+    def lemmatize_text(self, text):
+        return apicache.lemmatize_text(text)
 
-class HtmlColorizerAPIView(View):
+
+class DocumentColorizerAPIView(BaseAPIView):
     def post(self, request):
         content_type = request.META.get('CONTENT_TYPE', '')
-        color_attribute = self.request.GET.get("attribute", "").strip()
+        color_attribute = self.request.GET.get("attribute", htmlcolorizer.DEFAULT_COLOR_ATTR).strip()
         if content_type.startswith("text/html"):
-            input_html = get_request_body_html(request)
-            output_html = colorize_html_with_cache(input_html, color_attribute)
+            input_html = self.get_request_body_html(request)
+            output_html = self.colorize_html(input_html, color_attribute)
             response = HttpResponse(output_html, content_type="text/html")
         else:
-            body = get_request_body_json(request)
+            body = self.get_request_body_json(request)
             input_html = body.get("html", "")
-            output_html = colorize_html_with_cache(input_html, color_attribute)
+            output_html = self.colorize_html(input_html, color_attribute)
             response = JsonResponse({"html": output_html}, safe=False)
         return response
 
+    def colorize_html(self, input_html, color_attribute=None):
+        return apicache.colorize_html(input_html, color_attribute)
 
-text_parser_api_view = csrf_exempt(TextParserAPIView.as_view())
-html_colorizer_api_view = csrf_exempt(HtmlColorizerAPIView.as_view())
-lemmatize_api_view = csrf_exempt(LemmatizeAPIView.as_view())
-tokenize_api_view = csrf_exempt(TokenizeAPIView.as_view())
-lemma_api_view = csrf_exempt(LemmaAPIView.as_view())
+
+class ElementsColorizerAPIView(BaseAPIView):
+    def post(self, request):
+        color_attribute = self.request.GET.get("attribute", htmlcolorizer.DEFAULT_COLOR_ATTR).strip()
+
+        body = self.get_request_body_json(request)
+        (valid, errors) = self.validate_body(body)
+        if not valid:
+            result = {
+                "status": "invalid",
+                "error": errors
+            }
+            return JsonResponse(result, status=400)
+
+        output = self.colorize_elements(body["elements"], color_attribute)
+        result = {
+            "status": "success",
+            "data": {
+                "elements": output
+            }
+        }
+        return JsonResponse(result)
+
+    def validate_body(self, body):
+        if "elements" not in body:
+            return (False, ["JSON missing key: 'elements'"])
+
+        errors = []
+        for element_id, element_value in body["elements"].items():
+            if not bool(element_value):
+                errors.append("Element '%s' is empty" % element_id)
+                continue
+            if not isinstance(element_value, str):
+                errors.append("Element '%s' does not have a string value" % element_id)
+                continue
+
+        if len(errors) > 0:
+            return (False, errors)
+
+        return (True, [])
+
+    def colorize_elements(self, elements, color_attribute):
+        return apicache.colorize_elements(elements, color_attribute)
