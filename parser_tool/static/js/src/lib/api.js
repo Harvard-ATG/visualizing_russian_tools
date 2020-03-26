@@ -86,7 +86,7 @@
                 method: "POST",
                 headers: {'Content-Type':'application/json'},
                 dataType: "json",
-                data: elements
+                data: JSON.stringify(elements)
             };
             var jqXhr = this._ajax(url, settings);
             return jqXhr;
