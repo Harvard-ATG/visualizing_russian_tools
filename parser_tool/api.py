@@ -81,13 +81,14 @@ class LemmaAPIView(BaseAPIView):
 
 class TokenizeAPIView(BaseAPIView):
     def post(self, request):
-        text = self.get_request_body_json(request)
+        body = self.get_request_body_json(request)
         status = "success"
         message_for_status = {
             "error": "Internal server error"
         }
         tokens = []
         try:
+            text = body.get("text", "")
             tokens = self.tokenize_and_tag(text)
         except Exception as e:
             logger.exception(e)

@@ -32,7 +32,7 @@
 
         tokenize(content) {
             var url = this._url('/api/tokenize');
-            var settings = {method: "POST", data: JSON.stringify(content)};
+            var settings = {method: "POST", data: JSON.stringify({text: content})};
             var jqXhr = this._ajax(url, settings);
             return jqXhr;
         }
@@ -61,7 +61,7 @@
         parsetext(content, params) {
             params = params || {};
             var url = this._url('/api/parsetext', params);
-            var settings = {method: "POST", data: JSON.stringify(content)};
+            var settings = {method: "POST", data: JSON.stringify({text: content})};
             var jqXhr = this._ajax(url, settings);
             return jqXhr;
         }
