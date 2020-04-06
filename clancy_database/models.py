@@ -40,6 +40,7 @@ class Lemma(models.Model):
             "gender": self.gender,
             "pos": self.pos,
             "level": self.level,
+            "level_num": int(self.level[0]),
             "count": self.count,
             "rank": self.rank,
             "animacy": self.animacy,
