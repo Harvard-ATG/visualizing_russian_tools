@@ -10,9 +10,9 @@
     class MiniStoryController {
         constructor() {
             this.vocab_value = ""; // Raw string
+            this.vocab_text = null; // Holds instance of LemmatizedText
             this.story_value = ""; // Raw string
             this.story_text = null; // Holds instance of LemmatizedText
-            this.story_vocab = null; // Holds instance of LemmatizedText
             this.option_colorize = false; // Optionally display words in the color dictated by the "level" of the lemma
             this.option_wordlist= false; // Optionally display a vocabulary word list 
 
@@ -246,11 +246,12 @@
         }
         // Compares target vocabulary lemmas against lemmas used in the text 
         render() {
+            debugger;
             let lemmatized_text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
             let vocab_lemmas = lemmatized_text_compare.compare();
             
             let html = vocab_lemmas.map((item, idx) => {
-                const level = this.story_text.levelOf(item.word);
+                const level = this.vocab_text.levelOf(item.word);
                 return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td><td>${item.lemmas.join(", ")}</td></tr>`
             }).join("");
 
