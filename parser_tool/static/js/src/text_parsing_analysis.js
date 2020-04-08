@@ -228,13 +228,16 @@
    * Responsible for displaying and manipulating statistics about the parsed text.
    */
   var textInfoCtrl = {
-    render: function(data) {
+    group_levels: false,
+    render: function() {
       this.counts = this.getCounts();
-      this.generateChart();
+      this.generateBarChart();
+      this.generatePieChart();
       this.showTextInfo();
     },
     reset: function() {
       this.counts = null;
+      this.combine_levels = false;
       $("#levels").html('');
       $("#textinfo").html('');
     },
@@ -247,44 +250,84 @@
       counts.total = counts[0] + counts[1] + counts[2] + counts[3] + counts[4];
       return counts;
     },
-    generateChart: function() {
+    onClickChart: function(d, i) {
+      console.log("onclick", d, i); 
+      var cls = this.getMaskCls(d.id);
+      var el = document.querySelector(".words");
+      if(el.classList.contains(cls)) {
+        el.className = "words";
+      } else {
+        el.className = "words mask " + cls;
+      }
+    },
+    orderById: function(a, b) {
+      var a_level = a.id.charAt(1);
+      var b_level = b.id.charAt(1);
+      if(a_level == "_") {
+        return 1;
+      } else if(b_level == "_") {
+        return -1;
+      }
+      return parseInt(a_level, 10) - parseInt(b_level, 10);
+    },
+    getChartColumns: function() {
       var counts = this.counts;
-      var colors = {L_: '#333333', L1: 'green', 'L1-2': 'green', L2: 'blue', L3: '#8000ff', L4: 'orange', L5: 'orange' };
-      var maskCls = {L_: "level0", L1: "level1", 'L1-2': 'level1-2', L2: 'level2', L3: 'level3', L4: 'level4', L5: 'level5'};
-      
-      var onclick = function (d, i) { 
-        console.log("onclick", d, i); 
-        var cls = maskCls[d.id]
-        var el = document.querySelector(".words");
-        if(el.classList.contains(cls)) {
-          el.className = "words";
-        } else {
-          el.className = "words mask " + cls;
-        }
+      var columns = [];
+      if(this.combine_levels) {
+        columns = [
+          ['L1-2', counts[1] + counts[2]],
+          ['L3', counts[3]],
+          ['L4', counts[4]],
+          ['L_', counts[0]]
+        ];
+      } else {
+        columns = [
+          ['L1', counts[1]],
+          ['L2', counts[2]],
+          ['L3', counts[3]],
+          ['L4', counts[4]],
+          ['L_', counts[0]]
+        ];
+      }
+      return columns;
+    },
+    getChartColors: function() {
+      return {
+        'L_': '#333333', 
+        'L1': 'green', 
+        'L1-2': 'url(#striped-L1-2)', // blue-green #0d98ba
+        'L2': 'blue', 
+        'L3': '#8000ff', 
+        'L4': 'orange', 
+        'L5': 'orange'
+      }
+    },
+    getMaskCls: function(id) {
+      var maskCls = {
+        'L_': "level0", 
+        'L1': "level1", 
+        'L1-2': 'level1-2',
+        'L1-3': 'level1-3',
+        'L1-4': 'level1-4',
+        'L2': 'level2', 
+        'L2-3': 'level2-3',
+        'L2-4': 'level2-4',
+        'L3': 'level3', 
+        'L3-4': 'level3-4',
+        'L4': 'level4', 
+        'L5': 'level5'
       };
-
-      var order = function(a, b) {
-        var a_level = a.id.charAt(1);
-        var b_level = b.id.charAt(1);
-        if(a_level == "_") {
-          return 1;
-        } else if(b_level == "_") {
-          return -1;
-        }
-        return parseInt(a_level, 10) - parseInt(b_level, 10);
-      };
-
-      var char1 = c3.generate({
-        bindto: '#chart-bar',
+      return maskCls[id];
+    },
+    generateBarChart: function() {
+      var total = this.counts.total;
+      var bindto = '#chart-bar';
+      c3.generate({
+        bindto: bindto,
         data: {
             type: 'bar',
-            columns: [
-                ['L1', counts[1]],
-                ['L2', counts[2]],
-                ['L3', counts[3]],
-                ['L4', counts[4]],
-                ['L_', counts[0]],
-            ],
+            columns: this.getChartColumns(),
+            colors: this.getChartColors(),
             groups: [
               ['L1'],
               ['L2'],
@@ -293,32 +336,47 @@
               ['L_']
             ],
             labels: {
-              format: function(v, id, i, j) { return d3.format('.1%')(v / counts.total) }
+              format: function(v, id, i, j) { 
+                var result = v / total;
+                return d3.format('.1%')(Number.isNaN(result) ? 0 : result) 
+              }
             },
-            order: order,
-            colors: colors,
-            onclick: onclick,
+            order: this.orderById, 
+            onclick: this.onClickChart.bind(this)
         },
         tooltip: {
           show: false
         }
       });
-
-      var char2 = c3.generate({
-        bindto: '#chart-pie',
+      this.addStripePatternToChart(bindto, 'striped-L1-2');
+    },
+    generatePieChart: function() {
+      var bindto = '#chart-pie';
+      c3.generate({
+        bindto: bindto,
         data: {
             type: 'pie',
-            columns: [
-                ['L1-2', counts[1]+counts[2]],
-                ['L3', counts[3]],
-                ['L4', counts[4]],
-                ['L_', counts[0]],
-            ],
-            colors: colors,
-            onclick: onclick,
-            order: order
+            columns: this.getChartColumns(),
+            colors: this.getChartColors(),
+            order: this.orderById, 
+            onclick: this.onClickChart.bind(this)
         }
       }); 
+      this.addStripePatternToChart('#chart-pie', 'striped-L1-2');
+    },
+    addStripePatternToChart: function(bindto, id) {
+      // Crate pattern for showing a stripe pattern 
+      var pattern = d3.select(bindto).select("defs").append("pattern");
+      pattern.attr('id', id)
+        .attr('width', 16)
+        .attr('height', 16)
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('patternTransform', 'rotate(-45)');
+      pattern.append("rect")
+        .attr('width', 15)
+        .attr('height', 16)
+        .attr('transform', 'translate(0,0)')
+        .attr('fill', '#0d98ba'); // #0d98ba is "blue green"
     },
     showTextInfo: function() {
       var counts = this.counts;
@@ -347,6 +405,9 @@
       document.execCommand("copy");
       window.getSelection().removeAllRanges();
       copyText.style.display = "none";
+    },
+    toggleChartLevels: function() {
+      this.combine_levels = !this.combine_levels;
     }
   };
 
@@ -447,6 +508,10 @@
     onClickCopyTextInfo: function(e) {
       textInfoCtrl.copyToClipboard();
     },
+    onClickToggleChartLevels: function(e) {
+      textInfoCtrl.toggleChartLevels();
+      textInfoCtrl.render();
+    },
     clearAnalysis: function() {
       parsedTextCtrl.reset();
       textInfoCtrl.reset();
@@ -465,6 +530,7 @@
     $(document).on('click', '.word.parsed', utils.logEvent(mainCtrl.onClickWord));  
     $(document).on('click', '.lemma-toggle', utils.logEvent(mainCtrl.onClickLemmaToggle));
     $(document).on('click', '#textinfocopy', utils.logEvent(mainCtrl.onClickCopyTextInfo));
+    $(document).on('click', '#toggle-chart-levels', utils.logEvent(mainCtrl.onClickToggleChartLevels));
     if(window.location.hash == "#demo") {
       window.demo();
     }

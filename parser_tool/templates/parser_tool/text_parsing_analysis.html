@@ -50,9 +50,9 @@
             <div id="parser-error" class="alert alert-danger d-none"></div>
         </div>
     </div>
-</div>
-<div id="analysis" class="d-none" style="margin-bottom: 400px; border-top: 2px solid #efefef; ">
-    <div class="row" style="border-bottom: 2px solid #efefef;">
+</div>  
+<div id="analysis" class="d-none">
+    <div class="row" >
         <div class="col-md-3 offset-1">
             <div id="chart-bar" class="mt-2 mb-2" style="height: 300px;"></div>
         </div>
@@ -61,6 +61,15 @@
         </div>
         <div class="col-md-3">
             <div id="textinfo" class="mt-2 mb-2 text-muted" style="padding-left: 1em;"></div>
+        </div>
+    </div>
+    <div class="row" style="border-bottom: 2px solid #efefef;">
+        <div class="col-md-11 offset-1 mt-2 mb-2">
+            <div class="btn-group-toggle">
+                <label class="btn btn-outline-secondary btn-sm">
+                  <input type="checkbox" id="toggle-chart-levels" value="1"> Combine L1 and L2
+                </label>
+              </div>
         </div>
     </div>
     <div class="row mt-4">

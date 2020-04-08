@@ -22,8 +22,13 @@ pre.words.mask.level0 .word.parsed {
 }
 pre.words.mask.level1 .word:not(.level1), 
 pre.words.mask.level1-2 .word:not(.level1):not(.level2),
+pre.words.mask.level1-3 .word:not(.level1):not(.level2):not(.level3),
+pre.words.mask.level1-4 .word:not(.level1):not(.level2):not(.level3):not(.level4),
 pre.words.mask.level2 .word:not(.level2),
+pre.words.mask.level2-3 .word:not(.level2):not(.level3),
+pre.words.mask.level2-4 .word:not(.level2):not(.level3):not(.level4),
 pre.words.mask.level3 .word:not(.level3),
+pre.words.mask.level3-4 .word:not(.level3):not(.level4),
 pre.words.mask.level4 .word:not(.level4)
 {
     color: inherit !important; /* mask the color of words for particular levels*/
