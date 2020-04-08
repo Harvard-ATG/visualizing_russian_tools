@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS lemma (
   domain                TEXT NOT NULL,
   aspect                TEXT NOT NULL,
   transitivity          TEXT,
+  stress_pattern_semu   TEXT,
   rank                  INTEGER NOT NULL DEFAULT -1,
   count                 REAL,
 

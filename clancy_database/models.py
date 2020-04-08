@@ -18,6 +18,7 @@ class Lemma(models.Model):
     domain = models.TextField()
     aspect = models.TextField()
     transitivity = models.TextField()
+    stress_pattern_semu = models.TextField()
     rank = models.IntegerField()
     count = models.FloatField(blank=True, null=True)
 
@@ -47,6 +48,7 @@ class Lemma(models.Model):
             "aspect": self.aspect,
             "aspect_pair": [],
             "transitivity": self.transitivity,
+            "stress_pattern_semu": self.stress_pattern_semu,
             "reverse": "",
         }
         if self.pos == "verb":

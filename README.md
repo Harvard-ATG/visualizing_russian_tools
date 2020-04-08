@@ -38,14 +38,14 @@ Given that the lemma and word form data for this project is sourced from Steven 
 To convert a spreadsheet and output a SQL dump:
 
 ```
-$ ./manage.py convert_clancy_spreadsheet --csvfile NewVisualizingRussian21January2019.csv --dbfile russian.sqlite3
-$ sqlite3 russian.sqlite3 .dump > NewVisualizingRussian21January2019.sql
+$ ./manage.py convert_clancy_spreadsheet --csvfile russian.csv --dbfile russian.sqlite3
+$ sqlite3 russian.sqlite3 .dump > russian.sql
 ```
 
 To import a SQL dump:
 
 ```
-$ ./manage.py import_clancy_sqldump --sqlfile NewVisualizingRussian21January2019.sql
+$ ./manage.py import_clancy_sqldump --sqlfile russian.sql
 ```
 
 ## Running unit tests

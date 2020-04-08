@@ -164,7 +164,7 @@
     },
     template: function(word_info) {
       var form = word_info.forms[0].label;
-      var fields = ['label', 'pos', 'aspect', 'level', 'translation'];
+      var fields = ['label', 'pos', 'aspect', 'level', 'translation', 'stress_pattern_semu'];
       var data = {};
       word_info.lemmas.forEach(function(lemma) {
         fields.forEach(function(key) {
@@ -195,6 +195,7 @@
       }
       html += '<span>Levels:</span> <span class="textinfoval">' + data.level.join(", ") + "</span><br>";
       html += '<span>Inflections:</span> <span class="textinfoval">' + data.type.join(", ") + "</span><br>";
+      html += '<span>Stress Pattern:</span> <span class="textinfoval">' + (data.stress_pattern_semu.join(", ") || "n/a")+ "</span><br>";
       html += '<span>Translation:</span> <span class="textinfoval">' + (data.translation.join(", ") || "n/a") + "</span><br>";
       return html;
     },
