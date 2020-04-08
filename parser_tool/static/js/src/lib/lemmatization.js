@@ -54,6 +54,9 @@
                     capitalized: (_forms[i].label.charAt(0) == _forms[i].label.charAt(0).toUpperCase()),
                 };
                 trie.insert(_forms[i].label, data);
+                if(_forms[i].stressed) {
+                    trie.insert(_forms[i].stressed, data);
+                }
             }
 
             let _lemmas = Object.values(this._lemmas);
@@ -64,6 +67,9 @@
                     capitalized: (_lemmas[i].label.charAt(0) == _lemmas[i].label.charAt(0).toUpperCase())
                 };
                 trie.insert(_lemmas[i].label, data);
+                if(_lemmas[i].stressed) {
+                    trie.insert(_forms[i].stressed, data);
+                }
             }
 
             this._trie = trie;

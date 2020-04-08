@@ -14,7 +14,7 @@
             // Strip all diacritics from keys EXCEPT for the following which have special significance:
             // - combining breve (U+0306) which is used for leter "й" or "Yot" (https://en.wiktionary.org/wiki/%D0%B9)
             // - combining diuresis (U+0308) which is used for letter "ё" or "Yo" (https://en.wiktionary.org/wiki/%D1%91)
-            key = key.normalize("NFD").replace(/[\u0300-\u0305\u307\u0309-\u036f]/g, "");
+            key = key.normalize("NFD").replace(/[\u0300-\u0305\u0307\u0309-\u036f]/g, "");
 
             return key;
         }
