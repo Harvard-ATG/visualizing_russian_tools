@@ -19,3 +19,14 @@
 .word.level6, .wordlevel6, [data-level='6U'] {
     color: black;
 }
+
+.gradient-green-to-blue {
+    color: black;
+    background: repeating-linear-gradient(
+      to right,
+      #0F7001,
+      #0F7001 15px,
+      #0000FF 15px,
+      #0000FF 30px
+    );
+}

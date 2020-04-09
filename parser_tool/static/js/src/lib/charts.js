@@ -1,22 +1,29 @@
 (function(global, d3, c3) {
     "use strict";
 
-    const COLORS = {
-        'L_': '#333333', 
-        'L1': 'green', 
-        'L1-2': 'url(#striped-L1-2)', // blue-green #0d98ba
-        'L2': 'blue', 
-        'L3': '#8000ff', 
-        'L4': 'orange', 
-        'L5': 'orange'
+    const BLACK = "#333333";
+    const GREEN = "#008000";
+    const BLUE = "#0000ff";
+    const PURPLE = "#8000ff";
+    const ORANGE = "#ffa500";
+    const BLUEGREEN = "#0d98ba";
+
+    const CHART_COLORS = {
+        'L_': BLACK, 
+        'L1': GREEN, 
+        'L1-2': 'url(#stripe-L1-2)', 
+        'L2': BLUE, 
+        'L3': PURPLE, 
+        'L4': ORANGE, 
+        'L5': ORANGE
     };
-    
+
 
     class LevelsChart {
         constructor({ counts, bindto, combineLevels }) {
             this.counts = counts;
             this.bindto = bindto;
-            this.colors = COLORS;
+            this.colors = CHART_COLORS;
             this.combineLevels = (combineLevels === true);
             this.formatAsPercent = this.formatAsPercent.bind(this);
             this.toggleMask = this.toggleMask.bind(this);
@@ -68,23 +75,39 @@
             el.className = (el.classList.contains(cls) ? "words" : `words mask ${cls}`);
         }
 
-        addStripePattern(bindto, id) {
-            var pattern = d3.select(bindto)
+        addStripePatternUsingGradient(bindto, id, gradient) {
+            const pattern = d3.select(bindto)
                 .select("defs").append("pattern");
             pattern.attr('id', id)
-                .attr('width', 16)
-                .attr('height', 16)
+                .attr('width', 24)
+                .attr('height', 24)
                 .attr('patternUnits', 'userSpaceOnUse')
-                .attr('patternTransform', 'rotate(-45)');
+                .attr('patternTransform', 'rotate(-135)');
             pattern.append("rect")
-                .attr('width', 15)
-                .attr('height', 16)
+                .attr('width', 24)
+                .attr('height', 24)
                 .attr('transform', 'translate(0,0)')
-                .attr('fill', '#0d98ba'); // #0d98ba is "blue green"
+                .attr('fill', gradient); 
+        }
+
+        addGradientGreenToBlue(bindto, id) {
+            const linearGradient = d3.select(bindto)
+                .select("defs")
+                .append("linearGradient");
+            linearGradient.attr('id', id)
+                .attr('x1', '0')
+                .attr('y1', '0')
+                .attr('x2', '0')
+                .attr('y2', '100%');
+            linearGradient.append('stop').attr('offset', '0').attr('stop-color', '#0F7001');
+            linearGradient.append('stop').attr('offset', '50%').attr('stop-color', '#606dbc');
+            linearGradient.append('stop').attr('offset', '50%').attr('stop-color', '#0000FF');
+            linearGradient.append('stop').attr('offset', '100%').attr('stop-color', '#0000FF');
         }
 
         addPatterns() {
-            this.addStripePattern(this.bindto, "striped-L1-2");
+            this.addGradientGreenToBlue(this.bindto, "gradient-L1-2");
+            this.addStripePatternUsingGradient(this.bindto, "stripe-L1-2", "url(#gradient-L1-2)");
         }
     }
 
@@ -102,7 +125,7 @@
                     onclick: this.toggleMask,
                 }
             });
-            this.addPatterns();
+            //this.addPatterns();
         }
     }
 
