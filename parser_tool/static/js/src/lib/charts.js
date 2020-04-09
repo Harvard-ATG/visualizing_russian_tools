@@ -106,6 +106,7 @@
         }
 
         addPatterns() {
+            // Defines patterns in the SVG that can be used to fill() along with the usual colors
             this.addGradientGreenToBlue(this.bindto, "gradient-L1-2");
             this.addStripePatternUsingGradient(this.bindto, "stripe-L1-2", "url(#gradient-L1-2)");
         }
@@ -125,7 +126,7 @@
                     onclick: this.toggleMask,
                 }
             });
-            //this.addPatterns();
+            this.addPatterns();
         }
     }
 

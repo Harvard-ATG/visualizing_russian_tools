@@ -1,0 +1,29 @@
+table.stress-pattern {
+    font-size: 100%;
+    border-spacing: 2px;
+    border-collapse: separate;
+}
+table.stress-pattern th {
+    font-weight: bold;
+}
+table.stress-pattern .stem,
+table.stress-pattern .end {
+    display: inline-block;
+}
+table.stress-pattern .stem {
+    width: 50px;
+    border-bottom: 1px solid black;
+}
+
+table.stress-pattern .end {
+    width: 30px;
+    border-bottom: 1px solid black;
+}
+table.stress-pattern .stress {
+    background-color: #dbe5f1;
+    text-align: right;
+    padding-right: 10px;
+}
+table.stress-pattern .stress:after {
+    content: "\00B4"
+}

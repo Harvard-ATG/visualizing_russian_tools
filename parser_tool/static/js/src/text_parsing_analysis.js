@@ -7,6 +7,7 @@
   const FrequencyGauge = window.app.FrequencyGauge;
   const LevelsPieChart = window.app.LevelsPieChart;
   const LevelsBarChart = window.app.LevelsBarChart;
+  const StressPatternWidget = window.app.StressPatternWidget;
 
   /**
    * Parse Service
@@ -145,10 +146,12 @@
       if(word_info) {
         $("#worddetails").html(this.template(word_info));
         $("#wordvis").html("");
-        this.updateVis(word_info);
+        $("#wordstress").html("");
+        this.showWordVis(word_info);
       } else {
         $("#worddetails").html("");
         $("#wordvis").html("");
+        $("#wordstress").html("");
       }
       
     },
@@ -163,6 +166,7 @@
     reset: function() {
       $("#worddetails").html("Click on a word.");
       $("#wordvis").html("");
+      $("#wordstress").html("");
     },
     template: function(word_info) {
       var form = word_info.forms[0].label;
@@ -197,16 +201,22 @@
       }
       html += '<span>Levels:</span> <span class="textinfoval">' + data.level.join(", ") + "</span><br>";
       html += '<span>Inflections:</span> <span class="textinfoval">' + data.type.join(", ") + "</span><br>";
-      html += '<span>Stress Pattern:</span> <span class="textinfoval">' + (data.stress_pattern_semu.join(", ") || "n/a")+ "</span><br>";
       html += '<span>Translation:</span> <span class="textinfoval">' + (data.translation.join(", ") || "n/a") + "</span><br>";
+      html += '<span>Stress Pattern:</span> <span class="textinfoval">' + (data.stress_pattern_semu.map((pattern) => `<span class="wordstresspattern" data-pattern="${pattern}" style="cursor:pointer">${pattern}</span>`).join(", ") || "n/a")+ "</span><br>";
+
       return html;
     },
-    updateVis: function(word_info) {
+    showWordVis: function(word_info) {
       if(word_info.lemmas.length != 1) {
         return;
       }
       var lemma = word_info.lemmas[0];
       this._updateVerbFrequencyGauge(lemma);
+    },
+    showWordStress: function(stress_pattern_semu) {
+      var widget = new StressPatternWidget({ stress_pattern_semu: stress_pattern_semu });
+      var html = widget.render();
+      $("#wordstress").html(html);
     },
     _updateVerbFrequencyGauge: function(lemma) {
       var vis_data = [];
@@ -400,6 +410,9 @@
       textInfoCtrl.toggleChartLevels();
       textInfoCtrl.render();
     },
+    onClickWordStressPattern: function(e) {
+      wordInfoCtrl.showWordStress(e.target.dataset.pattern);
+    },
     clearAnalysis: function() {
       parsedTextCtrl.reset();
       textInfoCtrl.reset();
@@ -419,6 +432,7 @@
     $(document).on('click', '.lemma-toggle', utils.logEvent(mainCtrl.onClickLemmaToggle));
     $(document).on('click', '#textinfocopy', utils.logEvent(mainCtrl.onClickCopyTextInfo));
     $(document).on('click', '#toggle-chart-levels', utils.logEvent(mainCtrl.onClickToggleChartLevels));
+    $(document).on('click', '.wordstresspattern', utils.logEvent(mainCtrl.onClickWordStressPattern));
     if(window.location.hash == "#demo") {
       window.demo();
     }
