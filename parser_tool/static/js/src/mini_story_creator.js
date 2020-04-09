@@ -246,7 +246,6 @@
         }
         // Compares target vocabulary lemmas against lemmas used in the text 
         render() {
-            debugger;
             let lemmatized_text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
             let vocab_lemmas = lemmatized_text_compare.compare();
             
