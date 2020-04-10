@@ -6,12 +6,15 @@ table.stress-pattern {
 table.stress-pattern th {
     font-weight: bold;
 }
+table.stress-pattern th.plural {
+    margin-left: 1em;
+}
 table.stress-pattern .stem,
 table.stress-pattern .end {
     display: inline-block;
 }
 table.stress-pattern .stem {
-    width: 50px;
+    width: 45px;
     border-bottom: 1px solid black;
 }
 
