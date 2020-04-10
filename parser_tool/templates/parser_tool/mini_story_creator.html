@@ -10,6 +10,15 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
     <style>
         h2 { color: #777777 }
+        .storyeditor {
+            min-height:200px; 
+            overflow: auto; 
+            resize: vertical; 
+            border-bottom: 5px #ccc;
+        }
+        .vocabeditor {
+            min-height:200px;
+        }
     </style>
 {% endblock %}
 
@@ -33,11 +42,11 @@
     <div class="col-md-1"></div>
     <div class="col-md-7 mt-3">
         <h2>Enter Mini-story:</h2>
-        <div id="storytext_input" class="form-control" style="min-height:200px; overflow: auto; resize: vertical; border-bottom: 5px #ccc;" contenteditable="true"></div>
+        <div id="storytext_input" class="form-control storyeditor" contenteditable="true" spellcheck="false" autocomplete="off"></div>
     </div>
     <div class="col-md-3 mt-3">
         <h2>Vocabulary:</h2>
-        <textarea id="storyvocab_input" class="form-control" style="min-height:200px;"></textarea>
+        <textarea id="storyvocab_input" class="form-control vocabeditor" ></textarea>
     </div>
 </div>
 <div class="row mb-3" style="background-color: #f7f7f7">

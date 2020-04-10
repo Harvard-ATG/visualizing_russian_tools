@@ -20,11 +20,12 @@
 
     class LemmatizedText {
 
-        constructor(data) {
-            data = data || {tokens: [], forms: {}, lemmas: {}};
-            this._tokens = data.tokens;
-            this._lemmas = data.lemmas;
-            this._forms = data.forms;
+        constructor(text, data) {
+            data = data || {}; // lemmatization data
+            this.text = text || ''; // original source text
+            this._tokens = data.tokens || [];
+            this._lemmas = data.lemmas || {};
+            this._forms = data.forms || {};
             this._cache_forms_of = {}
             this._cache_lemmas_of = {};
             this._trie = null;
@@ -39,7 +40,7 @@
             }
             // async request to lemmatize the text using the API client 
             return api.lemmatizetext(text).then((res) => {
-                return new LemmatizedText(res.data);
+                return new LemmatizedText(text, res.data);
             });
         }
 
@@ -73,6 +74,11 @@
             }
 
             this._trie = trie;
+        }
+
+        // returns the source text
+        getText() {
+            return this.text;
         }
 
         // returns true if there are zero tokens

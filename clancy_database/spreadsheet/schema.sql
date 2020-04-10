@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS lemma (
   FOREIGN KEY (gender) REFERENCES gender(key) ON DELETE RESTRICT ON UPDATE CASCADE,
   FOREIGN KEY (aspect) REFERENCES aspect(key) ON DELETE RESTRICT ON UPDATE CASCADE,
   FOREIGN KEY (animacy) REFERENCES animacy(key) ON DELETE RESTRICT ON UPDATE CASCADE,
-  FOREIGN KEY (transitivity) REFERENCES transitivity(key) ON DELETE RESTRICT ON UPDATE CASCADE
+  FOREIGN KEY (transitivity) REFERENCES transitivity(key) ON DELETE RESTRICT ON UPDATE CASCADE,
+  FOREIGN KEY (stress_pattern_semu) REFERENCES stress_pattern_semu(key) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX lemma_lemma_index ON lemma(lemma);
 
@@ -233,3 +234,22 @@ INSERT INTO pos (key, description) VALUES ('prefix', 'prefix');
 INSERT INTO pos (key, description) VALUES ('prep', 'preposition');
 INSERT INTO pos (key, description) VALUES ('pron', 'pronoun');
 INSERT INTO pos (key, description) VALUES ('verb', 'verb');
+
+CREATE TABLE IF NOT EXISTS stress_pattern_semu (
+  key                  TEXT PRIMARY KEY,
+  description          TEXT NOT NULL
+);
+INSERT INTO stress_pattern_semu (key, description) VALUES('', '');
+INSERT INTO stress_pattern_semu (key, description) VALUES('EE', 'Singular end stress, Plural end stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('EM', 'Singular end stress, Plural mixed stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('ES', 'Singular end stress, Plural stem stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('E_', 'Singular end stress, Plural does not occur');
+INSERT INTO stress_pattern_semu (key, description) VALUES('SE', 'Singular stem stress, Plural end stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('SM', 'Singular stem stress, Plural mixed stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('SS', 'Singular stem stress, Plural stem stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('S_', 'Singular stem stress, Plural does not occur');
+INSERT INTO stress_pattern_semu (key, description) VALUES('UM', 'Singular u-retraction, Plural mixed stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('US', 'Singular u-retraction, Plural stem stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('_E', 'Singular does not occur, Plural end stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('_M', 'Singular does not occur, Plural mixed stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('_S', 'Singular does not occur, plural stem stress');

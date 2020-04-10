@@ -9,6 +9,7 @@
 
     class MiniStoryController {
         constructor() {
+            this.api = new ApiClient();
             this.vocab_value = ""; // Raw string
             this.vocab_text = null; // Holds instance of LemmatizedText
             this.story_value = ""; // Raw string
@@ -78,28 +79,40 @@
 
         // Renders the view
         render() {
-            let views = [
-                new MiniStoryEditorView({
-                    story_text: this.story_text,
-                    vocab_text: this.vocab_text,
-                    colorize: this.option_colorize
+            let components = [
+                new MiniStoryEditorComponent({
+                    selector: "#storytext_input",
+                    props: {
+                        story_text: this.story_text,
+                        vocab_text: this.vocab_text,
+                        colorize: this.option_colorize
+                    }
                 }),
-                new MiniStoryLemmasView({
-                    story_text: this.story_text,
-                    colorize: this.option_colorize
+                new MiniStoryLemmasComponent({
+                    selector: "#storytext_lemmatized",
+                    props: {
+                        story_text: this.story_text,
+                        colorize: this.option_colorize
+                    }
                 }),
-                new MiniStoryVocabUsageView({
-                    story_text: this.story_text,
-                    vocab_text: this.vocab_text,
-                    colorize: this.option_colorize
+                new MiniStoryVocabUsageComponent({
+                    selector: "#storyvocab_lemmatized",
+                    props: {
+                        story_text: this.story_text,
+                        vocab_text: this.vocab_text,
+                        colorize: this.option_colorize
+                    }
                 }),
-                new MiniStoryUniqueWordsView({ 
-                    story_text: this.story_text,
-                    visible: this.option_wordlist,
-                    colorize: this.option_colorize
+                new MiniStoryUniqueWordsComponent({ 
+                    selector: "#storytext_vocab",
+                    props: {
+                        story_text: this.story_text,
+                        visible: this.option_wordlist,
+                        colorize: this.option_colorize
+                    }
                 })
             ];
-            views.forEach((view) => view.render());
+            components.forEach((c) => c.render());
             return this;
         }
 
@@ -130,7 +143,7 @@
                 return Promise.resolve(this.vocab_text); 
             }
             this.vocab_value = vocab_value;
-            return LemmatizedText.asyncFromString({ api: new ApiClient(), text: vocab_value}).then((vocab_text) => {
+            return LemmatizedText.asyncFromString({ api: this.api, text: vocab_value}).then((vocab_text) => {
                 this.vocab_text = vocab_text;
                 return this.vocab_text;
             });
@@ -142,7 +155,7 @@
                 return Promise.resolve(this.story_text);
             }
             this.story_value = story_value;
-            return LemmatizedText.asyncFromString({ api: new ApiClient(), text: story_value}).then((story_text) => {
+            return LemmatizedText.asyncFromString({ api: this.api, text: story_value}).then((story_text) => {
                 this.story_text = story_text;
                 return this.story_text;
             });
@@ -159,22 +172,20 @@
     }
 
 
-    class MiniStoryEditorView {
-        constructor({ story_text, vocab_text, colorize }) {
-            this.selector = "#storytext_input";
-            this.story_text = story_text;
-            this.vocab_text = vocab_text;
-            this.colorize = colorize;
+    class MiniStoryEditorComponent {
+        constructor({ selector, props }) {
+            this.selector = selector;
+            this.props = props;
         }
         // Shows the input text with target vocabulary emphasized based on lemma
         render() {
             const token2html = (token, tokentype, index) => {
                 let output = token;
                 if(tokentype == "RUS") {
-                    let level = this.story_text.levelOf(token);
-                    let words = this.story_text.lemmasOf(token).map((word) => word.label);
-                    let found = this.vocab_text.containsLemmas(words);
-                    if(this.colorize) {
+                    let words = this.props.story_text.lemmasOf(token).map((word) => word.label);
+                    let found = this.props.vocab_text.containsLemmas(words);
+                    if(this.props.colorize) {
+                        let level = this.props.story_text.levelOf(token);
                         if(found) {
                             output = `<b class="wordlevel${level}">${output}</b>`
                         } else {
@@ -193,32 +204,31 @@
                 return output;
             };
 
-            let html = this.story_text.mapTokens(token2html).join("");
-
+            let html = this.props.story_text.mapTokens(token2html).join("");
+            
             document.querySelector(this.selector).innerHTML = html;
         }
     }
 
 
-    class MiniStoryLemmasView {
-        constructor({ story_text, colorize }) {
-            this.selector = "#storytext_lemmatized";
-            this.story_text = story_text;
-            this.colorize = colorize;
+    class MiniStoryLemmasComponent {
+        constructor({ selector, props }) {
+            this.selector = selector;
+            this.props = props;
         }
         // Shows list of lemmas used in the story along with the specific forms associated with each
         render() {
-            let story_lemma_stats = this.story_text.lemma_stats();
+            let story_lemma_stats = this.props.story_text.lemma_stats();
 
             let story_lemma_stats_html = story_lemma_stats.map((item, idx) => {
-                const level = this.story_text.levelOf(item.word);
+                const level = this.props.story_text.levelOf(item.word);
                 const words = Object.keys(item.words).map(w => {
                     if(item.words[w] > 1) {
                         return w + `(×${item.words[w]})`;
                     }
                     return w;
                 }).join(", ");
-                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td><td>${level}</td></tr>`
+                return `<tr class="wordlevel${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td><td>${level}</td></tr>`
             }).join("");
 
             document.querySelector(this.selector).innerHTML = `
@@ -237,21 +247,19 @@
     }
 
 
-    class MiniStoryVocabUsageView {
-        constructor({ story_text, vocab_text, colorize }) {
-            this.selector = "#storyvocab_lemmatized";
-            this.story_text = story_text;
-            this.vocab_text = vocab_text;
-            this.colorize = colorize;
+    class MiniStoryVocabUsageComponent {
+        constructor({ selector, props }) {
+            this.selector = selector;
+            this.props = props;
         }
         // Compares target vocabulary lemmas against lemmas used in the text 
         render() {
-            let lemmatized_text_compare = new LemmatizedTextCompare(this.vocab_text, this.story_text);
+            let lemmatized_text_compare = new LemmatizedTextCompare(this.props.vocab_text, this.props.story_text);
             let vocab_lemmas = lemmatized_text_compare.compare();
             
             let html = vocab_lemmas.map((item, idx) => {
-                const level = this.vocab_text.levelOf(item.word);
-                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td><td>${item.lemmas.join(", ")}</td></tr>`
+                const level = this.props.vocab_text.levelOf(item.word);
+                return `<tr class="wordlevel${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td><td>${item.lemmas.join(", ")}</td></tr>`
             }).join("");
 
             document.querySelector(this.selector).innerHTML = `
@@ -270,27 +278,25 @@
     }
 
 
-    class MiniStoryUniqueWordsView {
-        constructor({ story_text, visible, colorize }) {
-            this.selector = "#storytext_vocab";
-            this.visible = visible;
-            this.story_text = story_text;
-            this.colorize = colorize;
+    class MiniStoryUniqueWordsComponent {
+        constructor({ selector, props }) {
+            this.selector = selector;
+            this.props = props;
         }
         // Shows a list of unique vocabulary words used in the text
         // Note that this is optional and not displayed by default since it's less useful than the list of lemmas.
         render() {
             let containerEl = document.querySelector(this.selector)
-            containerEl.style.display = (this.visible ? "" : "none");
-            if(!this.visible) {
+            containerEl.style.display = (this.props.visible ? "" : "none");
+            if(!this.props.visible) {
                 return;
             }
 
-            let story_vocab_stats = this.story_text.vocab_stats();
+            let story_vocab_stats = this.props.story_text.vocab_stats();
 
             let story_vocab_stats_html = story_vocab_stats.map((item, idx) => {
-                const level = this.story_text.levelOf(item.word);
-                return `<tr class="wordlevel${this.colorize ? level : 0}"><td>${item.word}</td><td>${item.count}</td><td>${level}</td></tr>`
+                const level = this.props.story_text.levelOf(item.word);
+                return `<tr class="wordlevel${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${item.count}</td><td>${level}</td></tr>`
             }).join("");
             
             containerEl.innerHTML = `

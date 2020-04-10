@@ -7,7 +7,7 @@
   const FrequencyGauge = window.app.FrequencyGauge;
   const LevelsPieChart = window.app.LevelsPieChart;
   const LevelsBarChart = window.app.LevelsBarChart;
-  const StressPatternWidget = window.app.StressPatternWidget;
+  const StressPatternTableComponent = window.app.StressPatternTableComponent;
 
   /**
    * Parse Service
@@ -214,9 +214,11 @@
       this._updateVerbFrequencyGauge(lemma);
     },
     showWordStress: function(stress_pattern_semu) {
-      var widget = new StressPatternWidget({ stress_pattern_semu: stress_pattern_semu });
-      var html = widget.render();
-      $("#wordstress").html(html);
+      var c = new StressPatternTableComponent({ 
+        selector: "#wordstress", 
+        props: {stress_pattern_semu}
+      });
+      c.render();
     },
     _updateVerbFrequencyGauge: function(lemma) {
       var vis_data = [];
