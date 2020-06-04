@@ -10,9 +10,7 @@ Visualizing Russian is a suite of web-based tools for language learners, researc
 ## Getting Started
 
 ```
-pipenv run pip install pip==18.0
-pipenv install
-pipenv shell
+pip install -r requirements.txt
 ./manage.py migrate
 ./manage.py import_clancy_sqldump
 ./manage.py runserver

@@ -14,9 +14,7 @@ class DatabaseRouter(object):
         return 'default'
     
     def allow_relation(self, obj1, obj2, **hints):
-        if obj1._meta.db_table in CLANCY_DATABASE_TABLES and obj2._meta.db_table in CLANCY_DATABASE_TABLES:
-            return True
-        return False
+        return True
     
     def allow_syncdb(self, db, model):
         if db == 'clancy_database':

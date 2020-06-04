@@ -61,7 +61,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'visualizing_russian_tools.wsgi.application'
 
-DATABASES = {}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(ROOT_DIR, 'default.sqlite3'),
+    },
+    'clancy_database': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(ROOT_DIR, 'clancy_database.sqlite3'),
+    }
+}
+DATABASE_ROUTERS = [
+    'visualizing_russian_tools.database_routers.DatabaseRouter',
+]
 
 CACHES = {
     'default': {
