@@ -5,8 +5,7 @@ COPY . /app
 WORKDIR /app
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install gzip sqlite3 libsqlite3-dev
-RUN pip install pipenv
-RUN pipenv install --system --deploy
+RUN pip install -r requirements.txt
 
 EXPOSE 8000
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

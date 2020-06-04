@@ -151,6 +151,12 @@ LOGGING = {
             'level': os.getenv('DB_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
+        # Capture gunicorn logging
+        'gunicorn': {
+            'handlers': ['console'],
+            'level': os.getenv('DB_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
         # Capture app-specific logging
         'visualizing_russian_tools': {
             'handlers': ['console', 'file'],
