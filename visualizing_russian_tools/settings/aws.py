@@ -32,6 +32,10 @@ if 'DB_NAME' in os.environ:
             'PASSWORD': os.environ['DB_PASSWORD'],
             'HOST': os.environ['DB_HOSTNAME'],
             'PORT': os.environ.get('DB_PORT', 5432),
+        },
+        'clancy_database': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(ROOT_DIR, 'clancy_database.sqlite3'),
         }
     }
 else:
@@ -39,6 +43,10 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': os.path.join(ROOT_DIR, 'default.sqlite3'),
+        },
+        'clancy_database': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(ROOT_DIR, 'clancy_database.sqlite3'),
         }
     }
 
