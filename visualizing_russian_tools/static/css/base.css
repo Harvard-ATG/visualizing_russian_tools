@@ -1,3 +1,17 @@
+html, body {
+    height: 100%;
+}
 .container, .container-fluid {
     font-family: Lato, sans-serif;
+}
+.main {
+    height: auto;
+    min-height: calc(100% - 56px - 250px); /* 56px = navbar, 250px = footer */
+}
+.footer {
+    width: 100%;
+    height: 250px;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-top: 1px solid #ccc;
+    padding: 20px 0;
 }

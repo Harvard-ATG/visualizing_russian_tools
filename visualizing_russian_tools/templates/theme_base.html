@@ -31,7 +31,7 @@
     <nav class="navbar navbar-expand-md navbar-light">
         <div class="container-fluid">
             <div class="navbar-nav">
-                <a class="navbar-brand" href="/">Russian Modules</a>
+                <a class="navbar-brand" href="/">Visualizing Russian</a>
                 <a class="nav-item nav-link" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a>
                 <a class="nav-item nav-link" href="{% url 'mini_story_creator' %}">Mini-story Creator</a>
             </div>
@@ -44,13 +44,25 @@
     </nav>
     {% endblock %}
 
-    <div class="container-fluid">
+    <main role="main" class="container-fluid main">
         {% block page_header_base %}
             {% block page_header %}{% endblock %}
         {% endblock %}
 
         {% block content_base %}{% endblock %}
-    </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5>Visualizing Russian © 2014-2020 Steven Clancy</h5>
+                    <p>For questions or further information about the project, please contact Steven Clancy &lt;<a href="mailto:sclancy@fas.harvard.edu">sclancy@fas.harvard.edu</a>&gt;.</p>
+                    <p>Citation:<br><cite>Clancy, Steven. Visualizing Russian. A suite of tools for exploring the data behind the Russian language, 2014-2020, (<a href="http://visualizingrussian.fas.harvard.edu">http://visualizingrussian.fas.harvard.edu</a>).</cite></p>
+                </div>    
+            </div>
+        </div>
+    </footer>
 
     {% block script_base %}
         <script src="{% static 'vendor/jquery-3.3.1/jquery.min.js' %}"></script>
