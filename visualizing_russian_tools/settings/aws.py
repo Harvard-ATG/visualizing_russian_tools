@@ -9,7 +9,7 @@ SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 DEBUG = False
 
 # Hostnames
-ALLOWED_HOSTS = [h for h in os.environ.get('ALLOWED_HOSTS', '').split(' ') if h]
+ALLOWED_HOSTS = ['127.0.0.1'] + [h for h in os.environ.get('ALLOWED_HOSTS', '').split(' ') if h]
 EC2_PRIVATE_IP = None
 try:
     EC2_PRIVATE_IP = requests.get('http://169.254.169.254/latest/meta-data/local-ipv4', timeout=0.01).text
