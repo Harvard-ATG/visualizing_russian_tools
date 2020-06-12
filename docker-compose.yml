@@ -9,8 +9,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DJANGO_SETTINGS_MODULE=visualizing_russian_tools.settings.aws
-      - DJANGO_SECRET_KEY=asdfaafl;kjl;k2j3423
       - DJANGO_LOG_LEVEL=DEBUG
       - LOG_LEVEL=DEBUG
       - DB_LOG_LEVEL=DEBUG
