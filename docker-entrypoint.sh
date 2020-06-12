@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cd /app
 ./manage.py migrate
 ./manage.py collectstatic --clear --noinput
 ./manage.py import_clancy_sqldump

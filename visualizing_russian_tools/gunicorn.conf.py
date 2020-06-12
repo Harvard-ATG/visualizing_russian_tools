@@ -2,7 +2,7 @@
 
 bind = '0.0.0.0:8000'
 workers = 3
-worker_tmp_dir = "/dev/shm" # https://docs.gunicorn.org/en/stable/faq.html#how-do-i-avoid-gunicorn-excessively-blocking-in-os-fchmod
+# worker_tmp_dir = "/dev/shm" # https://docs.gunicorn.org/en/stable/faq.html#how-do-i-avoid-gunicorn-excessively-blocking-in-os-fchmod
 
 # These log settings assume that gunicorn log config will be included in the django base.py logging configuration
 accesslog = '-'
