@@ -1,12 +1,11 @@
-dist: xenial
+dist: bionic
 language: python
 python:
 - '3.6'
 env:
 - DJANGO_SETTINGS_MODULE="visualizing_russian_tools.settings.local" BOTO_CONFIG=/dev/null SENTRY_DSN="" SENTRY_DEBUG=1
 install:
-- pip install pipenv
-- pipenv install
+- pip install -r requirements.txt
 script:
-- pipenv run python3 manage.py migrate --noinput
-- pipenv run python3 manage.py test
+- python3 manage.py migrate --noinput
+- python3 manage.py test
