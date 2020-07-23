@@ -129,6 +129,8 @@ def lemmatize(form):
             lemmas.append(inflection.lemma.to_dict())
     return lemmas
 
+# TODO: write query to find 
+
 
 def batch(iterable, n=1):
     """
