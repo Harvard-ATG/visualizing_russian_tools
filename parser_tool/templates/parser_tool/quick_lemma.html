@@ -1,0 +1,91 @@
+{% extends "site_base.html" %}
+{% load staticfiles %}
+
+{% block head_title %}Quick Lemma{% endblock %}
+{% block body_id %}quicklemma{% endblock %}
+{% block body_class %}{% endblock %}
+
+{% block extra_style %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
+    <style>
+        h2 { color: #777777 }
+        iframe.previewhtml {
+            border: 1px solid #ccc;
+            padding: 5px;
+            width: 100%;
+            min-height: 500px;
+            max-width: 100%;
+            overflow: auto;
+        }
+        textarea#outputhtml {
+            white-space: pre;
+            width: 100%;
+            min-height: 200px;
+            border: 1px solid #888;
+            padding: 5px;
+            outline: none;
+            overflow: auto;
+            font-size: 10px;
+            font-family: Monaco, courier;
+        }
+        .altbtn {
+            background-color: red;
+            border: red;
+        }
+        .altbtn:hover {
+            background-color: #cc0000;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+            }
+        tr:hover {background-color: #f5f5f5;}
+    </style>
+{% endblock %}
+
+{% block extra_script %}
+    <script src="{% static 'js/src/lib/api.js' %}"></script>
+    <script src="{% static 'js/src/quick_lemma.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+<a name="top"></a>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10 mt-3">
+        <h2>Quick Lemma Tool</h2>
+        <textarea id="contentinput" placeholder="Enter list of text for frequencies" style="min-height:100px; width: 100%; overflow: auto; resize: vertical; border-bottom: 5px #ccc;"></textarea>
+    </div>
+</div>
+<div class="row mb-3" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-4">
+        <h2 style="font-size: 125%"><span style="color: blue">Lemmas</span>: i.e. кабинет, контора, офис</h2>
+        <div class="form-group">
+            <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="lemmabtn">Original order<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
+            <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="sortedlemmabtn">Frequency order<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <h2 style="font-size: 125%"><span style="color: red">Forms</span>: i.e. русская, русский, русское, русские</h2>
+        <div class="form-group">
+            <button type="button" align="left" class="altbtn btn btn-lg btn-primary mt-2 mb-2" id="formbtn">Original order<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
+            <button type="button" align="left" class="altbtn btn btn-lg btn-primary mt-2 mb-2" id="sortedformbtn">Frequency order<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
+        </div>
+    </div>
+    <div id="qlerror" class="mb-3" style="display:none; color: red;"></div>
+</div>
+
+<div id="results" class="row mt-3 bt-5">
+    <div class="col-md-1"></div>
+    <div class="col-md-2">
+        <table id='outputtable' style="width:100%"></table>
+    </div>
+</div>
+
+<br><br>
+
+
+{% endblock %}
