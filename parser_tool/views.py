@@ -11,3 +11,6 @@ def mini_story_creator(request):
 
 def html_colorizer(request):
     return render(request, 'parser_tool/html_colorizer.html')
+
+def quick_lemma(request):
+    return render(request, 'parser_tool/quick_lemma.html')

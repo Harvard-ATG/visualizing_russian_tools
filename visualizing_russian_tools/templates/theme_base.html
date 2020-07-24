@@ -34,6 +34,7 @@
                 <a class="navbar-brand" href="/">Visualizing Russian</a>
                 <a class="nav-item nav-link" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a>
                 <a class="nav-item nav-link" href="{% url 'mini_story_creator' %}">Mini-story Creator</a>
+                <a class="nav-item nav-link" href="{% url 'quick_lemma' %}">Quick Lemma Tool</a>
             </div>
             <div class="navbar-nav navbar-right">
             {% if request.user.is_authenticated and request.user.is_staff %}

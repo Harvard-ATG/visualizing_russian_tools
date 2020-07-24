@@ -17,6 +17,7 @@ urlpatterns = [
     path('text-parsing-analysis', parser_tool.views.text_parsing_analysis,  name='text_parsing_analysis'),
     path('html-colorizer', parser_tool.views.html_colorizer,  name='html_colorizer'),
     path('mini-story-creator', parser_tool.views.mini_story_creator,  name='mini_story_creator'),
+    path('quick-lemma', parser_tool.views.quick_lemma,  name='quick_lemma'),
 
     # API endpoints
     path('api/parsetext', parser_tool.api.TextParserAPIView.as_view(), name='api-parse-text'),
@@ -25,4 +26,5 @@ urlpatterns = [
     path('api/lemma', parser_tool.api.LemmaAPIView.as_view(), name='api-lemma'),
     path('api/colorize/html', parser_tool.api.DocumentColorizerAPIView.as_view(), name='api-colorize-html'),
     path('api/colorize/elements', parser_tool.api.ElementsColorizerAPIView.as_view(), name='api-colorize-elements'),
+
 ]
