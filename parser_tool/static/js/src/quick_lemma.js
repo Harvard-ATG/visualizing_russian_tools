@@ -2,68 +2,78 @@
   const ApiClient = window.app.ApiClient;
     // practice
     async function sorted_lemmas() {
-      await display(make_lemma_array, true)
-    }
-    async function lemmas() {
-      await display(make_lemma_array, false)
+      await display('lemma');
     }
     async function sorted_forms() {
-      await display(make_form_array, true)
+      await display('form');
     }
-    async function forms() {
-      await display(make_form_array, false)
+    async function get_forms() {
+      await display('lemma_to_forms');
     }
 
-    async function display(fun, sorted_bool) {
+    async function display(designator) {
         const api = new ApiClient();
         var input_text = $("#contentinput").val();
         try {
           before_rank_lemmas();
-          const jqXhr = api.lemmatizetext(input_text); 
-          jqXhr.then(function(result, textStatus) {
-            var array = fun(result);
-            if (sorted_bool) {
-              console.log('sorted_bool = true');
-              array.sort((a, b) => (a.freq < b.freq) ? 1 : -1);
-            }
+          if ((designator == 'lemma') || (designator == 'form')) {
+            const jqXhr = api.lemmatizetext(input_text); 
+            jqXhr.then(function(result, textStatus) {
+            var array = new_make_array(result, designator);
+            after_rank_lemmas(array, designator);
+            })
+          };
+          if (designator == 'lemma_to_forms') {
+            const jqXhr = api.getforms(input_text); 
+            jqXhr.then(function(result, textStatus) {
+            var array = new_make_array(result, designator);
             after_rank_lemmas(array);
-          });
+            });
+          }
         } catch(err) {
           error(err);
         }
       };
-      function make_form_array(jqXhr_result, sorted_bool) {
-        var values = Object.values(jqXhr_result.data.forms);
-        var array = [];
-        var unique_words = [];
-        console.log(values)
-        for (const val of values) {
-          if (!unique_words.includes(val.label)) {
-            if (val.frequency == null) {
-              array.push({'word' : val.label, 'freq' : 'No data', 'level' : '6U'});
-            }
-            else {
-              array.push({'word' : val.label, 'freq' : val.frequency, 'level' : '6U'});
-            }
-            unique_words.push(val.label);
-          }
-        };
-        return array;
-      }
 
-      function make_lemma_array(jqXhr_result, sorted_bool) {
-        var values = Object.values(jqXhr_result.data.tokens);
-        var array = [];
+      function new_make_array(result, designator) {
+        if (designator == 'lemma') {
+          var values = Object.values(result.data.lemmas);
+        }
+        if (designator == 'form') {
+          var values = Object.values(result.data.tokens);
+        }
+        if (designator == 'lemma_to_forms') {
+          var values = Object.values(result.data);
+        }
+        var array = []
+        let unique_words = new Set();
         for (const val of values) {
-          if (val.tokentype == 'RUS') {
-            if (val.count == null) {
-              array.push({'word' : val.canonical, 'freq' : 'No data', 'level' : val.level});
-            }
-            else {
-              array.push({'word' : val.canonical, 'freq' : val.count, 'level' : val.level});
+          if (designator == 'lemma') {
+            var word_label = val.label;
+            var frequency = val.count;
+            var level = val.level;
+            var rank = val.rank;
+          }
+          if (designator == 'form') {
+            var word_label = val.canonical;
+            var frequency = val.count;
+            var level = val.level;
+            var rank = 'No data';
+          }
+          if (designator == 'lemma_to_forms') {
+            var word_label = val.form;
+            var frequency = val.frequency;
+            var level = '6U';
+            var rank = 'No data';
+          }
+          if (level != "") {
+            if (!unique_words.has(word_label)) {
+              array.push({'word' : word_label, 'freq' : frequency, 'level' : level, 'rank' : rank});
+              unique_words.add(word_label);
             }
           }
-        };
+        }
+        array.sort((a, b) => (a.freq < b.freq) ? 1 : -1);
         return array;
       }
 
@@ -75,11 +85,13 @@
       }
       function after_rank_lemmas(array) {
         $("#results").show();
+        $("#outputtable").append('<tr style="color:gray"><th> Word </th><th> Frequency </th><th> Rank </th></tr>');
         if (array.length == 0) {
-          $('#outputtable').text('No input data found.');
+          $("#outputtable").text('No input data found.');
         }
         for (const token of array) {
-          $('#outputtable').append('<tr><th data-level=' + token.level + '>' + token.word + '</th><th>' + token.freq + '</th></tr>');
+          $("#outputtable").append('<tr><th data-level=' + token.level + '>' 
+          + token.word + '</th><th>' + token.freq + '</th><th>' + token.rank + '</th></tr>');
         }
       }
       // error
@@ -91,10 +103,9 @@
     // practice
     $(document).ready(async function () {
         console.log("ready!");
-        $('#lemmabtn').on('click', lemmas);
         $("#sortedlemmabtn").on("click", sorted_lemmas);
-        $("#formbtn").on("click", forms);
         $("#sortedformbtn").on("click", sorted_forms);
+        $("#getformsbtn").on("click", get_forms);
     });
 
       // Just execute "demo()" in the console to populate the input with sample HTML.

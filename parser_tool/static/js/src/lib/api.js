@@ -44,6 +44,15 @@
             return jqXhr;
         }
 
+        // new addition
+        getforms(content) {
+            var url = this._url('/api/getforms');
+            var settings = {method: "POST", data: JSON.stringify({text: content})};
+            var jqXhr = this._ajax(url, settings);
+            return jqXhr;
+        }
+        
+
         lemmatizeword(word) {
             var url = this._url('/api/lemmatize');
             var settings = {method: "GET", data: {word: word}};

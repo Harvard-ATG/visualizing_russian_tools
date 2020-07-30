@@ -26,5 +26,7 @@ urlpatterns = [
     path('api/lemma', parser_tool.api.LemmaAPIView.as_view(), name='api-lemma'),
     path('api/colorize/html', parser_tool.api.DocumentColorizerAPIView.as_view(), name='api-colorize-html'),
     path('api/colorize/elements', parser_tool.api.ElementsColorizerAPIView.as_view(), name='api-colorize-elements'),
+    # new path
+    path('api/getforms', parser_tool.api.GetFormsAPIView.as_view(), name='api-get-forms'),
 
 ]
