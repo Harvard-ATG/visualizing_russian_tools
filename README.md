@@ -13,7 +13,8 @@ Visualizing Russian is a suite of web-based tools for language learners, researc
 pip install -r requirements.txt
 ./manage.py migrate
 ./manage.py import_clancy_sqldump
-./manage.py runserver --nostatic 
+./manage.py load_sharoff_freq_list
+./manage.py runserver --nostatic
 ```
 
 Using docker:

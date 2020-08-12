@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS lemma (
   aspect                TEXT NOT NULL,
   transitivity          TEXT,
   stress_pattern_semu   TEXT,
-  rank                  INTEGER NOT NULL DEFAULT -1,
+  rank                  INTEGER,
   count                 REAL,
 
   FOREIGN KEY (pos) REFERENCES pos(key) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS inflection (
   stressed             TEXT NOT NULL,
   type                 TEXT NOT NULL, -- Grammatical type expressing features of the form such as gender, case, number or person, tense
   frequency            REAL,
+  sharoff_freq         REAL,
+  sharoff_rank         INTEGER,
 
   FOREIGN KEY (lemma_id) REFERENCES lemma(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   FOREIGN KEY (type) REFERENCES inflection_type(key) ON DELETE RESTRICT ON UPDATE CASCADE
