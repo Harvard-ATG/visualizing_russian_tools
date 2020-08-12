@@ -31,9 +31,10 @@ def tokens2html(tokens, **options):
             container_el.append(rendered['element'])
             prev_el = rendered['element']
         elif rendered['node_type'] == TEXT_NODE:
-            text_attribute = 'text' if prev_el is None else 'tail'
-            starting_text = getattr(prev_el, text_attribute, '') or ''
-            setattr(prev_el, text_attribute, starting_text + rendered['text'])
+            if prev_el is container_el:
+                prev_el.text = (prev_el.text or '') + rendered['text']
+            else:
+                prev_el.tail = (prev_el.tail or '') + rendered['text']
 
     # Serialize element tree to HTML string
     html = serialize(container_el)
