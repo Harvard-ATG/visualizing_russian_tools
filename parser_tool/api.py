@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 
 
 class BaseAPIView(View):
-    MAX_BODY_SIZE = 500000
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -29,15 +28,11 @@ class BaseAPIView(View):
     def get_request_body_html(self, request):
         if not request.content_type.startswith("text/html"):
             raise JsonBadRequest("Expected HTML content type header")
-        if len(request.body.decode('utf-8')) > self.MAX_BODY_SIZE:
-            raise ValueError("Submitted request is too large (maximum {max_size:,} characters).".format(max_size=self.MAX_BODY_SIZE))
         return request.body.decode('utf-8')
 
     def get_request_body_json(self, request):
         if request.content_type != "application/json":
             raise JsonBadRequest("Expected JSON content type header")
-        if len(request.body.decode('utf-8')) > self.MAX_BODY_SIZE:
-            raise ValueError("Submitted request is too large (maximum {max_size:,} characters).".format(max_size=self.MAX_BODY_SIZE))
         try:
             body = json.loads(request.body.decode('utf-8'))
         except ValueError:
