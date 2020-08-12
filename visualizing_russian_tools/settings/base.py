@@ -118,6 +118,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [ os.path.join(BASE_DIR, "static") ]
 STATIC_ROOT = os.path.join(ROOT_DIR, 'http_static')
 
+# Max size in bytes that the request body can be (default: 2621440, i.e. 2.5MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2097152 # 2MB
+
 # Logging
 LOGGING = {
     'version': 1,
