@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 ./manage.py migrate
 ./manage.py collectstatic --clear --noinput
