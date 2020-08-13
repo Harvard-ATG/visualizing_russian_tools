@@ -64,7 +64,20 @@ class TestHtmlGenerator(unittest.TestCase):
 
         self.assertEqual(htmlgenerator.TEXT_NODE, rendered['node_type'])
         self.assertEqual(expected_text, rendered['text'])
-
+    
+    def test_tokens_with_leading_punct_to_html(self):
+        # (собака) dog
+        tokens = [
+            self._maketokendict(token="(", tokentype=tokenizer.TOKEN_PUNCT),
+            self._maketokendict(token="собака", tokentype=tokenizer.TOKEN_RUS, level="1E", form_ids=["7599"]),
+            self._maketokendict(token=")", tokentype=tokenizer.TOKEN_RUS),
+            self._maketokendict(token=" ", tokentype=tokenizer.TOKEN_SPACE),
+            self._maketokendict(token="dog", tokentype=tokenizer.TOKEN_WORD),
+        ]
+        html = htmlgenerator.tokens2html(tokens)
+        expected_html = '<pre class="words">(<span class="word parsed level1" data-form-ids="7599" data-level="1E">собака</span><span class="word">)</span> <span class="word">dog</span></pre>'
+        self.assertEqual(expected_html, html)
+        
     def test_tokens2html(self):
         tokens = [
             self._maketokendict(token="A", tokentype=tokenizer.TOKEN_WORD),

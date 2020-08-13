@@ -147,10 +147,11 @@ def process_data(cursor, filename, verbose=False):
         for rowid, row in enumerate(csvreader, start=1):
             if rowid == 1:
                 continue
-            lemma = insert_lemma(cursor, row, verbose=verbose)
-            lemma_pk = lemma['id']
-            lemma_to_sheet_row[lemma_pk] = row
-            insert_inflections(cursor, lemma_pk, row, verbose=verbose)
+            if can_insert_lemma(row, verbose=verbose):
+                lemma = insert_lemma(cursor, row, verbose=verbose)
+                lemma_pk = lemma['id']
+                lemma_to_sheet_row[lemma_pk] = row
+                insert_inflections(cursor, lemma_pk, row, verbose=verbose)
         insert_aspect_pairs(cursor, verbose, lemma_to_sheet_row)
 
 
@@ -221,6 +222,14 @@ def insert_aspect_pairs(cursor, verbose=False, lemma_to_sheet_row=None):
         except sqlite3.Error as e:
             logging.exception("aspect_pair: %s" % insert)
             raise e
+
+
+def can_insert_lemma(row, verbose=False):
+    # Skip 6O lemmas since these should be omitted
+    # as they don't fit in the schema right now (includes some MWEs, etc)
+    if row['Level'].strip() == "6O":
+        return False
+    return True
 
 
 def insert_lemma(cursor, row, verbose=False):

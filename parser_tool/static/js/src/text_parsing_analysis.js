@@ -256,12 +256,16 @@
       $("#textinfo").html('');
     },
     getCounts: function() {
-      var counts = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0};
-      $('.word[data-level]').each(function(index, el) {
-          counts[parseInt($(el).attr("data-level")[0])] += 1;
+      var counts = {total: 0, 0: 0, 1: 0, 2: 0, 3: 0, 4: 0};
+      var elementList = document.querySelectorAll('.word');
+      elementList.forEach(function(el, index) {
+        counts.total += 1;
+        if('level' in el.dataset) {
+          counts[parseInt(el.dataset.level, 10)] += 1;
+        } else {
+          counts[0] += 1;
+        }
       });
-      counts[0] = $('.word').length - $('.word[data-level]').length;
-      counts.total = counts[0] + counts[1] + counts[2] + counts[3] + counts[4];
       return counts;
     },
     generateCharts: function() {
@@ -280,9 +284,8 @@
     },
     showTextInfo: function() {
       var counts = this.counts;
-      var wl = $('.word').length;
       var html = '';
-      html += '<div>Word Count: <span class="numbers mr-4"> ' + wl + '</span></div>';
+      html += '<div>Word Count: <span class="numbers mr-4"> ' + counts.total + '</span></div>';
       html += '<div>Unparsed Count: <span class="numbers mr-4"> ' + counts[0] + '</span></div>';
       html += '<div>L1 Count: <span class="numbers mr-4"> ' + counts[1] + '</span></div>';
       html += '<div>L2 Count: <span class="numbers mr-4"> ' + counts[2] + '</span></div>';
@@ -291,7 +294,7 @@
       html += '<button type="button" id="textinfocopy" class="btn btn-secondary btn-sm">Copy to clipboard</button>';
       html += '<div id="textinfocsv" style="display:none;">';
       html += ['Word Count', 'Unparsed', 'L1', 'L2', 'L3', 'L4'].join(",") + "<br>";
-      html += [wl, counts[0], counts[1], counts[2], counts[3], counts[4]].join(",") + "\n";
+      html += [counts.total, counts[0], counts[1], counts[2], counts[3], counts[4]].join(",") + "\n";
       html += '</div>'; 
       $('#textinfo').html(html);
     },
@@ -386,12 +389,14 @@
     },
     onClickWord: function(e) {
       var $el = $(e.target);
-      if($el.hasClass("highlight")) {
-        $el.removeClass("highlight");
+      if(e.target.classList.contains("highlight")) {
+        e.target.classList.remove("highlight");
         wordInfoCtrl.reset();
       } else {
-        $(".word.highlight").removeClass("highlight");
-        $el.addClass("highlight");
+        document.querySelectorAll(".word.highlight").forEach(function(el) {
+          el.classList.remove("highlight");
+        });
+        e.target.classList.add("highlight");
         var form_ids = parsedTextCtrl.getElementDataFormIds($el);
         var word_info = parseService.getWordInfo(form_ids)
         wordInfoCtrl.setPosition({top: $el.position().top });

@@ -101,6 +101,8 @@ class Inflection(models.Model):
     stressed = models.TextField()
     type = models.TextField()
     frequency = models.FloatField(blank=True, null=True)
+    sharoff_freq = models.FloatField(blank=True, null=True)
+    sharoff_rank = models.IntegerField()
 
     def __str__(self):
         return "%s [%s:%s]" % (self.form, self.type, self.id)

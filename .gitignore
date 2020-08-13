@@ -13,6 +13,6 @@
 .env*
 http_static
 NewVisualizingRussian*.csv
-NewVisualizingRussian*.xslx
+NewVisualizingRussian*.xlsx
 /scratch
 /django_cache
