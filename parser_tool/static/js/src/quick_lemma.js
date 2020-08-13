@@ -27,7 +27,7 @@
             const jqXhr = api.getforms(input_text); 
             jqXhr.then(function(result, textStatus) {
             var array = new_make_array(result, designator);
-            after_rank_lemmas(array);
+            after_rank_lemmas(array, designator);
             });
           }
         } catch(err) {
@@ -58,13 +58,13 @@
             var word_label = val.canonical;
             var frequency = val.count;
             var level = val.level;
-            var rank = 'No data';
+            var rank = 'No data yet';
           }
           if (designator == 'lemma_to_forms') {
             var word_label = val.form;
             var frequency = val.frequency;
-            var level = '6U';
-            var rank = 'No data';
+            var level = result['level'];
+            var rank = 'No data yet';
           }
           if (level != "") {
             if (!unique_words.has(word_label)) {
@@ -83,9 +83,15 @@
         $("#outputtable").empty();
         $("#results").hide();
       }
-      function after_rank_lemmas(array) {
+      function after_rank_lemmas(array, designator) {
         $("#results").show();
-        $("#outputtable").append('<tr style="color:gray"><th> Word </th><th> Frequency </th><th> Rank </th></tr>');
+        if (designator == 'form' || designator == 'lemma_to_forms') {
+          var frequency_title = 'Form  Frequency';
+        }
+        else {
+          var frequency_title = 'Lemma  Frequency'
+        }
+        $("#outputtable").append('<tr style="color:gray"><th> Word </th><th>' + frequency_title + '</th><th> Rank </th></tr>');
         if (array.length == 0) {
           $("#outputtable").text('No input data found.');
         }

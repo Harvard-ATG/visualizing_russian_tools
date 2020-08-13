@@ -73,21 +73,19 @@
     <div class="col-md-3">
         <h2 style="font-size: 125%"><span style="color: blue">Lemmas</span>: i.e. кабинет, контора, офис</h2>
         <div class="form-group">
-            <!-- <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="lemmabtn">Original order<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button> -->
             <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="sortedlemmabtn">Get lemma frequencies<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <h2 style="font-size: 125%"><span style="color: rgb(255, 179, 0)">Get forms from lemma</span>: i.e. улица -> улице, улицу, улицаы, ...</h2>
+        <div class="form-group">
+            <button type="button" align="left" class="getformbtn btn btn-lg btn-primary mt-2 mb-2" id="getformsbtn">Get forms from lemma<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
         </div>
     </div>
     <div class="col-md-3">
         <h2 style="font-size: 125%"><span style="color: red">Forms</span>: i.e. русская, русский, русское, русские</h2>
         <div class="form-group">
-            <!-- <button type="button" align="left" class="altbtn btn btn-lg btn-primary mt-2 mb-2" id="formbtn">Original order<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button> -->
             <button type="button" align="left" class="formbtn btn btn-lg btn-primary mt-2 mb-2" id="sortedformbtn">Get form frequencies<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <h2 style="font-size: 125%"><span style="color: rgb(255, 179, 0)">Get forms from lemma</span>: i.e. окно -> окно, окна, окном, окон...</h2>
-        <div class="form-group">
-            <button type="button" align="left" class="getformbtn btn btn-lg btn-primary mt-2 mb-2" id="getformsbtn">Get forms from lemma<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
         </div>
     </div>
     <div id="qlerror" class="mb-3" style="display:none; color: red;"></div>
@@ -98,12 +96,6 @@
     <div class="col-md-3">
         <table id='outputtable' style="width:100%"></table>
     </div>
-    <!-- <div class="col-md-3">
-        <table id='outputtableform' style="width:100%"></table>
-    </div>
-    <div class="col-md-3">
-        <table id='outputtablelemma_to_forms' style="width:100%"></table>
-    </div> -->
 </div>
 
 <br><br>

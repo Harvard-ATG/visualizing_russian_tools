@@ -257,7 +257,7 @@ class GetFormsAPIView(BaseAPIView):
         }
         try:
             text = body.get("text", "")
-            lemma_data = lemmatizer.get_word_forms(text)
+            lemma_data, lemma_level = lemmatizer.get_word_forms(text)
         except Exception as e:
             logger.exception(e)
             status = "error"
@@ -265,6 +265,7 @@ class GetFormsAPIView(BaseAPIView):
         result = {"status": status}
         if status == "success":
             result["data"] = lemma_data
+            result["level"] = lemma_level
         if status in message_for_status:
             result["message"] = message_for_status[status]
 

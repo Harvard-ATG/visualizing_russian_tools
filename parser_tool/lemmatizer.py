@@ -79,4 +79,5 @@ def get_word_forms(text):
     tokens = tokenizer.tokenize(text)
     lemmas = [queries.lemmatize(tokens[0]) for token in tokens][0]
     ids = [lemma["id"] for lemma in lemmas]
-    return queries.getforms(ids)
+    lemma_level = [lemma['level'] for lemma in lemmas][0]
+    return (queries.getforms(ids), lemma_level)
