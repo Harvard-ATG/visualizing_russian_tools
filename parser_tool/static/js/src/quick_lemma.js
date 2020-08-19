@@ -19,6 +19,7 @@
           if ((designator == 'lemma') || (designator == 'form')) {
             const jqXhr = api.lemmatizetext(input_text); 
             jqXhr.then(function(result, textStatus) {
+              console.log(result);
             var array = new_make_array(result, designator);
             after_rank_lemmas(array, designator);
             })
@@ -26,6 +27,8 @@
           if (designator == 'lemma_to_forms') {
             const jqXhr = api.getforms(input_text); 
             jqXhr.then(function(result, textStatus) {
+              console.log(result);
+
             var array = new_make_array(result, designator);
             after_rank_lemmas(array, designator);
             });
@@ -56,15 +59,15 @@
           }
           if (designator == 'form') {
             var word_label = val.canonical;
-            var frequency = val.count;
+            var frequency = val.sharoff_freq;
             var level = val.level;
-            var rank = 'No data yet';
+            var rank = val.sharoff_rank;
           }
           if (designator == 'lemma_to_forms') {
             var word_label = val.form;
-            var frequency = val.frequency;
+            var frequency = val.sharoff_freq;
             var level = result['level'];
-            var rank = 'No data yet';
+            var rank = val.sharoff_rank;
           }
           if (level != "") {
             if (!unique_words.has(word_label)) {
@@ -87,13 +90,15 @@
         $("#results").show();
         if (designator == 'form' || designator == 'lemma_to_forms') {
           var frequency_title = 'Form  Frequency';
+          var rank_title = 'Form  Rank';
         }
         else {
-          var frequency_title = 'Lemma  Frequency'
+          var frequency_title = 'Lemma  Frequency';
+          var rank_title = 'Lemma  Rank';
         }
-        $("#outputtable").append('<tr style="color:gray"><th> Word </th><th>' + frequency_title + '</th><th> Rank </th></tr>');
+        $("#outputtable").append('<tr style="color:gray"><th> Word </th><th>' + frequency_title + '</th><th>'+ rank_title +'</th></tr>');
         if (array.length == 0) {
-          $("#outputtable").text('No input data found.');
+          $("#outputtable").text('No input data found or word not found in database.');
         }
         for (const token of array) {
           $("#outputtable").append('<tr><th data-level=' + token.level + '>' 

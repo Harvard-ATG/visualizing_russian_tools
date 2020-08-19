@@ -100,7 +100,7 @@ class Inflection(models.Model):
     form = models.TextField()
     stressed = models.TextField()
     type = models.TextField()
-    frequency = models.FloatField(blank=True, null=True)
+    # frequency = models.FloatField(blank=True, null=True)
     sharoff_freq = models.FloatField(blank=True, null=True)
     sharoff_rank = models.IntegerField()
 
@@ -113,7 +113,9 @@ class Inflection(models.Model):
             "type": self.type,
             "label": self.form,
             "stressed": self.stressed,
-            "frequency": self.frequency,
+            # "frequency": self.frequency,
+            "sharoff_freq": self.sharoff_freq,
+            "sharoff_rank": self.sharoff_rank,
             "lemma_id": self.lemma_id,
         }
 
