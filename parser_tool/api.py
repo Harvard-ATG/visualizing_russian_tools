@@ -239,3 +239,31 @@ class ElementsColorizerAPIView(BaseAPIView):
 
     def colorize_elements(self, elements, color_attribute):
         return apicache.colorize_elements(elements, color_attribute)
+
+
+# try to add getforms response
+class GetFormsAPIView(BaseAPIView):
+    def post(self, request):
+        body = self.get_request_body_json(request)
+
+        status = "success"
+        message_for_status = {
+            "error": "Internal server error"
+        }
+        try:
+            text = body.get("text", "")
+            lemma_data, lemma_level = lemmatizer.get_word_forms(text)
+        except Exception as e:
+            logger.exception(e)
+            status = "error"
+
+        result = {"status": status}
+        if status == "success":
+            result["data"] = lemma_data
+            result["level"] = lemma_level
+        if status in message_for_status:
+            result["message"] = message_for_status[status]
+
+        logger.debug("lemmatize response data=%s" % result)
+
+        return JsonResponse(result, safe=False)

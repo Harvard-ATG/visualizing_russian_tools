@@ -63,7 +63,8 @@ def lemmatize_tokens(tokens):
                     token["level"] = lemma["level"]
                     token["form_ids"] = form_ids
                     # new attribute for token
-                    token["count"] = lemma["count"];
+                    token["sharoff_freq"] = lemmatized["forms"][form_id]["sharoff_freq"];
+                    token["sharoff_rank"] = lemmatized["forms"][form_id]["sharoff_rank"];
                     token["label"] = lemma["label"];
 
     # Aggregate all of the data, such that each token can be mapped to a form entry and by extension a lemma entry
@@ -74,3 +75,13 @@ def lemmatize_tokens(tokens):
     }
 
     return data
+
+def get_word_forms(text):
+    tokens = tokenizer.tokenize(text)
+    lemmas = [queries.lemmatize(tokens[0]) for token in tokens][0]
+    ids = [lemma["id"] for lemma in lemmas]
+    try:
+        lemma_level = [lemma['level'] for lemma in lemmas][0]
+    except:
+        lemma_level = '0'
+    return (queries.getforms(ids), lemma_level)

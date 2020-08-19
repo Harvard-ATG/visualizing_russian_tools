@@ -1,5 +1,6 @@
 import logging
 from operator import itemgetter
+from django.db.models.query import EmptyQuerySet
 
 from .models import Inflection, Lemma
 
@@ -129,7 +130,12 @@ def lemmatize(form):
             lemmas.append(inflection.lemma.to_dict())
     return lemmas
 
-# TODO: write query to find 
+def getforms(lemma_ids):
+    """
+    Returns an array of the form data for every form in database for lemma
+    """
+    forms = Inflection.objects.filter(lemma_id__in=lemma_ids)
+    return list(forms.values())
 
 
 def batch(iterable, n=1):
