@@ -46,31 +46,29 @@
 
         init() {
             let trie = new LemmaTrie();
-
+            
             let _forms = Object.values(this._forms);
             for(let i = 0; i < _forms.length; i++) {
+                let form = _forms[i];
                 let data = {
                     type: "form",
-                    id:_forms[i].id,
-                    capitalized: (_forms[i].label.charAt(0) == _forms[i].label.charAt(0).toUpperCase()),
+                    id: form.id,
+                    capitalized: (form.label.charAt(0) == form.label.charAt(0).toUpperCase()),
                 };
-                trie.insert(_forms[i].label, data);
-                if(_forms[i].stressed) {
-                    trie.insert(_forms[i].stressed, data);
-                }
+                trie.insert(form.label, data);
+                trie.insert(form.stressed, data);
             }
 
             let _lemmas = Object.values(this._lemmas);
             for(let i = 0; i < _lemmas.length; i++) {
+                let lemma = _lemmas[i];
                 let data = {
                     type: "lemma", 
-                    id:_lemmas[i].id,
-                    capitalized: (_lemmas[i].label.charAt(0) == _lemmas[i].label.charAt(0).toUpperCase())
+                    id: lemma.id,
+                    capitalized: (lemma.label.charAt(0) == lemma.label.charAt(0).toUpperCase())
                 };
-                trie.insert(_lemmas[i].label, data);
-                if(_lemmas[i].stressed) {
-                    trie.insert(_forms[i].stressed, data);
-                }
+                trie.insert(lemma.label, data);
+                trie.insert(lemma.stressed, data);
             }
 
             this._trie = trie;
@@ -198,12 +196,14 @@
                             console.error(word, node, i);
                             throw new Exception("invalid node value index");
                     }
-
-                    let lemma_obj = this._lemmas[lemma_id];
-                    if(!seen.hasOwnProperty(lemma_id)) {
-                        word_lemmas.push(lemma_obj);
-                        seen[lemma_id] = true;
+                    if(lemma_id) {
+                        let lemma_obj = this._lemmas[lemma_id];
+                        if(!seen.hasOwnProperty(lemma_id)) {
+                            word_lemmas.push(lemma_obj);
+                            seen[lemma_id] = true;
+                        }
                     }
+
                 }
             }
 
