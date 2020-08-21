@@ -340,51 +340,59 @@ describe("lemmatization suite", function() {
       expect(lemmatized_text.empty()).toBe(true);
     });
     it("constructor should create a new instance witih data (non-empty)", function() {
-      let lemmatized_text = new LemmatizedText(FIXTURE_TEXT_LEMMATIZED);
+      let text = FIXTURE_TEXT_STRING;
+      let data = FIXTURE_TEXT_LEMMATIZED;
+      let lemmatized_text = new LemmatizedText(text, data);
       expect(lemmatized_text.empty()).toBe(false);
     });
   });
 
   describe("LemmatizedText data retrieval methods", function() {
     it("tokens", function() {
+      let text = FIXTURE_TEXT_STRING;
       let data = FIXTURE_TEXT_LEMMATIZED;
-      let lemmatized_text = new LemmatizedText(data);
+      let lemmatized_text = new LemmatizedText(text, data);
       let actual = lemmatized_text.tokens();
       let expected = data.tokens.map(o => o.token);
       expect(actual).toEqual(expected);
     });
     it("words", function() {
+      let text = FIXTURE_TEXT_STRING;
       let data = FIXTURE_TEXT_LEMMATIZED;
-      let lemmatized_text = new LemmatizedText(data);
+      let lemmatized_text = new LemmatizedText(text, data);
       let actual = lemmatized_text.words();
       let expected = data.tokens.filter(o => o.tokentype == "RUS").map(o => o.token);
       expect(actual).toEqual(expected);
     });
     it("wordsLemmatized", function() {
+      let text = FIXTURE_TEXT_STRING;
       let data = FIXTURE_TEXT_LEMMATIZED;
-      let lemmatized_text = new LemmatizedText(data);
+      let lemmatized_text = new LemmatizedText(text, data);
       let actual = lemmatized_text.wordsLemmatized();
       let expected = data.tokens.filter(o => o.tokentype == "RUS" && o.form_ids.length > 0).map(o => o.token);
       expect(actual).toEqual(expected);
     });
     it("wordsNotLemmatized", function() {
+      let text = FIXTURE_TEXT_STRING;
       let data = FIXTURE_TEXT_LEMMATIZED;
-      let lemmatized_text = new LemmatizedText(data);
+      let lemmatized_text = new LemmatizedText(text, data);
       let actual = lemmatized_text.wordsNotLemmatized();
       let expected = data.tokens.filter(o => o.tokentype == "RUS" && o.form_ids.length == 0).map(o => o.token);
       expect(actual).toEqual(expected);
     });
     it("lemmas", function() {
+      let text = FIXTURE_TEXT_STRING;
       let data = FIXTURE_TEXT_LEMMATIZED;
-      let lemmatized_text = new LemmatizedText(data);
+      let lemmatized_text = new LemmatizedText(text, data);
       let actual = lemmatized_text.lemmas();
       let expected = Object.values(data.lemmas).map(o => o.label);
       expected.sort((a, b) => a.localeCompare(b), "ru-RU", {sensitivity: "base", ignorePunctuation: true});
       expect(actual).toEqual(expected);
     });
     it("vocab", function() {
+      let text = FIXTURE_TEXT_STRING;
       let data = FIXTURE_TEXT_LEMMATIZED;
-      let lemmatized_text = new LemmatizedText(data);
+      let lemmatized_text = new LemmatizedText(text, data);
       let actual = lemmatized_text.vocab();
       let expected_tokens = data.tokens.filter(o => o.tokentype == "RUS").map(o => o.token);
       let expected_unique = [...new Set(expected_tokens)]; 
