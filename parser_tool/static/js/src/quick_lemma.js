@@ -19,7 +19,6 @@
           if ((designator == 'lemma') || (designator == 'form')) {
             const jqXhr = api.lemmatizetext(input_text); 
             jqXhr.then(function(result, textStatus) {
-              console.log(result);
             var array = new_make_array(result, designator);
             after_rank_lemmas(array, designator);
             })
@@ -27,8 +26,6 @@
           if (designator == 'lemma_to_forms') {
             const jqXhr = api.getforms(input_text); 
             jqXhr.then(function(result, textStatus) {
-              console.log(result);
-
             var array = new_make_array(result, designator);
             after_rank_lemmas(array, designator);
             });
@@ -39,11 +36,12 @@
       };
 
       function new_make_array(result, designator) {
+        console.log(result)
         if (designator == 'lemma') {
           var values = Object.values(result.data.lemmas);
         }
         if (designator == 'form') {
-          var values = Object.values(result.data.tokens);
+          var values = Object.values(result.data.forms);
         }
         if (designator == 'lemma_to_forms') {
           var values = Object.values(result.data);
@@ -58,7 +56,7 @@
             var rank = val.rank;
           }
           if (designator == 'form') {
-            var word_label = val.canonical;
+            var word_label = val.label;
             var frequency = val.sharoff_freq;
             var level = val.level;
             var rank = val.sharoff_rank;
@@ -81,9 +79,10 @@
       }
 
       function before_rank_lemmas() {
-        // $("#type").empty();
         $("#qlerror").html("").hide();
         $("#outputtable").empty();
+        $("#ngramtitle").empty();
+        $("#ngramviewer").empty();
         $("#results").hide();
       }
       function after_rank_lemmas(array, designator) {
@@ -100,17 +99,33 @@
         if (array.length == 0) {
           $("#outputtable").text('No input data found or word not found in database.');
         }
+
+        var direct_url = 't1%3B%2C';
+        var content = '';
+        var index = 0;
+        
         for (const token of array) {
           $("#outputtable").append('<tr><th data-level=' + token.level + '>' 
           + token.word + '</th><th>' + token.freq + '</th><th>' + token.rank + '</th></tr>');
+          // for ngram viewer
+          if (index != (array.length - 1)) {
+            direct_url = direct_url + token.word + '%3B%2Cc0%3B.t1%3B%2C';
+            content = content + token.word + '%2C+'}
+          else {
+            // deal with last element in array (differenr url endings)
+            direct_url = direct_url + token.word + '%3B%2Cc0';
+            content = content + token.word;
+          }
+          index += 1;
         }
-      }
-      // error
-      function error(err) {
-        console.log("Error generating lemma frequencies:", err);
-        $("#qlerror").html(err.statusText || "Error generating lemma frequencies").show();
-        writeframe('outputpreview', 'Error');
-      }
+
+        // add ngram
+        $("#ngramtitle").append('<tr style="color:gray"><th> Google N-Gram Viewer</th><th>');
+        $("#ngramviewer").append('<iframe name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?smoothing=3&direct_url=' + direct_url 
+          + '&corpus=36&year_start=1800&content=' + content 
+          + '&year_end=2010" width=800 height=500 marginwidth=0 marginheight=0 hspace=0 vspace=0 frameborder=0 scrolling=no></iframe>');
+      };
+
     // practice
     $(document).ready(async function () {
         console.log("ready!");

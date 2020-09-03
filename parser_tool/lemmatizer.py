@@ -62,10 +62,11 @@ def lemmatize_tokens(tokens):
                     lemma = lemmatized["lemmas"][lemma_id]
                     token["level"] = lemma["level"]
                     token["form_ids"] = form_ids
-                    # new attribute for token
-                    token["sharoff_freq"] = lemmatized["forms"][form_id]["sharoff_freq"];
-                    token["sharoff_rank"] = lemmatized["forms"][form_id]["sharoff_rank"];
-                    token["label"] = lemma["label"];
+                    token["sharoff_freq"] = lemmatized["forms"][form_id]["sharoff_freq"]
+                    token["sharoff_rank"] = lemmatized["forms"][form_id]["sharoff_rank"]
+                    token["label"] = lemma["label"]
+                    token["rnc_doc_count"] = lemmatized["forms"][form_id]["rnc_doc_count"]
+                    token["rnc_form_count"] = lemmatized["forms"][form_id]["rnc_form_count"]
 
     # Aggregate all of the data, such that each token can be mapped to a form entry and by extension a lemma entry
     data = {
