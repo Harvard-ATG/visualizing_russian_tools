@@ -100,9 +100,10 @@ class Inflection(models.Model):
     form = models.TextField()
     stressed = models.TextField()
     type = models.TextField()
-    # frequency = models.FloatField(blank=True, null=True)
     sharoff_freq = models.FloatField(blank=True, null=True)
     sharoff_rank = models.IntegerField()
+    rnc_doc_count = models.IntegerField()
+    rnc_form_count = models.IntegerField()
 
     def __str__(self):
         return "%s [%s:%s]" % (self.form, self.type, self.id)
@@ -113,10 +114,11 @@ class Inflection(models.Model):
             "type": self.type,
             "label": self.form,
             "stressed": self.stressed,
-            # "frequency": self.frequency,
             "sharoff_freq": self.sharoff_freq,
             "sharoff_rank": self.sharoff_rank,
             "lemma_id": self.lemma_id,
+            "rnc_doc_count": self.rnc_doc_count,
+            "rnc_form_count": self.rnc_form_count,
         }
 
     def lemmatize(self):

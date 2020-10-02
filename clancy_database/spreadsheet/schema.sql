@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS inflection (
   frequency            REAL,
   sharoff_freq         REAL,
   sharoff_rank         INTEGER,
+  rnc_doc_count        INTEGER,
+  rnc_form_count       INTEGER,
 
   FOREIGN KEY (lemma_id) REFERENCES lemma(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   FOREIGN KEY (type) REFERENCES inflection_type(key) ON DELETE RESTRICT ON UPDATE CASCADE

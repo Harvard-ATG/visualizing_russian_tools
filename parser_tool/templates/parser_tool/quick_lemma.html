@@ -29,9 +29,19 @@
             font-size: 10px;
             font-family: Monaco, courier;
         }
+        .btn {
+            font-size: medium;
+        }
         .formbtn {
             background-color: red;
             border: red;
+        }
+        .rncbtn {
+            background-color: gray;
+            border: gray;
+        }
+        .rncbtn:hover {
+            background-color: rgb(85, 85, 85);
         }
         .formbtn:hover {
             background-color: #cc0000;
@@ -68,34 +78,56 @@
         <textarea id="contentinput" placeholder="Enter list of text for frequencies" style="min-height:100px; width: 100%; overflow: auto; resize: vertical; border-bottom: 5px #ccc;"></textarea>
     </div>
 </div>
-<div class="row mb-3" style="background-color: #f7f7f7">
+<div class="row mb-3" style="font-size: small; background-color: #f7f7f7">
     <div class="col-md-1"></div>
-    <div class="col-md-3">
-        <h2 style="font-size: 125%"><span style="color: blue">Lemma(s)</span>: e.g. русский vs. российский</h2>
+    <div class="col-md">
+        <h2 style="font-size: 125%"><span style="color: blue">Lemma</span>: e.g. русский, российский</h2>
         <div class="form-group">
+            <br>
             <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="sortedlemmabtn">Get lemma frequencies<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
         </div>
     </div>
-    <div class="col-md-3">
-        <h2 style="font-size: 125%"><span style="color: rgb(255, 179, 0)">Get forms from lemma</span>: e.g. улица &#8594 улице, улицу, улицы, улицаx, ...</h2>
-        <div class="form-group">
-            <button type="button" align="left" class="getformbtn btn btn-lg btn-primary mt-2 mb-2" id="getformsbtn">Get forms from lemma<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <h2 style="font-size: 125%"><span style="color: red">Form(s)</span>: e.g. сказал vs. скажешь vs. сказав</h2>
+    <div class="col-md">
+        <h2 style="font-size: 125%"><span style="color: red">Inflection</span>: e.g. масло, масла, маслом</h2>
+        <br>
         <div class="form-group">
             <button type="button" align="left" class="formbtn btn btn-lg btn-primary mt-2 mb-2" id="sortedformbtn">Get form frequencies<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
         </div>
     </div>
+    <div class="col-md">
+        <h2 style="font-size: 125%"><span style="color: rgb(255, 179, 0)">Get forms from lemma</span>: e.g. улица &#8594 улице, улицу, улицы, улицах, ...</h2>
+        <div class="form-group">
+            <button type="button" align="left" class="getformbtn btn btn-lg btn-primary mt-2 mb-2" id="getformsbtn">Get forms from lemma<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
+        </div>
+    </div>
+    <div class="col-md">
+        <h2 style="font-size: 125%"><span style="color: black">Get RNC Counts</span>: on forms in the Russian National Corpus (RNC)</h2>
+        <br>
+        <div class="form-group">
+            <button type="button" align="left" class="rncbtn btn btn-lg btn-primary mt-2 mb-2" id="rncbtn">Get RNC counts<i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
+        </div>
+    </div>
+    <div class="col-md-1"></div>
     <div id="qlerror" class="mb-3" style="display:none; color: red;"></div>
 </div>
 
+<div id="rnc_info" class="row mt-3 bt-5" style='display: none;'>
+    <div class="col-md-1"></div>
+    <div class="col-md-8">
+        <table style="width:100%; color: gray">Query data is from the Russian National Corpus, which has 321,712,061 words and  124,565 documents in total.</table>
+    </div>
+</div>
 <div id="results" class="row mt-3 bt-5">
     <div class="col-md-1"></div>
     <div class="col-md-3">
         <table id='outputtable' style="width:100%"></table>
     </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-6">
+        <table id='ngramtitle' style="width:100%; color: gray"></table>
+        <div id='ngramviewer'></div>
+    </div>
+    <div class="col-md-1"></div>
 </div>
 
 <br><br>
