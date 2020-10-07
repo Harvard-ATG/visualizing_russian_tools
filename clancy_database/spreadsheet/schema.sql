@@ -21,6 +21,10 @@ CREATE TABLE IF NOT EXISTS lemma (
   stress_pattern_semu   TEXT,
   rank                  INTEGER,
   count                 REAL,
+  prefixes              TEXT NOT NULL,
+  roots                 TEXT NOT NULL,
+  suffixes              TEXT NOT NULL,
+
 
   FOREIGN KEY (pos) REFERENCES pos(key) ON DELETE RESTRICT ON UPDATE CASCADE,
   FOREIGN KEY (level) REFERENCES level(key) ON DELETE RESTRICT ON UPDATE CASCADE,

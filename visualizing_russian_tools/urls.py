@@ -18,6 +18,9 @@ urlpatterns = [
     path('html-colorizer', parser_tool.views.html_colorizer,  name='html_colorizer'),
     path('mini-story-creator', parser_tool.views.mini_story_creator,  name='mini_story_creator'),
     path('quick-lemma', parser_tool.views.quick_lemma,  name='quick_lemma'),
+    path('word-formation', parser_tool.views.word_formation,  name='word_formation'),
+    path('case-distribution', parser_tool.views.case_distribution,  name='case_distribution'),
+
 
     # API endpoints
     path('api/parsetext', parser_tool.api.TextParserAPIView.as_view(), name='api-parse-text'),

@@ -21,7 +21,7 @@
     <div class="card">
             <div class="card-header">Mini-story Creator</div>
         <div class="card-body">
-            <p class="card-text">Enter target vocabulary and then write sentences, a paragraph, a mini-story, etc that uses up that vocabulary.</p>
+            <p class="card-text">Enter target vocabulary and then write sentences, a paragraph, a mini-story, etc that uses up that vocabulary.</p><br>
             <a href="{% url 'mini_story_creator' %}" class="btn btn-primary">Enter Mini-story Creator</a>
         </div>
     </div>
@@ -30,7 +30,7 @@
     <div class="card">
         <div class="card-header">HTML Colorizer</div>
         <div class="card-body">
-            <p class="card-text">Colorize words in HTML according to their level.</p>
+            <p class="card-text">Colorize words in HTML according to their level.</p><br><br><br>
             <a href="{% url 'html_colorizer' %}" class="btn btn-primary">Enter HTML Colorizer</a>
         </div>
     </div>
@@ -43,6 +43,24 @@
             <div class="card-body">
                 <p class="card-text">Rank words by form/lemma frequency.</p>
                 <a href="{% url 'quick_lemma' %}" class="btn btn-primary">Enter Quick Lemma Tool</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Word Formation Tool</div>
+            <div class="card-body">
+                <p class="card-text">Visualize prefixes, roots, and suffixes.</p>
+                <a href="{% url 'word_formation' %}" class="btn btn-primary">Enter Word Formation Tool</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Case Distribution Tool</div>
+            <div class="card-body">
+                <p class="card-text">Visualize a lemma's case breakdown.</p>
+                <a href="{% url 'case_distribution' %}" class="btn btn-primary">Enter Case Distribution Tool</a>
             </div>
         </div>
     </div>
