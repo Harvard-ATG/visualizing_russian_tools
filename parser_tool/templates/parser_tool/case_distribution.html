@@ -56,6 +56,10 @@
     <div class="col-md-1"></div>
     <div class="col-md-10 mt-3">
         <h2>Case Distribution Tool</h2>
+        <p style="color: gray">
+            Word counts collected from the Morphological Standard Russian National Corpus, 2020,
+            <a href="https://ruscorpora.ru/new/en/index.html">https://ruscorpora.ru/new/en/index.html</a>.
+        </p>
         <textarea id="contentinput" placeholder="Enter lemma for case breakdown"
             style="min-height:15px; width: 100%;"></textarea>
     </div>
@@ -74,20 +78,20 @@
     <div class="col-md-1"></div>
     <div class="col-md-10 mt-3">
         <div id="output" style="display: none">
-            <h4>Radar chart of the case distribution of <span id='lemma' style="font-weight: bold"></span> 
+            <h4>Radar chart of the case distribution of <span id='lemma' style="font-weight: bold"></span>
                 <span style="float: right;">
-                <span
-                    style="color: #FFD700; background-color: black">Singular = yellow</span><span
-                    style="color: #00BFFF"> Plural = blue</span></span></h4>
-            <h5 style="color: gray">Singular occurrences: <span id="sg"></span></h5>
-            <h5 style="color: gray">Plural occurrences: <span id="pl"></span></h5>
-                    <div id="chart"></div>
+                    <span style="color: #FFD700; background-color: black">Singular = yellow</span><span
+                        style="color: #00BFFF"> Plural = blue</span></span></h4>
+            <span style="float: left">
+                <h5 style="color: gray">Singular occurrences: <span id="sg"></span></h5>
+                <h5 style="color: gray">Plural occurrences: <span id="pl"></span></h5>
+            </span>
+            <div id="chart"></div>
         </div>
         <div id="error" style="color: gray; display: none">
             <h5>Word not found in the database.</h5>
             <h5>Try the dictionary/nominative form of the word or an alternate spelling.</h5>
         </div>
     </div>
-</div>
 </div>
 {% endblock %}
