@@ -14,3 +14,9 @@ def html_colorizer(request):
 
 def quick_lemma(request):
     return render(request, 'parser_tool/quick_lemma.html')
+
+def word_formation(request):
+    return render(request, 'parser_tool/word_formation.html')
+
+def case_distribution(request):
+    return render(request, 'parser_tool/case_distribution.html')

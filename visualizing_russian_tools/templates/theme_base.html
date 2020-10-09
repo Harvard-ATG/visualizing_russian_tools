@@ -3,6 +3,8 @@
 <html lang="en">
 
 <head>
+    <script src="{% static 'vendor/d3-5.15.0/d3.min.js' %}"></script>
+
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -34,7 +36,9 @@
                 <a class="navbar-brand" href="/">Visualizing Russian</a>
                 <a class="nav-item nav-link" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a>
                 <a class="nav-item nav-link" href="{% url 'mini_story_creator' %}">Mini-story Creator</a>
-                <a class="nav-item nav-link" href="{% url 'quick_lemma' %}">Quick Lemma Tool</a>
+                <a class="nav-item nav-link" href="{% url 'quick_lemma' %}">Quick Lemma</a>
+                <a class="nav-item nav-link" href="{% url 'word_formation' %}">Word Formation</a>
+                <a class="nav-item nav-link" href="{% url 'case_distribution' %}">Case Distribution</a>
             </div>
             <div class="navbar-nav navbar-right">
             {% if request.user.is_authenticated and request.user.is_staff %}
@@ -69,7 +73,7 @@
         <script src="{% static 'vendor/jquery-3.3.1/jquery.min.js' %}"></script>
         <script src="{% static 'vendor/popper-1.14.3/popper.min.js' %}"></script>
         <script src="{% static 'vendor/bootstrap-4.3.1/js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'vendor/d3-5.15.0/d3.min.js' %}"></script>
+        <!-- <script src="{% static 'vendor/d3-5.15.0/d3.min.js' %}"></script> -->
         <script src="{% static 'vendor/c3-0.7.13/c3.min.js' %}"></script>
         {% block extra_script %}{% endblock %}
     {% endblock %}

@@ -1,0 +1,93 @@
+{% extends "site_base.html" %}
+{% load staticfiles %}
+
+{% block head_title %}Case Distribution{% endblock %}
+{% block body_id %}casedistribution{% endblock %}
+{% block body_class %}{% endblock %}
+
+{% block extra_style %}
+{{ block.super }}
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
+<style>
+    h2 {
+        color: #777777
+    }
+
+    iframe.previewhtml {
+        border: 1px solid #ccc;
+        padding: 5px;
+        width: 100%;
+        min-height: 15px;
+        max-width: 100%;
+        overflow: auto;
+    }
+
+    #contentinput {
+        overflow: auto;
+        resize: vertical;
+        border-bottom: 5px #ccc;
+    }
+
+    textarea#outputhtml {
+        white-space: pre;
+        width: 250px;
+        min-height: 15px;
+        border: 1px solid #888;
+        padding: 5px;
+        outline: none;
+        overflow: auto;
+        font-size: 20px;
+        font-family: Monaco, courier;
+    }
+</style>
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/src/lib/api.js' %}"></script>
+<script src="{% static 'js/src/case_distribution.js' %}"></script>
+
+{% endblock %}
+
+
+{% block content %}
+<a name="top"></a>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10 mt-3">
+        <h2>Case Distribution Tool</h2>
+        <textarea id="contentinput" placeholder="Enter lemma for case breakdown"
+            style="min-height:15px; width: 100%;"></textarea>
+    </div>
+</div>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div class="form-group">
+            <button type="button" class="formbtn btn btn-lg btn-primary mt-2 mb-2" id="makechart">Make case distribution
+                chart<i id="processing_indicator" class="spinner-border" role="status"
+                    style="display:none;"></i></button>
+        </div>
+    </div>
+</div>
+<div class="row" style="background-color: white">
+    <div class="col-md-1"></div>
+    <div class="col-md-10 mt-3">
+        <div id="output" style="display: none">
+            <h4>Radar chart of the case distribution of <span id='lemma' style="font-weight: bold"></span> 
+                <span style="float: right;">
+                <span
+                    style="color: #FFD700; background-color: black">Singular = yellow</span><span
+                    style="color: #00BFFF"> Plural = blue</span></span></h4>
+            <h5 style="color: gray">Singular occurrences: <span id="sg"></span></h5>
+            <h5 style="color: gray">Plural occurrences: <span id="pl"></span></h5>
+                    <div id="chart"></div>
+        </div>
+        <div id="error" style="color: gray; display: none">
+            <h5>Word not found in the database.</h5>
+            <h5>Try the dictionary/nominative form of the word or an alternate spelling.</h5>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
