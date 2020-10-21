@@ -19,6 +19,9 @@
             return key;
         }
         insert(key, data) {
+            if(typeof key !== "string" || key === "") {
+                return [-1, null];
+            }
             key = this.normalize(key);
 
             let node = this.root;
@@ -53,7 +56,7 @@
             return [d, node];
         }
         find(key) {
-            if(typeof key !== "string") {
+            if(typeof key !== "string" || key === "") {
                 return [-1, null];
             }
             key = this.normalize(key);

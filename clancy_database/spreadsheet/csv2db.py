@@ -251,6 +251,9 @@ def insert_lemma(cursor, row, verbose=False):
         'aspect':              row['Aspect'].strip(),
         'transitivity':        row['Transitivity'].strip(),
         'stress_pattern_semu': row['Stress_Pattern_SEMU'].strip(),
+        'prefixes':            row['Prefixes'].strip(),
+        'roots':               row['Roots'].strip(),
+        'suffixes':            row['Suffixes'].strip(),
     }
     items = data.items()
     fieldstr = ','.join(["'%s'" % k for k, v in items])

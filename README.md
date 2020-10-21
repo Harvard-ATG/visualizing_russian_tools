@@ -5,6 +5,8 @@
 
 Visualizing Russian is a suite of web-based tools for language learners, researchers, and teachers. 
 
+https://visualizingrussian.fas.harvard.edu/
+
 ![Visible Vocabulary](docs/img/visiblevocabulary.png)
 
 ## Getting Started
@@ -13,7 +15,6 @@ Visualizing Russian is a suite of web-based tools for language learners, researc
 pip install -r requirements.txt
 ./manage.py migrate
 ./manage.py import_clancy_sqldump
-./manage.py load_sharoff_freq_list
 ./manage.py runserver --nostatic
 ```
 
@@ -38,6 +39,8 @@ To convert a spreadsheet and output a SQL dump:
 
 ```
 $ ./manage.py convert_clancy_spreadsheet --csvfile russian.csv --dbfile russian.sqlite3
+$ ./manage.py load_sharoff_data --dbfile russian.sqlite3
+$ ./manage.py load_rnc_data --dbfile russian.sqlite3
 $ sqlite3 russian.sqlite3 .dump > russian.sql
 ```
 
