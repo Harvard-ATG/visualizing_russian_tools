@@ -12,7 +12,6 @@
 *.sock
 .env*
 http_static
-NewVisualizingRussian*.csv
-NewVisualizingRussian*.xlsx
+NewVisualizingRussian*
 /scratch
 /django_cache
