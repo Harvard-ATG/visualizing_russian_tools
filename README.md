@@ -15,7 +15,6 @@ https://visualizingrussian.fas.harvard.edu/
 pip install -r requirements.txt
 ./manage.py migrate
 ./manage.py import_clancy_sqldump
-./manage.py load_sharoff_freq_list
 ./manage.py runserver --nostatic
 ```
 
@@ -40,6 +39,8 @@ To convert a spreadsheet and output a SQL dump:
 
 ```
 $ ./manage.py convert_clancy_spreadsheet --csvfile russian.csv --dbfile russian.sqlite3
+$ ./manage.py load_sharoff_data --dbfile russian.sqlite3
+$ ./manage.py load_rnc_data --dbfile russian.sqlite3
 $ sqlite3 russian.sqlite3 .dump > russian.sql
 ```
 
