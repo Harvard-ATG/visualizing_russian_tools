@@ -1,6 +1,7 @@
 import csv
 import sqlite3
 import os.path
+import re
 import sys
 import time
 import logging
@@ -152,6 +153,7 @@ def process_data(cursor, filename, verbose=False):
                 lemma_pk = lemma['id']
                 lemma_to_sheet_row[lemma_pk] = row
                 insert_inflections(cursor, lemma_pk, row, verbose=verbose)
+                insert_mwes(cursor, lemma_pk, row, verbose=verbose)
         insert_aspect_pairs(cursor, verbose, lemma_to_sheet_row)
 
 
@@ -296,6 +298,34 @@ def insert_inflections(cursor, lemma_pk, row, verbose=False):
         except sqlite3.Error as e:
             logging.exception("inflection: %s" % insert)
             raise e
+
+
+def insert_mwes(cursor, lemma_pk, row, verbose=False):
+    """
+    Inserts MWEs or sequences of 2 or more words that should be treated
+    as a single unit of meaning.
+    """
+    sql = 'INSERT INTO mwe (text, cardinality, lemma_id) VALUES (?, ?, ?)'
+    if 'mwe' not in row['POS_Subtype']:
+        return
+
+    inserts = []
+    for text in (row['Russian'], row['SecondRussian']):
+        text = text.replace(';', ',')
+        words = [w for w in re.split(r'[ ,.]', text) if w != ""]
+        cardinality = len(words)
+        if cardinality >= 2:
+            inserts.append([text, cardinality, lemma_pk])
+
+    for insert in inserts:
+        try:
+            cursor.execute(sql, insert)
+        except sqlite3.Error as e:
+            logging.exception("inflection: %s" % insert)
+            raise e
+
+    if verbose:
+        print("[%s:%s:%s] %d inserts (%s)\n" % (row['UniqueId'], row['POS'], row['POS_Subtype'], len(inserts), [insert[0] for insert in inserts]))
 
 
 def get_row_freq(row, colname):
