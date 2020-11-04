@@ -41,11 +41,66 @@ class TestTokenizer(unittest.TestCase):
         self.assertEqual(text, ''.join(actual_tokens))
 
     def test_tokenize_sentence_with_multi_word_expression(self):
-        text = 'это только потому, что боитесь меня'
-        expected_tokens = ['это', ' ', 'только', ' ', 'потому, что', ' ', 'боитесь', ' ', 'меня']
-        actual_tokens = tokenizer.tokenize(text)
-        self.assertEqual(expected_tokens, actual_tokens)
-        self.assertEqual(text, ''.join(actual_tokens))
+        tests = [
+            {
+                'mwe': 'потому, что',
+                'text': 'это только потому, что боитесь меня',
+                'occurrences': 1,
+            },
+            {
+                'mwe': 'потому что',
+                'text': 'Не вспомнила, потому что не вспоминается...',
+                'occurrences': 1,
+            },
+            {
+                'mwe': 'Потому что',
+                'text': 'Потому что была война...',
+                'occurrences': 1,
+            },
+            {
+                'mwe': 'и то и другое',
+                'text': 'Из-за холода они быстро теряли и то и другое',
+                'occurrences': 1,
+            },
+            {
+                'mwe': 'и то, и другое',
+                'text': 'Вместе и то, и другое длилось 12 лет и 7 месяцев.',
+                'occurrences': 1,
+            },
+            {
+                'mwe': 'на самом деле',
+                'text': 'А как на самом деле?',
+                'occurrences': 1,
+            },
+            {
+                'mwe': 'НА САМОМ ДЕЛЕ',
+                'text': 'А КАК НА САМОМ ДЕЛЕ?',
+                'occurrences': 1,
+            },
+            {
+                'mwe': 'На самом деле',
+                'text': 'На самом деле я закрою за тобою дверь Осень, прощай.',
+                'occurrences': 1,
+            },
+            {
+                'mwe': 'на самом деле',
+                'text': 'Он стоял на гранитной площадке почти на самом берегу моря.',
+                'occurrences': 0,
+            },
+            {
+                'mwe': 'С тех пор',
+                'text': 'С тех пор узнаёт он в любом!',
+                'occurrences': 1,
+            },
+        ]
+        for test in tests:
+            (mwe, text, expected_occurrences) = test['mwe'], test['text'], test['occurrences']
+            actual_tokens = tokenizer.tokenize(text)
+            if expected_occurrences == 0:
+                self.assertNotIn(mwe, actual_tokens)
+            else:
+                self.assertIn(mwe, actual_tokens)
+            self.assertEqual(expected_occurrences, len([t for t in actual_tokens if t == mwe]))
 
     def test_tokenizer_sentence_with_mixed_english_and_punctuation(self):
         text = "A typical seventeen-year-old первоку́рсник | первоку́рсница (first-year student) in the филологи́ческий факульте́т (филфа́к) (Philology Faculty) has 23 па́ры"

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import unicodedata
 import re
+import pygtrie
 
 # Alphabet
 RUS_ALPHABET_LIST = (
@@ -68,25 +69,57 @@ HYPHENATED_WORDS = (
     'все-таки',
     'из-за',
     'из-под',
+    'во-первых',
+    'во-вторых',
+    'в-третьих',
+    'в-четвёртых',
+    'в-пятых',
+    'в-шестых',
+    'в-седьмых',
+    'в-девятых',
 )
 
 # Multi-word expressions
 MWES = (
-    'потому, что',
+    'до сих пор',
+    'до того как',
+    'до того, как',
+    'за границей',
+    'за границу',
+    'и то и другое',
+    'и то, и другое',
+    'и то и то',
+    'и то, и то',
+    'из дома',
+    'из дому',
+    'из-за границы',
+    'к сожалению',
+    'к счастью',
+    'как раз',
+    'как только',
+    'между прочим',
+    'на самом деле',
+    'на связи',
+    'не за что',
+    'ни за что',
+    'перед тем, как',
     'потому что',
-    # 'после того, как',
-    # 'после того как',
-    # 'до того, как',
-    # 'до того как',
-    # 'перед тем, как',
-    # 'перед тем как',
+    'потому, что',
+    'с тех пор',
+    'с удовольствием',
+    'так же',
+    'так как',
+    'так что',
+    'только что',
 )
 
-# Tokenized multi-word expressions
-MWES_TOKENIZED = [
-    (mwe, [s for s in re.split(r'([ ,])', mwe) if s != ""])
-    for mwe in MWES
-]
+# Trie of multi-word expressions
+MWE_MAXSIZE = 0
+MWE_TRIE = pygtrie.CharTrie()
+for mwe in MWES:
+    tokens = [t for t in re.split(r'([ ,])', mwe) if t != '']
+    MWE_MAXSIZE = max(len(tokens), MWE_MAXSIZE)
+    MWE_TRIE[mwe] = True
 
 # Translators
 TRANSLATOR_PUNCT_REMOVE = str.maketrans('', '', RUS_PUNCT)
@@ -159,8 +192,7 @@ def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_
 
 def merge_multiwordexpr(tokens):
     """
-    Find multi-word expressions that should be treated as a single token.
-    Naive implementation for handling a few select/high-frequency MWEs.
+    Merge multiple tokens that should be treated as a single unit (e.g. multiword expressions).
 
     >>> merge_multiwordexpr(['это', ' ', 'только', ' ', 'потому', ',', ' ', 'что', ' ', 'боитесь', ' ', 'меня'])
     ['это', ' ', 'только', ' ', 'потому, что', ' ', 'боитесь', ' ', 'меня']
@@ -169,19 +201,23 @@ def merge_multiwordexpr(tokens):
     """
     new_tokens = []
     i = 0
-    # TODO: consider a trie data structure for better performance
     while i < len(tokens):
         token = tokens[i]
-        merged = False
-        for (mwe_str, mwe_tokens) in MWES_TOKENIZED:
-            token_mwe_str = "".join(tokens[i:i + len(mwe_tokens)])
-            if token.lower() == mwe_tokens[0] and token_mwe_str.lower() == mwe_str:
-                new_tokens.append(token_mwe_str)
-                i += len(mwe_tokens)
-                merged = True
-        if not merged:
-            new_tokens.append(token)
-            i += 1
+        canonical_token = canonical(token)
+        increment = 1
+        if canonical_token != '' and MWE_TRIE.has_node(canonical_token):
+            # start with highest n-gram first and work backwards
+            num_tokens = MWE_MAXSIZE if MWE_MAXSIZE <= len(tokens) - i else len(tokens) - i
+            while num_tokens > 0:
+                mwe = "".join(tokens[i:i + num_tokens])
+                canonical_mwe = canonical(mwe)
+                if MWE_TRIE.has_key(canonical_mwe):
+                    increment = num_tokens
+                    token = mwe
+                    break
+                num_tokens -= 1
+        new_tokens.append(token)
+        i += increment
     return new_tokens
 
 
@@ -198,7 +234,7 @@ def tag(tokens):
             "index": idx,
             "offset": offset,
             "tokentype": tokentype(token),
-            "canonical": canonical(token)
+            "canonical": canonical(token.strip())
         })
         offset += len(token)
     return tagged
@@ -248,13 +284,13 @@ def strip_diacritics(token):
 
 def canonical(token):
     """
-    Returns the canonical text stripped of all punctuation, diacritics, and whitespace.
+    Returns the canonical text stripped of all punctuation and diacritics and
+    in the canonical unicode composition (NFKC).
+
     This is intended to be used for doing lookups of words against the database.
     """
     token = unicode_compose(strip_diacritics(unicode_decompose(normalize_hyphens(token))))
-    token = token.lower()
-    token = token.strip()
-    return token
+    return token.lower()
 
 
 TOKEN_PUNCT = "PUNCT"
@@ -286,7 +322,7 @@ def tokentype(text):
     elif is_punctuation(text):
         tokentype = TOKEN_PUNCT
     else:
-        canonical_text = canonical(text)
+        canonical_text = canonical(text.strip())
         if is_russian(canonical_text):
             tokentype = TOKEN_RUS
         elif is_numeric(canonical_text):

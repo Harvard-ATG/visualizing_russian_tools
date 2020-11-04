@@ -68,6 +68,14 @@ CREATE TABLE IF NOT EXISTS aspect_pair (
   FOREIGN KEY (aspect) REFERENCES aspect(key) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- Multi-word expressions
+CREATE TABLE IF NOT EXISTS mwe (
+  text                 TEXT PRIMARY KEY,
+  cardinality          INTEGER NOT NULL,
+  lemma_id             INTEGER NOT NULL,
+  FOREIGN KEY (lemma_id) REFERENCES lemma(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 -----------------------------------------------------------------------
 -- REFERENCE TABLES to enumerate possible values for particular fields
 CREATE TABLE IF NOT EXISTS inflection_type (
