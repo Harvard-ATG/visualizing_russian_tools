@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS lemma (
   prefixes              TEXT NOT NULL,
   roots                 TEXT NOT NULL,
   suffixes              TEXT NOT NULL,
-
+  rnc_doc_count         INTEGER,
+  rnc_lemma_count       INTEGER,
 
   FOREIGN KEY (pos) REFERENCES pos(key) ON DELETE RESTRICT ON UPDATE CASCADE,
   FOREIGN KEY (level) REFERENCES level(key) ON DELETE RESTRICT ON UPDATE CASCADE,
