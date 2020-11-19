@@ -16,6 +16,7 @@ class Command(BaseCommand):
         parser.add_argument("--level", help="Filter by level")
         parser.add_argument("--pos", help="Filter by part of speech")
         parser.add_argument('--exclude-mwes', help="Exclude multiple word expressions", action='store_true', default=False)
+        parser.add_argument('--fields', help="List of fields to return", default="label,translation")
 
     def handle(self, *args, **options):
         queryset = self.build_queryset(
@@ -23,7 +24,7 @@ class Command(BaseCommand):
             pos=options['pos'],
             exclude_mwes=options['exclude_mwes'],
         )
-        self.export_lemmas(queryset, format=options['format'])
+        self.export_lemmas(queryset, fields=options['fields'].split(","), format=options['format'])
 
     def build_queryset(self, level=None, pos=None, exclude_mwes=False):
         queryset = Lemma.objects.all()
@@ -35,11 +36,10 @@ class Command(BaseCommand):
             queryset = queryset.filter(~Q(lemma__contains=" "))
         return queryset
 
-    def export_lemmas(self, queryset, format=None):
+    def export_lemmas(self, queryset, fields=None, format=None):
         delimiter = "\t" if format == "tsv" else ","
         writer = csv.writer(sys.stdout, delimiter=delimiter, quoting=csv.QUOTE_MINIMAL)
         for lemma in queryset:
             data = lemma.to_dict()
-            fields = ("label", "translation")
             row = [data[f] for f in fields]
             writer.writerow(row)

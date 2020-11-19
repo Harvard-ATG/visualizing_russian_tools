@@ -357,7 +357,7 @@ def get_cell_multi_forms(form, stressed=''):
 
 
 def has_second_russian(row):
-    if row['POS'] in ('phrase', 'prefix', 'prep', 'num'):
+    if row['POS'] in ('phrase', 'prefix', 'prep'):
         return True
     if row['POS'] == 'conj' and 'mwe' in row['POS_Subtype']:
         return True
