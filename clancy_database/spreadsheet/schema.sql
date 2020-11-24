@@ -197,8 +197,8 @@ INSERT INTO level (key, description) VALUES ('', '');
 INSERT INTO level (key, description) VALUES ('1E', 'core');
 INSERT INTO level (key, description) VALUES ('2I', 'foundations');
 INSERT INTO level (key, description) VALUES ('3A', 'expansions');
-INSERT INTO level (key, description) VALUES ('3AU', '');
-INSERT INTO level (key, description) VALUES ('4S', 'specializations');
+INSERT INTO level (key, description) VALUES ('3AU', 'specializations');
+INSERT INTO level (key, description) VALUES ('4S', 'other');
 INSERT INTO level (key, description) VALUES ('4SU', '');
 INSERT INTO level (key, description) VALUES ('6O', '');
 
