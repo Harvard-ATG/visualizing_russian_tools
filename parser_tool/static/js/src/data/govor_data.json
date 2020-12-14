@@ -1,0 +1,883 @@
+{
+    "nodes": [
+        {
+            "id": "говорить",
+            "group": 1,
+            "count": "2059.32",
+            "pos": "verb",
+            "level": "1E",
+            "translation": "speak; say; tell"
+        },
+        {
+            "id": "разговор",
+            "group": 1,
+            "count": "321.3",
+            "pos": "noun",
+            "level": "1E",
+            "translation": "conversation"
+        },
+        {
+            "id": "поговорить",
+            "group": 1,
+            "count": "107.55",
+            "pos": "verb",
+            "level": "1E",
+            "translation": "have a (little) talk with"
+        },
+        {
+            "id": "заговорить",
+            "group": 1,
+            "count": "92.61",
+            "pos": "verb",
+            "level": "2I",
+            "translation": "say something suddenly"
+        },
+        {
+            "id": "заговорить",
+            "group": 1,
+            "count": "92.61",
+            "pos": "verb",
+            "level": "3A",
+            "translation": "start to talk"
+        },
+        {
+            "id": "договориться",
+            "group": 1,
+            "count": "48.79",
+            "pos": "verb",
+            "level": "2I",
+            "translation": "come to an agreement; agree (to do something)"
+        },
+        {
+            "id": "договор",
+            "group": 1,
+            "count": "40.64",
+            "pos": "noun",
+            "level": "2I",
+            "translation": "agreement; contract; treaty"
+        },
+        {
+            "id": "переговоры",
+            "group": 1,
+            "count": "30.91",
+            "pos": "noun",
+            "level": "2I",
+            "translation": "negotiations"
+        },
+        {
+            "id": "заговор",
+            "group": 1,
+            "count": "26.57",
+            "pos": "noun",
+            "level": "2I",
+            "translation": "conspiracy; plot"
+        },
+        {
+            "id": "уговорить",
+            "group": 1,
+            "count": "22.53",
+            "pos": "verb",
+            "level": "2I",
+            "translation": "persuade"
+        },
+        {
+            "id": "поговорка",
+            "group": 1,
+            "count": "8.39",
+            "pos": "noun",
+            "level": "2I",
+            "translation": "saying"
+        },
+        {
+            "id": "скороговорка",
+            "group": 1,
+            "count": "6.55",
+            "pos": "noun",
+            "level": "2I",
+            "translation": "tongue-twister"
+        },
+        {
+            "id": "отговорить",
+            "group": 1,
+            "count": "3.37",
+            "pos": "verb",
+            "level": "2I",
+            "translation": "dissuade"
+        },
+        {
+            "id": "разговорный",
+            "group": 1,
+            "count": "2.08",
+            "pos": "adj",
+            "level": "2I",
+            "translation": "conversational"
+        },
+        {
+            "id": "заговорить",
+            "group": 1,
+            "count": "92.61",
+            "pos": "verb",
+            "level": "2I",
+            "translation": "say something suddenly"
+        },
+        {
+            "id": "заговорить",
+            "group": 1,
+            "count": "92.61",
+            "pos": "verb",
+            "level": "3A",
+            "translation": "start to talk"
+        },
+        {
+            "id": "говориться",
+            "group": 1,
+            "count": "76.76",
+            "pos": "verb",
+            "level": "3A",
+            "translation": "it is said"
+        },
+        {
+            "id": "приговор",
+            "group": 1,
+            "count": "25.89",
+            "pos": "noun",
+            "level": "3A",
+            "translation": "sentence (judicial)"
+        },
+        {
+            "id": "выговорить",
+            "group": 1,
+            "count": "16.22",
+            "pos": "verb",
+            "level": "3A",
+            "translation": "pronounce"
+        },
+        {
+            "id": "приговорить",
+            "group": 1,
+            "count": "14.08",
+            "pos": "verb",
+            "level": "3A",
+            "translation": "sentence (judicial)"
+        },
+        {
+            "id": "переговорить",
+            "group": 1,
+            "count": "5.02",
+            "pos": "verb",
+            "level": "3A",
+            "translation": "talk"
+        },
+        {
+            "id": "разговорчивый",
+            "group": 1,
+            "count": "3.55",
+            "pos": "adj",
+            "level": "3A",
+            "translation": "talkative"
+        },
+        {
+            "id": "выговор",
+            "group": 1,
+            "count": "13.34",
+            "pos": "noun",
+            "level": "3AU",
+            "translation": "rebuke"
+        },
+        {
+            "id": "договорить",
+            "group": 1,
+            "count": "11.39",
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "finish"
+        },
+        {
+            "id": "говорящий",
+            "group": 1,
+            "count": "10.83",
+            "pos": "adj",
+            "level": "3AU",
+            "translation": "speaking"
+        },
+        {
+            "id": "уговор",
+            "group": 1,
+            "count": "10.77",
+            "pos": "noun",
+            "level": "3AU",
+            "translation": "contract"
+        },
+        {
+            "id": "разговориться",
+            "group": 1,
+            "count": "9.67",
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "talk"
+        },
+        {
+            "id": "наговорить",
+            "group": 1,
+            "count": "7.77",
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "to persuade"
+        },
+        {
+            "id": "сговориться",
+            "group": 1,
+            "count": "6.24",
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "conspire"
+        },
+        {
+            "id": "заговорщик",
+            "group": 1,
+            "count": "5.82",
+            "pos": "noun",
+            "level": "3AU",
+            "translation": "conspirator"
+        },
+        {
+            "id": "сговор",
+            "group": 1,
+            "count": "5.75",
+            "pos": "noun",
+            "level": "3AU",
+            "translation": "collusion"
+        },
+        {
+            "id": "говорун",
+            "group": 1,
+            "count": "5.63",
+            "pos": "noun",
+            "level": "3AU",
+            "translation": "talker"
+        },
+        {
+            "id": "оговорка",
+            "group": 1,
+            "count": "5.2",
+            "pos": "noun",
+            "level": "3AU",
+            "translation": "reservation"
+        },
+        {
+            "id": "договоренность",
+            "group": 1,
+            "count": "4.53",
+            "pos": "noun",
+            "level": "3AU",
+            "translation": "agreement"
+        },
+        {
+            "id": "безоговорочно",
+            "group": 1,
+            "count": "4.35",
+            "pos": "adv",
+            "level": "3AU",
+            "translation": "unconditionally"
+        },
+        {
+            "id": "оговориться",
+            "group": 1,
+            "count": "3.98",
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "make a reservation"
+        },
+        {
+            "id": "проговориться",
+            "group": 1,
+            "count": "3.31",
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "let it slip"
+        },
+        {
+            "id": "переговорный",
+            "group": 1,
+            "count": "3.31",
+            "pos": "adj",
+            "level": "3AU",
+            "translation": "negotiation"
+        },
+        {
+            "id": "оговорить",
+            "group": 1,
+            "count": "3.24",
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "stipulate"
+        },
+        {
+            "id": "неразговорчивый",
+            "group": 1,
+            "count": "2.94",
+            "pos": "adj",
+            "level": "3AU",
+            "translation": "taciturn"
+        },
+        {
+            "id": "проговорить",
+            "group": 1,
+            "count": "78.35",
+            "pos": "verb",
+            "level": "4S",
+            "translation": "to speak"
+        },
+        {
+            "id": "говор",
+            "group": 1,
+            "count": "6.61",
+            "pos": "noun",
+            "level": "4S",
+            "translation": "speech"
+        },
+        {
+            "id": "разговорчик",
+            "group": 1,
+            "count": "2.69",
+            "pos": "noun",
+            "level": "4SU",
+            "translation": "talk"
+        },
+        {
+            "id": "выговориться",
+            "group": 1,
+            "count": "2.51",
+            "pos": "verb",
+            "level": "4SU",
+            "translation": "speak out"
+        },
+        {
+            "id": "говорливый",
+            "group": 1,
+            "count": "2.45",
+            "pos": "adj",
+            "level": "4SU",
+            "translation": "talkative"
+        },
+        {
+            "id": "круговорот",
+            "group": 1,
+            "count": "2.33",
+            "pos": "noun",
+            "level": "4SU",
+            "translation": "circulation"
+        },
+        {
+            "id": "обговорить",
+            "group": 1,
+            "count": "2.26",
+            "pos": "verb",
+            "level": "4SU",
+            "translation": "to discuss"
+        },
+        {
+            "id": "наговориться",
+            "group": 1,
+            "count": "2.2",
+            "pos": "verb",
+            "level": "4SU",
+            "translation": "to talk"
+        },
+        {
+            "id": "громкоговоритель",
+            "group": 1,
+            "count": "1.9",
+            "pos": "noun",
+            "level": "4SU",
+            "translation": "speaker"
+        },
+        {
+            "id": "отговорка",
+            "group": 1,
+            "count": "1.41",
+            "pos": "noun",
+            "level": "4SU",
+            "translation": "answer"
+        },
+        {
+            "id": "безоговорочный",
+            "group": 1,
+            "count": "1.41",
+            "pos": "adj",
+            "level": "4SU",
+            "translation": "unconditional"
+        },
+        {
+            "id": "договорной",
+            "group": 1,
+            "count": "1.41",
+            "pos": "adj",
+            "level": "4SU",
+            "translation": "contractual"
+        },
+        {
+            "id": "заговорщический",
+            "group": 1,
+            "count": "1.29",
+            "pos": "adj",
+            "level": "4SU",
+            "translation": "conspiratorial"
+        },
+        {
+            "id": "сговорчивый",
+            "group": 1,
+            "count": "1.29",
+            "pos": "adj",
+            "level": "4SU",
+            "translation": "accommodating"
+        },
+        {
+            "id": "отговориться",
+            "group": 1,
+            "count": "1.29",
+            "pos": "verb",
+            "level": "4SU",
+            "translation": "to dissuade"
+        },
+        {
+            "id": "разговорить",
+            "group": 1,
+            "count": "1.22",
+            "pos": "verb",
+            "level": "4SU",
+            "translation": "talk"
+        },
+        {
+            "id": "подговорить",
+            "group": 1,
+            "count": "1.22",
+            "pos": "verb",
+            "level": "4SU",
+            "translation": "persuade"
+        },
+        {
+            "id": "наговор",
+            "group": 1,
+            "count": "1.16",
+            "pos": "noun",
+            "level": "4SU",
+            "translation": "persuasion"
+        },
+        {
+            "id": "несговорчивый",
+            "group": 1,
+            "count": "1.1",
+            "pos": "adj",
+            "level": "4SU",
+            "translation": "difficile"
+        },
+        {
+            "id": "разговаривать",
+            "group": 1,
+            "count": 128.05,
+            "pos": "verb",
+            "level": "1E",
+            "translation": "talk; converse; have a conversation"
+        },
+        {
+            "id": "уговаривать",
+            "group": 1,
+            "count": 25.46,
+            "pos": "verb",
+            "level": "2I",
+            "translation": "persuade"
+        },
+        {
+            "id": "договариваться",
+            "group": 1,
+            "count": 13.1,
+            "pos": "verb",
+            "level": "2I",
+            "translation": "come to an agreement; agree (to do something)"
+        },
+        {
+            "id": "отговаривать",
+            "group": 1,
+            "count": 3.31,
+            "pos": "verb",
+            "level": "2I",
+            "translation": "dissuade"
+        },
+        {
+            "id": "приговаривать",
+            "group": 1,
+            "count": 17.69,
+            "pos": "verb",
+            "level": "3A",
+            "translation": "sentence (judicial)"
+        },
+        {
+            "id": "переговариваться",
+            "group": 1,
+            "count": 13.53,
+            "pos": "verb",
+            "level": "3A",
+            "translation": "talk"
+        },
+        {
+            "id": "выговаривать",
+            "group": 1,
+            "count": 9.98,
+            "pos": "verb",
+            "level": "3A",
+            "translation": "pronounce"
+        },
+        {
+            "id": "говаривать",
+            "group": 1,
+            "count": 7.9,
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "to say"
+        },
+        {
+            "id": "заговаривать",
+            "group": 1,
+            "count": 6.73,
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "to speak"
+        },
+        {
+            "id": "поговаривать",
+            "group": 1,
+            "count": 6.12,
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "to talk"
+        },
+        {
+            "id": "сговариваться",
+            "group": 1,
+            "count": 4.22,
+            "pos": "verb",
+            "level": "3AU",
+            "translation": "conspire"
+        },
+        {
+            "id": "наговаривать",
+            "group": 1,
+            "count": 2.26,
+            "pos": "verb",
+            "level": "4SU",
+            "translation": "to persuade"
+        },
+        {
+            "id": "договаривать",
+            "group": 1,
+            "count": 2.08,
+            "pos": "verb",
+            "level": "4SU",
+            "translation": "negotiate"
+        },
+        {
+            "id": "оговариваться",
+            "group": 1,
+            "count": 1.29,
+            "pos": "verb",
+            "level": "4SU",
+            "translation": "make a reservation"
+        }
+    ],
+    "links": [
+        {
+            "source": "говорить",
+            "target": "говорить"
+        },
+        {
+            "source": "говорить",
+            "target": "разговор"
+        },
+        {
+            "source": "говорить",
+            "target": "поговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "заговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "заговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "договориться"
+        },
+        {
+            "source": "говорить",
+            "target": "договор"
+        },
+        {
+            "source": "говорить",
+            "target": "переговоры"
+        },
+        {
+            "source": "говорить",
+            "target": "заговор"
+        },
+        {
+            "source": "говорить",
+            "target": "уговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "поговорка"
+        },
+        {
+            "source": "говорить",
+            "target": "скороговорка"
+        },
+        {
+            "source": "говорить",
+            "target": "отговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "разговорный"
+        },
+        {
+            "source": "говорить",
+            "target": "заговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "заговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "говориться"
+        },
+        {
+            "source": "говорить",
+            "target": "приговор"
+        },
+        {
+            "source": "говорить",
+            "target": "выговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "приговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "переговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "разговорчивый"
+        },
+        {
+            "source": "говорить",
+            "target": "выговор"
+        },
+        {
+            "source": "говорить",
+            "target": "договорить"
+        },
+        {
+            "source": "говорить",
+            "target": "говорящий"
+        },
+        {
+            "source": "говорить",
+            "target": "уговор"
+        },
+        {
+            "source": "говорить",
+            "target": "разговориться"
+        },
+        {
+            "source": "говорить",
+            "target": "наговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "сговориться"
+        },
+        {
+            "source": "говорить",
+            "target": "заговорщик"
+        },
+        {
+            "source": "говорить",
+            "target": "сговор"
+        },
+        {
+            "source": "говорить",
+            "target": "говорун"
+        },
+        {
+            "source": "говорить",
+            "target": "оговорка"
+        },
+        {
+            "source": "говорить",
+            "target": "договоренность"
+        },
+        {
+            "source": "говорить",
+            "target": "безоговорочно"
+        },
+        {
+            "source": "говорить",
+            "target": "оговориться"
+        },
+        {
+            "source": "говорить",
+            "target": "проговориться"
+        },
+        {
+            "source": "говорить",
+            "target": "переговорный"
+        },
+        {
+            "source": "говорить",
+            "target": "оговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "неразговорчивый"
+        },
+        {
+            "source": "говорить",
+            "target": "проговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "говор"
+        },
+        {
+            "source": "говорить",
+            "target": "разговорчик"
+        },
+        {
+            "source": "говорить",
+            "target": "выговориться"
+        },
+        {
+            "source": "говорить",
+            "target": "говорливый"
+        },
+        {
+            "source": "говорить",
+            "target": "круговорот"
+        },
+        {
+            "source": "говорить",
+            "target": "обговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "наговориться"
+        },
+        {
+            "source": "говорить",
+            "target": "громкоговоритель"
+        },
+        {
+            "source": "говорить",
+            "target": "отговорка"
+        },
+        {
+            "source": "говорить",
+            "target": "безоговорочный"
+        },
+        {
+            "source": "говорить",
+            "target": "договорной"
+        },
+        {
+            "source": "говорить",
+            "target": "заговорщический"
+        },
+        {
+            "source": "говорить",
+            "target": "сговорчивый"
+        },
+        {
+            "source": "говорить",
+            "target": "отговориться"
+        },
+        {
+            "source": "говорить",
+            "target": "разговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "подговорить"
+        },
+        {
+            "source": "говорить",
+            "target": "наговор"
+        },
+        {
+            "source": "говорить",
+            "target": "несговорчивый"
+        },
+        {
+            "source": "говорить",
+            "target": "разговаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "уговаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "договариваться"
+        },
+        {
+            "source": "говорить",
+            "target": "отговаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "приговаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "переговариваться"
+        },
+        {
+            "source": "говорить",
+            "target": "выговаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "говаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "заговаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "поговаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "сговариваться"
+        },
+        {
+            "source": "говорить",
+            "target": "наговаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "договаривать"
+        },
+        {
+            "source": "говорить",
+            "target": "оговариваться"
+        }
+
+    ]
+}
