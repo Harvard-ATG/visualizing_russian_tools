@@ -22,16 +22,50 @@
         overflow: auto;
     }
 
-    textarea#outputhtml {
-        white-space: pre;
-        width: 100%;
-        min-height: 200px;
-        border: 1px solid #888;
-        padding: 5px;
-        outline: none;
-        overflow: auto;
-        font-size: 10px;
-        font-family: Monaco, courier;
+    body p {
+        font-size: 16px;
+    }
+
+    circle text {
+        font-size: 14px;
+    }
+
+    #title {
+        padding-top: 50px;
+    }
+
+    #reset-step,
+    #reset-simple {
+        border-radius: 4px;
+        background-color: whitesmoke;
+    }
+
+    #option {
+        font-size: 16px;
+    }
+
+    .noHover {
+        pointer-events: none;
+    }
+
+    .sliderOpaque {
+        opacity: 1;
+    }
+
+    .sliderTransparent {
+        opacity: 0;
+    }
+
+    .checkboxOpaque {
+        opacity: 1;
+    }
+
+    .checkboxTransparent {
+        opacity: 0;
+    }
+
+    .slider-label p {
+        font-size: 12px;
     }
 
     .link {
@@ -41,17 +75,19 @@
     }
 
     .node circle {
-        pointer-events: all;
-        stroke: #777;
+        pointer-events: none;
+        stroke: transparent;
         stroke-width: 1px;
+        fill: transparent;
     }
 
     div.tooltip {
         position: absolute;
         background-color: white;
-        max-width: 200px;
+        max-width: 300px;
         height: auto;
-        padding: 1px;
+        padding: 7px;
+        font-size: 13px;
         border-style: solid;
         border-radius: 4px;
         border-width: 1px;
@@ -63,6 +99,7 @@
 
 {% block extra_script %}
 <script src="{% static 'js/src/lib/api.js' %}"></script>
+<script src="{% static 'js/src/lib/d3-simple-slider.js' %}"></script>
 <script src="{% static 'js/src/word_formation.js' %}"></script>
 {% endblock %}
 
@@ -73,11 +110,69 @@
     <div class="col-md-1"></div>
     <div class="col-md-10 mt-3">
         <h2>Word Formation Tool (Словообразование)</h2>
-        <div id="chart">
-            <svg width="1000" height="800"></svg>
-        </div>        
         <!-- <textarea id="contentinput" placeholder="Enter list of text for frequencies" style="min-height:100px; width: 100%; overflow: auto; resize: vertical; border-bottom: 5px #ccc;"></textarea> -->
     </div>
 </div>
+<div class="row">
+    <div class='col-md-12'>
+        <p>Distance from center is inversely correlated with count (less common words are farther away).</p>
+    </div>
+</div>
+<div class="row " id="option">
+    <div class='col-md-4'>
+        Root: <select id='rootButton'></select><br>
+        Color scheme: <select id="colorButton"></select><br>
+        Toggle labels: <select id="labelButton"></select>
+    </div>
+    <div class='col-md-5' id='levelcheckboxrow'>
+        <span> Select levels shown: </span>
+        <input type="checkbox" id="level1" class="inputclass" checked><span style="color: #00ad43;"> Core </span>
+        <input type="checkbox" id="level2" class="inputclass" checked><span style="color: #3da5d9"> Foundations
+        </span>
+        <input type="checkbox" id="level3" class="inputclass" checked><span style="color: #69359c"> Expansions </span>
+        <input type="checkbox" id="level4" class="inputclass" checked><span style="color: #ffa41c;"> Specializations
+        </span>
+    </div>
+    <div class="col-md-5" id="colorcheckboxrow" style="display:none">
+        <p>
+            <span> Select part of speech shown: </span>
+            <input type="checkbox" id="noun" class="inputclass" checked><span style="color: #118ab2;"> Noun </span>
+            <input type="checkbox" id="adj" class="inputclass" checked><span style="color: #ffd166"> Adjective </span>
+            <input type="checkbox" id="verb" class="inputclass" checked><span style="color: #ef476f"> Verb </span>
+            <input type="checkbox" id="adv" class="inputclass" checked><span style="color: #00ad43"> Adverb </span>
+            <input type="checkbox" id="phrase" class="inputclass" checked><span style="color: #69359c"> Phrase </span>
+        </p>
+    </div>
+    <div class='col-md-2'>
+        <span style="float: right;"><b>Total words displayed:</b> <span id="count"></span></span>
+    </div>
+</div>
+
+<div class="row" style="padding-top:20px;">
+    <div class="col-md-6" class="slider-label">
+        <p style="display:inline">Slide to show/hide bubbles:</p>
+        <p style="display:inline; font-style: italic" id="value-step"></p>
+        <p style="display:inline"> of words shown for the root family</p>
+    </div>
+    <div class='col-md-6'>
+        <p style="display:inline">Slide to adjust cloud size:</p>
+        <p style="display:inline; font-style: italic" id="value-simple"></p>
+    </div>
+</div>
+<div class="row" id='sliderrow'>
+    <div class="col-md-4">
+        <div id='slider-step'></div>
+    </div>
+    <div class='col-2 my-auto'>
+        <button id='reset-step'>Reset</button>
+    </div>
+    <div class='col-4'>
+        <div id="slider-simple"></div>
+    </div>
+    <div class='col-2 my-auto'>
+        <button id='reset-simple'>Reset</button>
+    </div>
+</div>
+<svg id="chartsvg"></svg>
 
 {% endblock %}
