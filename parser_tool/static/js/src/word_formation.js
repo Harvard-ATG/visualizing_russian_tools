@@ -53,7 +53,7 @@
             .nodes(graph.nodes)
             .force('link', d3.forceLink().id(d => d.id)
                 .distance(function (d, i) {
-                    return ((3 / (normalized_values[i] ** 1.2 + .01)));
+                    return ((3 / (normalized_values[i] ** 1.2 + .01)+40));
                 }))
             .force('charge', d3.forceManyBody().strength(-300))
             .force('center', d3.forceCenter(width / 2, height / 2))
@@ -212,15 +212,10 @@
             .default(1)
             .on('onchange', val => {
                 d3.select('p#value-simple').text(d3.format('.0%')(val));
-                // d3.selectAll("circle")
-                //     .transition()
-                //     .duration(750)
-                    // .attr('opacity', (2 - val)*1.5)
-                    // .attr('r', val * R);
                 simulation
                     .force('link', d3.forceLink().id(d => d.id)
                         .distance(function (d, i) {
-                            return (val * (3 / (normalized_values[i] ** 1.2 + .01)));
+                            return ((val * (3 / (normalized_values[i] ** 1.2 + .01)))+40);
                         }))
                     .force('charge', d3.forceManyBody().strength(-300))
                     .force('center', d3.forceCenter(width / 2, height / 2))
