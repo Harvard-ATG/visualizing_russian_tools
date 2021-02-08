@@ -44,9 +44,22 @@
             return jqXhr;
         }
 
-        // new addition
         getforms(content) {
             var url = this._url('/api/getforms');
+            var settings = {method: "POST", data: JSON.stringify({text: content})};
+            var jqXhr = this._ajax(url, settings);
+            return jqXhr;
+        }
+
+        getNavecVec(content) {
+            var url = this._url('/api/getnavec');
+            var settings = {method: "POST", data: JSON.stringify({text: content})};
+            var jqXhr = this._ajax(url, settings);
+            return jqXhr;
+        }
+
+        getNavecSimilar(content) {
+            var url = this._url('/api/getnavecsim');
             var settings = {method: "POST", data: JSON.stringify({text: content})};
             var jqXhr = this._ajax(url, settings);
             return jqXhr;

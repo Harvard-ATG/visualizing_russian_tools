@@ -1,0 +1,99 @@
+{% extends "site_base.html" %}
+{% load staticfiles %}
+
+{% block head_title %}Navec Word Embeddings{% endblock %}
+{% block body_id %}navec{% endblock %}
+{% block body_class %}{% endblock %}
+
+{% block extra_style %}
+{{ block.super }}
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
+<style>
+    h2 {
+        color: #777777
+    }
+
+    iframe.previewhtml {
+        border: 1px solid #ccc;
+        padding: 5px;
+        width: 100%;
+        min-height: 15px;
+        max-width: 100%;
+        overflow: auto;
+    }
+
+    #contentinput {
+        overflow: auto;
+        resize: vertical;
+        border-bottom: 5px #ccc;
+    }
+
+    .gray {
+        color: gray;
+    }
+</style>
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/src/lib/api.js' %}"></script>
+<script src="{% static 'js/src/navec.js' %}"></script>
+
+{% endblock %}
+
+
+{% block content %}
+<a name="top"></a>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10 mt-3">
+        <h2>Navec Word Embeddings</h2>
+        <textarea 
+            id="contentinput" 
+            placeholder="Input word here" 
+            style="min-height:15px; width: 100%;">
+        </textarea>
+    </div>
+</div>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div class="form-group">
+            <button type="button" class="formbtn btn btn-lg btn-primary mt-2 mb-2" id="submit">
+                Get vector
+                <i  id="processing_indicator" 
+                    class="spinner-border" 
+                    role="status" 
+                    style="display:none;">
+                </i>
+            </button>
+            <button type="button" class="formbtn btn btn-lg btn-primary mt-2 mb-2" id="similar">
+                Get similar words
+                <i  id="processing_indicator" 
+                    class="spinner-border" 
+                    role="status" 
+                    style="display:none;">
+                </i>
+            </button>
+        </div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-1'></div>
+    <div class='col-md-5'>
+        <p id='loading1' style='display: none;'>Loading vector representation (pretty quick)...</p>
+    </div>
+    <div class='col-md-5'>
+        <p id='loading2' style='display: none;'>Loading similar words (might take 30-45 sec)...</p>
+    </div>
+</div>
+<div class="row" style="background-color: white">
+    <div class="col-md-1"></div>
+    <div class="col-md-5">
+        <div id='output1'></div>
+    </div>
+    <div class="col-md-5">
+        <div id='output2'></div>
+    </div>
+</div>
+{% endblock %}

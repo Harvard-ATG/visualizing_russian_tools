@@ -39,6 +39,8 @@
                 <a class="nav-item nav-link" href="{% url 'quick_lemma' %}">Quick Lemma</a>
                 <a class="nav-item nav-link" href="{% url 'word_formation' %}">Word Formation</a>
                 <a class="nav-item nav-link" href="{% url 'case_distribution' %}">Case Distribution</a>
+                <!-- <a class="nav-item nav-link" href="{% url 'verb_radar_chart' %}">Verb Radar Chart</a> -->
+                <a class="nav-item nav-link" href="{% url 'navec' %}">Navec</a>
             </div>
             <div class="navbar-nav navbar-right">
             {% if request.user.is_authenticated and request.user.is_staff %}

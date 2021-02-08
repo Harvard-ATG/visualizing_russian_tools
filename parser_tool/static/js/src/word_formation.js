@@ -40,10 +40,10 @@
         d3.select("#count").text(total_word_count);
 
         // size svg accordingly
-        width = 1200
-        height = 1000
-        svg.attr('width', width)
-        svg.attr('height', height)
+        var width = screen.width;
+        var height = width / 1.2 ;
+        svg.attr('width', width);
+        svg.attr('height', height);
 
         // get normalized values for link placement
         normalized_values = getNormalized(graph);
@@ -308,7 +308,7 @@
             simulation
                 .force('link', d3.forceLink().id(d => d.id)
                     .distance(function (d, i) {
-                        return ((3 / (normalized_values[i] ** 1.2 + .01)));
+                        return ((3 / (normalized_values[i] ** 1.2 + .01))+40);
                     }))
                 .force('charge', d3.forceManyBody().strength(-300))
                 .force('center', d3.forceCenter(width / 2, height / 2))
