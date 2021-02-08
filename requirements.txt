@@ -8,3 +8,4 @@ django-cors-headers==3.1.1
 gunicorn==20.0.4
 whitenoise==5.1.0
 pygtrie==2.3.3
+navec==0.10.0
