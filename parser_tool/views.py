@@ -28,5 +28,5 @@ def case_distribution(request):
 def verb_radar_chart(request):
     return render(request, 'parser_tool/verb_radar_chart.html')
 
-def navec(request):
-    return render(request, 'parser_tool/navec.html')
+def similarity(request):
+    return render(request, 'parser_tool/similarity.html')

@@ -268,7 +268,7 @@ class GetFormsAPIView(BaseAPIView):
         return JsonResponse(result, safe=False)
 
 
-class getNavecVec(BaseAPIView):
+class getSimilarLSH(BaseAPIView):
     def post(self, request):
         body = self.get_request_body_json(request)
 
@@ -278,7 +278,7 @@ class getNavecVec(BaseAPIView):
         }
         try:
             text = body.get("text", "")
-            navector = navec.get_Navec_vec(text)
+            output, timing = navec.getSimilarLSH(text)
         except Exception as e:
             logger.exception(e)
             status = "error"
@@ -286,7 +286,8 @@ class getNavecVec(BaseAPIView):
         result = {"status": status}
         if status == "success":
             result['text'] = text
-            result['vector'] = list(float(v) for v in navector)
+            result['output'] =  output
+            result['timing'] = timing
         if status in message_for_status:
             result["message"] = message_for_status[status]
 
@@ -295,7 +296,7 @@ class getNavecVec(BaseAPIView):
         return JsonResponse(result, safe=False)
 
 
-class getNavecSimilar(BaseAPIView):
+class getSimilarBruteForce(BaseAPIView):
     def post(self, request):
         body = self.get_request_body_json(request)
 
@@ -305,16 +306,15 @@ class getNavecSimilar(BaseAPIView):
         }
         try:
             text = body.get("text", "")
-            print(navec.similar_words(text),'\n\n\n\n')
-            similar_list = [(round(val,4), word) for (val, word) in navec.similar_words(text)]
+            output, timing = navec.getSimilarBruteForce(text)
         except Exception as e:
             logger.exception(e)
             status = "error"
-
         result = {"status": status}
         if status == "success":
             result['text'] = text
-            result['similar'] = similar_list
+            result['output'] = output
+            result['timing'] = timing
         if status in message_for_status:
             result["message"] = message_for_status[status]
 

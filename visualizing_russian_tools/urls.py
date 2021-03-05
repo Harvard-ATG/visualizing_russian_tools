@@ -21,7 +21,7 @@ urlpatterns = [
     path('word-formation', parser_tool.views.word_formation,  name='word_formation'),
     path('case-distribution', parser_tool.views.case_distribution,  name='case_distribution'),
     path('verb-radar-chart', parser_tool.views.verb_radar_chart,  name='verb_radar_chart'),
-    path('navec', parser_tool.views.navec,  name='navec'),
+    path('similarity', parser_tool.views.similarity,  name='similarity'),
 
 
     # API endpoints
@@ -33,7 +33,7 @@ urlpatterns = [
     path('api/colorize/elements', parser_tool.api.ElementsColorizerAPIView.as_view(), name='api-colorize-elements'),
     # new path
     path('api/getforms', parser_tool.api.GetFormsAPIView.as_view(), name='api-get-forms'),
-    path('api/getnavec', parser_tool.api.getNavecVec.as_view(), name='api-navec'),
-    path('api/getnavecsim', parser_tool.api.getNavecSimilar.as_view(), name='api-navec-sim'),
+    path('api/getsimilarlsh', parser_tool.api.getSimilarLSH.as_view(), name='api-similar-lsh'),
+    path('api/getsimilarbruteforce', parser_tool.api.getSimilarBruteForce.as_view(), name='api-similar-brute-force'),
 
 ]

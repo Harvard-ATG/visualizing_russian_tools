@@ -51,15 +51,15 @@
             return jqXhr;
         }
 
-        getNavecVec(content) {
-            var url = this._url('/api/getnavec');
+        getSimilarLSH(content) {
+            var url = this._url('/api/getsimilarlsh');
             var settings = {method: "POST", data: JSON.stringify({text: content})};
             var jqXhr = this._ajax(url, settings);
             return jqXhr;
         }
 
-        getNavecSimilar(content) {
-            var url = this._url('/api/getnavecsim');
+        getSimilarBruteForce(content) {
+            var url = this._url('/api/getsimilarbruteforce');
             var settings = {method: "POST", data: JSON.stringify({text: content})};
             var jqXhr = this._ajax(url, settings);
             return jqXhr;

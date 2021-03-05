@@ -16,3 +16,5 @@ NewVisualizingRussian*
 /scratch
 /django_cache
 /russian.csv
+parser_tool/static/js/src/2-26-ANN-test.ann
+parser_tool/static/js/src/ANNOY_tree.ann
