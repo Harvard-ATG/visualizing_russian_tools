@@ -14,6 +14,7 @@ from . import tokenizer
 from . import lemmatizer
 from . import htmlcolorizer
 from . import htmlgenerator
+from . import navec
 
 
 logger = logging.getLogger(__name__)
@@ -240,8 +241,6 @@ class ElementsColorizerAPIView(BaseAPIView):
     def colorize_elements(self, elements, color_attribute):
         return apicache.colorize_elements(elements, color_attribute)
 
-
-# try to add getforms response
 class GetFormsAPIView(BaseAPIView):
     def post(self, request):
         body = self.get_request_body_json(request)
@@ -261,6 +260,65 @@ class GetFormsAPIView(BaseAPIView):
         if status == "success":
             result["data"] = lemma_data
             result["level"] = lemma_level
+        if status in message_for_status:
+            result["message"] = message_for_status[status]
+
+        logger.debug("lemmatize response data=%s" % result)
+
+        return JsonResponse(result, safe=False)
+
+
+class GetSimilarLSH(BaseAPIView):
+    """Retrieves closest neighbors of an input word using locality
+    sensitive hashing and the ANNOY tree in parser_tool/data"""
+    def post(self, request):
+        body = self.get_request_body_json(request)
+
+        status = "success"
+        message_for_status = {
+            "error": "Internal server error"
+        }
+        try:
+            text = body.get("text", "")
+            output, timing = navec.getSimilarLSH(text)
+        except Exception as e:
+            logger.exception(e)
+            status = "error"
+
+        result = {"status": status}
+        if status == "success":
+            result['text'] = text
+            result['output'] =  output
+            result['timing'] = timing
+        if status in message_for_status:
+            result["message"] = message_for_status[status]
+
+        logger.debug("lemmatize response data=%s" % result)
+
+        return JsonResponse(result, safe=False)
+
+
+class GetSimilarBruteForce(BaseAPIView):
+    """Retrieves closest neighbors of an input word using
+    the brute force cosine similarity comparison method"""
+    def post(self, request):
+        body = self.get_request_body_json(request)
+
+        status = "success"
+        message_for_status = {
+            "error": "Internal server error"
+        }
+        try:
+            text = body.get("text", "")
+            output, timing = navec.getSimilarBruteForce(text)
+        except Exception as e:
+            logger.exception(e)
+            status = "error"
+        result = {"status": status}
+        if status == "success":
+            result['text'] = text
+            result['output'] = output
+            result['timing'] = timing
         if status in message_for_status:
             result["message"] = message_for_status[status]
 

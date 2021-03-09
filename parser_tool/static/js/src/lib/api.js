@@ -44,9 +44,22 @@
             return jqXhr;
         }
 
-        // new addition
         getforms(content) {
             var url = this._url('/api/getforms');
+            var settings = {method: "POST", data: JSON.stringify({text: content})};
+            var jqXhr = this._ajax(url, settings);
+            return jqXhr;
+        }
+
+        getSimilarLSH(content) {
+            var url = this._url('/api/getsimilarlsh');
+            var settings = {method: "POST", data: JSON.stringify({text: content})};
+            var jqXhr = this._ajax(url, settings);
+            return jqXhr;
+        }
+
+        getSimilarBruteForce(content) {
+            var url = this._url('/api/getsimilarbruteforce');
             var settings = {method: "POST", data: JSON.stringify({text: content})};
             var jqXhr = this._ajax(url, settings);
             return jqXhr;

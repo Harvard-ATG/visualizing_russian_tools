@@ -16,3 +16,5 @@ NewVisualizingRussian*
 /scratch
 /django_cache
 /russian.csv
+# annoy tree ignored because of 1.29 GB size
+parser_tool/data/ANNOY_tree.ann

@@ -20,6 +20,8 @@ urlpatterns = [
     path('quick-lemma', parser_tool.views.quick_lemma,  name='quick_lemma'),
     path('word-formation', parser_tool.views.word_formation,  name='word_formation'),
     path('case-distribution', parser_tool.views.case_distribution,  name='case_distribution'),
+    path('verb-radar-chart', parser_tool.views.verb_radar_chart,  name='verb_radar_chart'),
+    path('similarity', parser_tool.views.similarity,  name='similarity'),
 
 
     # API endpoints
@@ -31,5 +33,7 @@ urlpatterns = [
     path('api/colorize/elements', parser_tool.api.ElementsColorizerAPIView.as_view(), name='api-colorize-elements'),
     # new path
     path('api/getforms', parser_tool.api.GetFormsAPIView.as_view(), name='api-get-forms'),
+    path('api/getsimilarlsh', parser_tool.api.GetSimilarLSH.as_view(), name='api-similar-lsh'),
+    path('api/getsimilarbruteforce', parser_tool.api.GetSimilarBruteForce.as_view(), name='api-similar-brute-force'),
 
 ]
