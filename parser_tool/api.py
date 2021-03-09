@@ -268,7 +268,9 @@ class GetFormsAPIView(BaseAPIView):
         return JsonResponse(result, safe=False)
 
 
-class getSimilarLSH(BaseAPIView):
+class GetSimilarLSH(BaseAPIView):
+    """Retrieves closest neighbors of an input word using locality
+    sensitive hashing and the ANNOY tree in parser_tool/data"""
     def post(self, request):
         body = self.get_request_body_json(request)
 
@@ -296,7 +298,9 @@ class getSimilarLSH(BaseAPIView):
         return JsonResponse(result, safe=False)
 
 
-class getSimilarBruteForce(BaseAPIView):
+class GetSimilarBruteForce(BaseAPIView):
+    """Retrieves closest neighbors of an input word using
+    the brute force cosine similarity comparison method"""
     def post(self, request):
         body = self.get_request_body_json(request)
 

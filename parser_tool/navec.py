@@ -4,7 +4,7 @@ from numpy.linalg import norm
 from annoy import AnnoyIndex
 import time
 
-path = 'parser_tool/static/js/src/data/navec_hudlit_v1_12B_500K_300d_100q.tar'
+path = 'parser_tool/data/navec_hudlit_v1_12B_500K_300d_100q.tar'
 navec = Navec.load(path)
 vocabulary = navec.vocab.words
 word_to_index = dict()
@@ -13,7 +13,7 @@ for i, word in enumerate(vocabulary):
 
 # load Annoy LSH tree
 lsh = AnnoyIndex(300, 'angular')
-lsh.load('parser_tool/static/js/src/ANNOY_tree.ann') # super fast, will just mmap the file
+lsh.load('parser_tool/data/ANNOY_tree.ann') # super fast, will just mmap the file
 
 def getSimilarLSH(text):
     start = time.time()
@@ -33,7 +33,7 @@ def getSimilarLSH(text):
 def cos_sim(a,b):
     return dot(a, b)/(norm(a)*norm(b))
 
-def getSimilarBruteForce(text, tolerance=.5):
+def getSimilarBruteForce(text, tolerance=.3):
     embedding0 = navec[text]
     above_tol = []
     begin_sim = time.time()

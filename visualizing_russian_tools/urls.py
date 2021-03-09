@@ -33,7 +33,7 @@ urlpatterns = [
     path('api/colorize/elements', parser_tool.api.ElementsColorizerAPIView.as_view(), name='api-colorize-elements'),
     # new path
     path('api/getforms', parser_tool.api.GetFormsAPIView.as_view(), name='api-get-forms'),
-    path('api/getsimilarlsh', parser_tool.api.getSimilarLSH.as_view(), name='api-similar-lsh'),
-    path('api/getsimilarbruteforce', parser_tool.api.getSimilarBruteForce.as_view(), name='api-similar-brute-force'),
+    path('api/getsimilarlsh', parser_tool.api.GetSimilarLSH.as_view(), name='api-similar-lsh'),
+    path('api/getsimilarbruteforce', parser_tool.api.GetSimilarBruteForce.as_view(), name='api-similar-brute-force'),
 
 ]
