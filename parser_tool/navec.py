@@ -1,8 +1,10 @@
+import time
+
 from navec import Navec
 from numpy import dot
 from numpy.linalg import norm
 from annoy import AnnoyIndex
-import time
+
 
 path = 'parser_tool/data/navec_hudlit_v1_12B_500K_300d_100q.tar'
 navec = Navec.load(path)
@@ -11,11 +13,22 @@ word_to_index = dict()
 for i, word in enumerate(vocabulary):
     word_to_index[word] = i
 
-# load Annoy LSH tree
-lsh = AnnoyIndex(300, 'angular')
-lsh.load('parser_tool/data/ANNOY_tree.ann') # super fast, will just mmap the file
+lsh = None # global that holds the Annoy tree
+
+def load_annoy_index():
+    ''' 
+    Lazy load the Annoy LSH tree.
+
+    This is wrapped in a function to avoid import errors if the index file
+    is not present at that time.
+    '''
+    global lsh
+    if lsh is None:
+        lsh = AnnoyIndex(300, 'angular')
+        lsh.load('parser_tool/data/ANNOY_tree.ann') # super fast, will just mmap the file
 
 def getSimilarLSH(text):
+    load_annoy_index()
     start = time.time()
     idx = word_to_index[text.strip()]
     indices = lsh.get_nns_by_item(idx, 100)
