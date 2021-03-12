@@ -10,3 +10,4 @@ errorlog = '-'
 access_log_format = '{"request": "%(r)s", "http_status_code": "%(s)s", "http_request_url": "%(U)s", "http_query_string": "%(q)s", "http_verb": "%(m)s", "http_version": "%(H)s", "http_referer": "%(f)s", "x_forwarded_for": "%({x-forwarded-for}i)s", "remote_address": "%(h)s", "request_usec": "%(D)s", "request_sec": "%(L)s"}'
 loglevel = 'DEBUG'
 enable_stdio_inheritance = True
+capture_output = True
