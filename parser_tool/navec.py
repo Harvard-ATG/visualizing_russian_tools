@@ -1,4 +1,7 @@
 import time
+import os.path
+
+from django.conf import settings
 
 from navec import Navec
 from numpy import dot
@@ -6,8 +9,10 @@ from numpy.linalg import norm
 from annoy import AnnoyIndex
 
 
-path = 'parser_tool/data/navec_hudlit_v1_12B_500K_300d_100q.tar'
-navec = Navec.load(path)
+NAVEC_PATH = os.path.join(settings.ROOT_DIR, "parser_tool", "data", "navec_hudlit_v1_12B_500K_300d_100q.tar")
+ANNOY_INDEX_PATH = os.path.join(settings.ROOT_DIR, "parser_tool", "data", "ANNOY_tree.ann")
+
+navec = Navec.load(NAVEC_PATH)
 vocabulary = navec.vocab.words
 word_to_index = dict()
 for i, word in enumerate(vocabulary):
@@ -25,7 +30,7 @@ def load_annoy_index():
     global lsh
     if lsh is None:
         lsh = AnnoyIndex(300, 'angular')
-        lsh.load('parser_tool/data/ANNOY_tree.ann') # super fast, will just mmap the file
+        lsh.load(ANNOY_INDEX_PATH) # super fast, will just mmap the file
 
 def getSimilarLSH(text):
     load_annoy_index()

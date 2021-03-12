@@ -1,10 +1,10 @@
-FROM python:3.8
+FROM python:3.8-slim
 ENV PYTHONUNBUFFERED 1
 
 COPY . /app
 WORKDIR /app
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install curl gzip sqlite3 libsqlite3-dev
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install build-essential python3-dev curl gzip sqlite3 libsqlite3-dev && apt-get clean
 RUN pip install -r requirements.txt
 RUN ./manage.py migrate \
     && ./manage.py import_clancy_sqldump 
