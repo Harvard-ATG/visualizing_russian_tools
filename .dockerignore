@@ -8,6 +8,8 @@
 *.sqlite3
 *.log
 *.sock
+*.xlsx
 .env*
 http_static
 /docs
+/scratch

@@ -12,7 +12,6 @@
     h2 {
         color: #777777
     }
-
     iframe.previewhtml {
         border: 1px solid #ccc;
         padding: 5px;
@@ -21,7 +20,6 @@
         max-width: 100%;
         overflow: auto;
     }
-
     textarea#outputhtml {
         white-space: pre;
         width: 100%;
@@ -33,39 +31,28 @@
         font-size: 10px;
         font-family: Monaco, courier;
     }
-
+    .dropdown {
+        font-size: medium;
+    }
     .btn {
         font-size: medium;
-        width: 200px;
+        width: fit-content;
     }
-
-    .formbtn {
-        background-color: red;
-        border: red;
+    .clearbtn {
+        background-color: tomato;
+        border: tomato;
+        opacity: .9;
     }
-
-    .rncbtn {
-        background-color: gray;
-        border: gray;
+    .clearbtn:hover {
+        background-color: rgb(230, 67, 39);
     }
-
-    .rncbtn:hover {
-        background-color: rgb(85, 85, 85);
-    }
-
-    .formbtn:hover {
-        background-color: #cc0000;
-    }
-
     .getformbtn {
         background-color: rgb(255, 179, 0);
         border: rgb(255, 179, 0);
     }
-
     .getformbtn:hover {
         background-color: rgb(172, 122, 8);
     }
-
     th,
     td {
         padding: 7px;
@@ -73,7 +60,6 @@
         max-width: 100%;
         white-space: nowrap;
     }
-
     tr:hover {
         background-color: #f5f5f5;
     }
@@ -93,55 +79,43 @@
     <div class="col-md-10 mt-3">
         <h2>Quick Lemma Tool</h2>
         <!-- input area -->
-        <textarea id="contentinput" placeholder="Enter list of text for frequencies"
+        <textarea id="contentinput" placeholder="Enter word or list of words for frequency information"
             style="min-height:100px; width: 100%; overflow: auto; resize: vertical; border-bottom: 5px #ccc;"></textarea>
-        <!-- row of descriptions -->
-        <div class="row mb-3" style="font-size: small; background-color: #f7f7f7">
-            <div class="col-md">
-                <h2 style="font-size: 125%"><span style="color: blue">Lemma</span>: e.g. Compare русский vs. российский</h2>
-            </div>
-            <div class="col-md">
-                <h2 style="font-size: 125%"><span style="color: red">Inflection</span>: e.g. Compare the forms масло, масла, маслом</h2>
-            </div>
-            <div class="col-md">
-                <h2 style="font-size: 125%"><span style="color: rgb(255, 179, 0)">Get forms from lemma</span>: e.g.<br>
-                    Input улица &#8594 Output улица, улице, улицу, улицы, улицах...</h2>
-            </div>
-            <div class="col-md">
-                <h2 style="font-size: 125%"><span style="color: black">Get RNC Counts</span>: on forms in the <a href="https://ruscorpora.ru/old/en/index.html">Russian
-                    National Corpus (RNC)</a></h2>
-            </div>
-            <div id="qlerror" class="mb-3" style="display:none; color: red;"></div>
-        </div>
         <!-- row of buttons -->
         <div class="row mb-3" style="margin-top: 0; font-size: small; background-color: #f7f7f7">
-            <div class="col-md">
+            <div class="col-md-2">
                 <div class="form-group">
-
-                    <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="sortedlemmabtn">Get
-                        lemma frequencies<i id="processing_indicator" class="spinner-border" role="status"
+                    <button type="button" align="left" class="btn btn-lg btn-primary mt-2 mb-2" id="sortedlemmabtn" style="margin-top: 100px">Get
+                        frequencies<i id="processing_indicator" class="spinner-border" role="status"
                             style="display:none;"></i></button>
                 </div>
             </div>
-            <div class="col-md">
-                <div class="form-group">
-                    <button type="button" align="left" class="formbtn btn btn-lg btn-primary mt-2 mb-2"
-                        id="sortedformbtn">Get form frequencies<i id="processing_indicator" class="spinner-border"
-                            role="status" style="display:none;"></i></button>
-                </div>
-            </div>
-            <div class="col-md">
+
+            <div class="col-md-3">
                 <div class="form-group">
                     <button type="button" align="left" class="getformbtn btn btn-lg btn-primary mt-2 mb-2"
-                        id="getformsbtn">Get forms from lemma<i id="processing_indicator" class="spinner-border"
+                        id="getformsbtn">Generate forms from lemma<i id="processing_indicator" class="spinner-border"
                             role="status" style="display:none;"></i></button>
                 </div>
             </div>
-            <div class="col-md">
+            <div class="col-md-2" id="type_dropdown" style="display: none">
+                <label class="dropdown" for="type_dropdown">Word type: </label>
+                <br>
+                <select id="type_dropdown_options" class="dropdown" nfFormame="type_dropdown">
+                    <option value="lemmas">Lemma</option>
+                    <option value="forms">Form/inflection</option>
+                </select>
+            </div>
+            <div class="col-md-3" id="source_dropdown" style="display: none">
+                <label class="dropdown" for="source_dropdown">Source: </label>
+                <select id="source_dropdown_options" class="dropdown" name="source_dropdown">
+                    <option value="visrus">Visualizing Russian Database</option>
+                    <option value="rnc">Russian National Corpus Counts</option>
+                </select>
+            </div>
+            <div class="col-md-2" id="clearbtn_display" style="display:none;">
                 <div class="form-group">
-                    <button type="button" align="left" class="rncbtn btn btn-lg btn-primary mt-2 mb-2" id="rncbtn">Get
-                        RNC counts<i id="processing_indicator" class="spinner-border" role="status"
-                            style="display:none;"></i></button>
+                    <button type="button" align="left" class="clearbtn btn btn-lg btn-primary mt-2 mb-2" id="clearbtn">Clear display</button>
                 </div>
             </div>
         </div>
@@ -152,8 +126,8 @@
 <div id="rnc_info" class="row mt-3 bt-5" style='display: none;'>
     <div class="col-md-1"></div>
     <div class="col-md-8">
-        <table style="width:100%; color: gray">Query data is from the Russian National Corpus, which has 321,712,061
-            words and 124,565 documents in total.</table>
+        <table style="width:100%; color: gray">Query data is from the <a href='https://ruscorpora.ru/new/en/'>Russian National Corpus</a> (321,712,061
+            words and 124,565 documents total).</table>
     </div>
 </div>
 <div id="results" class="row mt-3 bt-5">

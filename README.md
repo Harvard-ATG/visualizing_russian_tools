@@ -15,6 +15,7 @@ https://visualizingrussian.fas.harvard.edu/
 pip install -r requirements.txt
 ./manage.py migrate
 ./manage.py import_clancy_sqldump
+./manage.py build_annoy_forest
 ./manage.py runserver --nostatic
 ```
 

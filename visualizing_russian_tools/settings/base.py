@@ -121,6 +121,10 @@ STATIC_ROOT = os.path.join(ROOT_DIR, 'http_static')
 # Max size in bytes that the request body can be (default: 2621440, i.e. 2.5MB)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 2097152 # 2MB
 
+_DEFAULT_LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+_DJANGO_LOG_LEVEL = os.getenv('DJANGO_LOG_LEVEL', 'INFO')
+_LOG_ROOT = os.getenv('LOG_ROOT', ROOT_DIR)
+
 # Logging
 LOGGING = {
     'version': 1,
@@ -137,56 +141,52 @@ LOGGING = {
         'require_debug_true': {
             '()': 'django.utils.log.RequireDebugTrue',
         },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
     },
     'handlers': {
         'console': {
-            'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': os.getenv('DJANGO_LOG_FILE', os.path.join(ROOT_DIR, 'app.log')),
+            'filename': os.path.join(_LOG_ROOT, 'app.log'),
             'formatter': 'verbose',
         },
     },
     'loggers': {
         # Root level logger
         '': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
+            'handlers': ['console'],
+            'level': _DEFAULT_LOG_LEVEL,
         },
         # Capture django-related logging
         'django': {
-            'handlers': ['console', 'file'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'handlers': ['console'],
+            'level': _DJANGO_LOG_LEVEL,
             'propagate': False,
         },
         'django.db': {
-            'handlers': ['console', 'file'],
-            'level': os.getenv('DB_LOG_LEVEL', 'INFO'),
-            'propagate': False,
-        },
-        # Capture gunicorn logging
-        'gunicorn': {
             'handlers': ['console'],
-            'level': os.getenv('DB_LOG_LEVEL', 'INFO'),
+            'level': _DJANGO_LOG_LEVEL,
             'propagate': False,
         },
         # Capture app-specific logging
         'visualizing_russian_tools': {
-            'handlers': ['console', 'file'],
-            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'handlers': ['console'],
+            'level': _DEFAULT_LOG_LEVEL,
             'propagate': False,
         },
         'clancy_database': {
-            'handlers': ['console', 'file'],
-            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'handlers': ['console'],
+            'level': _DEFAULT_LOG_LEVEL,
             'propagate': False,
         },
         'parser_tool': {
-            'handlers': ['console', 'file'],
-            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'handlers': ['console'],
+            'level': _DEFAULT_LOG_LEVEL,
             'propagate': False,
         },
     }

@@ -291,6 +291,19 @@
             console.log('data loaded!');
             $("#makechart").on("click", function(){make_chart(data, lemma_lookup)});
         });
+        // content input keystroke limitations
+        $('#contentinput').keydown(function (event) {
+            let keyPressed = event.keyCode || event.which;
+            // enter
+            if (keyPressed === 13) {
+                event.preventDefault();
+                getNeighbors('lsh');
+            }
+            // space
+            else if (keyPressed == 32) {
+                event.preventDefault()
+            }
+        });
     });
 
     // Just execute "demo()" in the console to populate the input with sample HTML.

@@ -1,0 +1,198 @@
+{% extends "site_base.html" %}
+{% load staticfiles %}
+
+{% block head_title %}Similarity Tool{% endblock %}
+{% block body_id %}navec{% endblock %}
+{% block body_class %}{% endblock %}
+
+{% block extra_style %}
+{{ block.super }}
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
+<style>
+    h2 {
+        color: #777777
+    }
+
+    iframe.previewhtml {
+        border: 1px solid #ccc;
+        padding: 5px;
+        width: 100%;
+        min-height: 15px;
+        max-width: 100%;
+        overflow: auto;
+    }
+
+    #contentinput {
+        overflow: auto;
+        resize: vertical;
+        border-bottom: 5px #ccc;
+    }
+
+    .gray {
+        color: gray;
+    }
+
+    .bold {
+        font-weight: bold
+    }
+
+    .loading span {
+        display: inline-block
+    }
+
+    span {
+        display: block;
+    }
+
+    svg {
+        display: inline-block
+    }
+
+    #submit2 {
+        background-color: tomato;
+        border: tomato
+    }
+
+    #error {
+        color: tomato;
+        display: none;
+        float: left;
+    }
+
+    #output1 p {
+        font-weight: bold;
+    }
+
+    .t-header {
+        display: none;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/src/lib/api.js' %}"></script>
+<script src="{% static 'js/src/navec.js' %}"></script>
+<script src="{% static 'js/src/lib/d3-simple-slider.js' %}"></script>
+<script src='https://cdn.jsdelivr.net/npm/pca-js@1.0.0/pca.min.js'></script>
+{% endblock %}
+
+
+{% block content %}
+<a name="top"></a>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10 mt-3">
+        <h2>Similarity Tool</h2>
+        <textarea id="contentinput" placeholder="Input word here" style="min-height:15px; width: 100%;"></textarea>
+    </div>
+</div>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div class="form-group">
+            <button type="button" class="formbtn btn btn-primary mt-2 mb-2" id="submit1">
+                Generate similar words (LSH)
+                <i id="processing_indicator" class="spinner-border" role="status" style="display:none;">
+                </i>
+            </button>
+            <button type="button" class="formbtn btn btn-primary mt-2 mb-2" id="submit2">
+                Generate similar words (brute force)
+                <i id="processing_indicator" class="spinner-border" role="status" style="display:none;">
+                </i>
+            </button>
+        </div>
+    </div>
+</div>
+<div class='row' style="background-color: #f7f7f7">
+    <div class='col-md-1'></div>
+    <div class='col-md-10'>
+        <a class="btn" data-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false"
+            aria-controls="multiCollapseExample1" style='background-color: #d3d3d3; margin-bottom: 20px'>
+            About the vectors, similarity, and graph
+        </a>
+        <div class="collapse multi-collapse" id="multiCollapseExample1">
+            <div class='row'>
+                <div class='col-md-4'>
+                    <div class="card card-body">
+                        <h5>Vectors as word representations</h5>
+                        <p>
+                            <a href='https://github.com/natasha/navec'>Navec's</a> word embedding vectors are
+                            300-dimensional numerical representations of words computed by applying the
+                            <a href='https://nlp.stanford.edu/projects/glove/'>GloVe</a> vector algorithm
+                            (unsupervised machine learning trained on aggregated global word-word co-occurrence
+                            statistics)
+                            to <a href='https://github.com/natasha/corus#load_librusec'>Lib.rus.ec</a>,
+                            a corpus of 301,871 Russian fiction texts.
+                        </p>
+                    </div>
+                </div>
+                <div class='col-md-4'>
+                    <div class="card card-body">
+                        <h5>How is similarity calculated?</h5>
+                        <p>
+                            Our tool uses locality sensitive hashing (LSH) and randomly generated forests to
+                            determine approximate near neighbors of a given word. Near neighbors to a given
+                            word are calculated by searching the forest for the nearest word vectors based on cosine
+                            similarity.
+                            Because of the random nature of the algorithm, approximate results can be calculated
+                            much more quickly than brute-force similarity comparisons.
+                        </p>
+                    </div>
+                </div>
+                <div class='col-md-4'>
+                    <div class="card card-body">
+                        <h5>Graphical representation <a
+                                href='https://en.wikipedia.org/wiki/Principal_component_analysis'>(PCA)</a></h5>
+                        <p>
+                            The chart generated to the right plots 2-dimensional representations of the
+                            300-dimensional word embeddings vectors. We use Principal Component Analysis (PCA)
+                            to reduce the number of features. PCA is an unsupervised and projection-based
+                            linear transformation technique that retains the most important (variable) features
+                            of vectors by maximizing variance.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <br>
+        </div>
+    </div>
+</div>
+
+
+<div class='row' style='padding-top: 15px'>
+    <div class='col-md-1'></div>
+    <div class='col-md-4'>
+        <div class='row'>
+            <div class='col-md-12'>
+                <p id='error' style='white-space: nowrap;'>Word not found. Check spelling or use infinitive form of
+                    verb.</p>
+                <h4 id='title' class='hide' style='white-space: nowrap;'></h4>
+                <div style='color: gray'>
+                    <p class='loading' id='loading1' style='display: none;'>Generating neighbors by LSH... <span class='timing'></span></p>
+                    <p class='loading' id='loading2' style='display: none;'>Generating neighbors by brute force... <span class='timing'></span></p>
+                </div>
+            </div>
+        </div>
+        <div class='row'>
+            <div class='col-md-6'>
+                <div id='header1' class='t-header hide'>Form</div>
+                <div id='output1'></div>
+            </div>
+            <div class='col-md-6'>
+                <div id='header2' class='t-header hide'>Similarity</div>
+                <div id='output2'></div>
+            </div>
+        </div>
+    </div>
+    <div class='col-md-6'>
+        <h4 id='graph-title' class='hide'></h4>
+        <p id='graph-descript' class=hide></p>
+        <span id="slider-step"></span>
+        <div id='graph'></div>
+
+    </div>
+</div>
+{% endblock %}

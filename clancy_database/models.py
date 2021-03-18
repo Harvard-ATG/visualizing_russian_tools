@@ -21,6 +21,8 @@ class Lemma(models.Model):
     stress_pattern_semu = models.TextField()
     rank = models.IntegerField()
     count = models.FloatField(blank=True, null=True)
+    rnc_doc_count = models.IntegerField()
+    rnc_lemma_count = models.IntegerField()
 
     def __str__(self):
         return "%s [%s:%s] " % (self.lemma, self.pos, self.id)
@@ -50,6 +52,8 @@ class Lemma(models.Model):
             "transitivity": self.transitivity,
             "stress_pattern_semu": self.stress_pattern_semu,
             "reverse": "",
+            "rnc_doc_count": self.rnc_doc_count,
+            "rnc_lemma_count": self.rnc_lemma_count,
         }
         if self.pos == "verb":
             data["aspect_pair"] = self.get_aspect_pair()
