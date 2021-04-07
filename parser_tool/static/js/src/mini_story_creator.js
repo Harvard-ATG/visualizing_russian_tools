@@ -23,7 +23,7 @@
 
         // Event handler that calls the update() method
         onCheckStory(e) {
-            if (event.target.id != "storyupdatebtn") return;
+            if (e.target.id != "storyupdatebtn") return;
             try {
                 this.update();
             } catch(e) {
@@ -34,7 +34,7 @@
 
         // Event handler that pastes formatted text as plain text
         onPasteMakePlainText(e) {
-            if (event.target.id != "storytext_input") return;
+            if (e.target.id != "storytext_input") return;
             e.preventDefault();
             var text = '';
             if (e.clipboardData || e.originalEvent.clipboardData) {
