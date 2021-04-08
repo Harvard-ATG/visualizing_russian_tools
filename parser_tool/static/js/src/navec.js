@@ -3,7 +3,7 @@
 
     async function getNeighbors(algorithm_type) {
         const api = new ApiClient();
-
+        $('#output0').empty();
         $('#output1').empty();
         $('#output2').empty();
         $("#graph").empty();
@@ -26,11 +26,10 @@
         }
 
         jqXhr.then(function (result, textStatus) {
-            // $('#loading1').css('display', 'none');
-            // $('#loading2').css('display', 'none');
             console.log('result:', result);
             if (result.status  == 'error') {
                 $('#error').css('display','block')
+                $('.loading').css('display','none')
                 return false;
             } 
             $('.hide').css('display','block')
@@ -40,12 +39,16 @@
 
             drawChart(result)
 
+            d3.select('#slider-step').append('div')
+                .text('Show/hide words:')
+                .style('display','inline-block')
+
             // Step
             sliderStep = d3
                 .sliderBottom()
                 .min(0)
                 .max(100)
-                .width(600)
+                .width(300)
                 .step(5)
                 .ticks(10)
                 .default(20)
@@ -66,22 +69,12 @@
                             d3.select(this).transition().style('opacity','0')
                         }
                     })
-
-                    for (i = 1; i <= 100; i++) {
-                        if (i <= val) {
-                            d3.select('#result' + i).transition().style('opacity', '1')
-                            d3.select('#sim' + i).transition().style('opacity', '1')
-                        } else {
-                            d3.select('#result' + i).transition().style('opacity', '0')
-                            d3.select('#sim' + i).transition().style('opacity', '0')
-                        }
-                    }
                 });
 
             gStep = d3
                 .select('#slider-step')
                 .append('svg')
-                .attr('width', 700)
+                .attr('width', 350)
                 .attr('height', 100)
                 .append('g')
                 .style('display', 'none')
@@ -89,21 +82,20 @@
 
             gStep.call(sliderStep);
 
-            $('#slider-label').css('display','block')
+            // var zoombutton = d3.select('#slider-step')
+            //     .append('div')
+            //     .attr('id','zoombutton')
+            //     .text('Reset zoom')
+
             $('#graph-title').text('2-D Representation of the closest ' + sliderStep.value() + ' forms to ' + input_text)
-            $('#graph-descript').text('Pan rectangle on graph to zoom in. Double-click to zoom out. Adjust slider to show and hide forms in list and on graph.')
+            $('#graph-descript').text('Pan rectangle on graph to zoom in. Double-click to zoom out. Adjust slider to show and hide forms on graph.')
             $('#header1').css('display','block')
             $('#header2').css('display','block')
 
             result.output.forEach((elt, i) => {
-                var currentval = sliderStep.value()
-                if (i <= currentval) {
-                    $('#output1').append('<span id="result' + (i + 1) + '" style="opacity: 1">' + elt.word + '</span>')
-                    $('#output2').append('<span id="sim' + (i + 1) + '" style="opacity: 1">' + elt.similarity.toFixed(4) + '</span>')
-                } else {
-                    $('#output1').append('<span id="result' + (i + 1) + '" style="opacity: 0">' + elt.word + '</span>')
-                    $('#output2').append('<span id="sim' + (i + 1) + '" style="opacity: 0">' + elt.similarity.toFixed(4) + '</span>')
-                }
+                $('#output0').append('<span id="result' + (i + 1) + '" style="opacity: 1">' + (i+1) + '</span>')
+                $('#output1').append('<span id="result' + (i + 1) + '" style="opacity: 1">' + elt.word + '</span>')
+                $('#output2').append('<span id="sim' + (i + 1) + '" style="opacity: 1">' + elt.similarity.toFixed(4) + '</span>')
             });
 
             gStep.transition().style('display', 'block')
@@ -204,7 +196,7 @@
                 if (i == 0) { return "tomato" };
                 return "#4292c6";
             });
-
+        
         label = node
             .append('text')
             .attr("x", function (d) { return x(d.x) + 7; })
