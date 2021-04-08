@@ -1,4 +1,4 @@
-django==2.2.13
+django==2.2.20
 requests==2.22.0
 django-dotenv==1.4.2
 sentry-sdk==0.10.1
