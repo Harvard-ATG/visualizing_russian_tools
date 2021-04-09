@@ -169,40 +169,33 @@
       $("#wordstress").html("");
     },
     template: function(word_info) {
-      var form = word_info.forms[0].label;
-      var fields = ['label', 'pos', 'aspect', 'level', 'translation', 'stress_pattern_semu'];
-      var data = {};
-      word_info.lemmas.forEach(function(lemma) {
-        fields.forEach(function(key) {
-          if(!(key in data)) {
-            data[key] = [];
-          }
-          if(lemma[key] && data[key].indexOf(lemma[key]) == -1) {
-            data[key].push(lemma[key]);
-          }
-        });
-      });
-      word_info.forms.forEach(function(form) {
-        if(!("type" in data)) {
-          data.type = [];
-        }
-        if(form.type && data.type.indexOf(form.type) == -1) {
-          data.type.push(form.type);
-        }
-      });
+      var forms = word_info.forms.slice(0);
+      var lemmas = word_info.lemmas.slice(0);
+      var form = forms[0].label;
 
-      var html = '<h3 class="wordtitle inline d-block">'+form+'</h3>';
-      if(data.label.length > 0) {
-        html += '<span>Lemma:</span> <span class="textinfoval">' + data.label.join(", ") + "</span><br>";
-      }
-      html += '<span>Parts of Speech:</span> <span class="textinfoval">' + data.pos.join(", ") + "</span><br>";
-      if(data.aspect.length > 0) {
-        html += '<span>Aspect:</span> <span class="textinfoval">' + data.aspect.join(", ") + "</span><br>";
-      }
-      html += '<span>Levels:</span> <span class="textinfoval">' + data.level.join(", ") + "</span><br>";
-      html += '<span>Inflections:</span> <span class="textinfoval">' + data.type.join(", ") + "</span><br>";
-      html += '<span>Translation:</span> <span class="textinfoval">' + (data.translation.join(", ") || "n/a") + "</span><br>";
-      html += '<span>Stress Pattern:</span> <span class="textinfoval">' + (data.stress_pattern_semu.map((pattern) => `<span class="wordstresspattern" data-pattern="${pattern}" style="cursor:pointer">${pattern}</span>`).join(", ") || "n/a")+ "</span><br>";
+      var forms_by_lemma = forms.reduce((lookup, form) => {
+        if(!lookup.hasOwnProperty(form.lemma_id)) {
+          lookup[form.lemma_id] = [];
+        }
+        lookup[form.lemma_id].push(form);
+        return lookup;
+      }, {});
+
+      var lemma_list_html = lemmas.map((lemma) => {
+        let details = [];
+        details.push(['Part of Speech', lemma.pos]);
+        if(lemma.aspect) {
+          details.push(['Aspect', lemma.aspect]);
+        }
+        details.push(['Level', lemma.level]);
+        details.push(['Cases', forms_by_lemma[lemma.id].map((form) => form.type).join(", ") ]);
+        details.push(['Translation', lemma.translation]);
+        details.push(['Stress Pattern', `<span class="wordstresspattern" data-pattern="${lemma.stress_pattern_semu}" style="cursor:pointer;">${lemma.stress_pattern_semu || 'n/a'}</span>`]);
+        let details_html = details.map((item) => `<span>${item[0]}:</span> <span class="textinfoval">${item[1]}</span>`).join("<br>");
+        return `<div style="margin-bottom: 10px;"><b>${lemma.stressed || lemma.label}</b><br>${details_html}</div>`;
+      }).join("");
+
+      var html = `<h3 class="wordtitle inline d-block">${form}</h3>${lemma_list_html}`;
 
       return html;
     },
@@ -221,18 +214,19 @@
       c.render();
     },
     _updateVerbFrequencyGauge: function(lemma) {
-      var vis_data = [];
       if(lemma.pos == "verb") {
         var aspect_pair = (lemma.aspect_pair && lemma.aspect_pair.length == 2) ? lemma.aspect_pair : [];
-        vis_data = aspect_pair.map((v) => { 
+        var vis_data = aspect_pair.map((v) => { 
           return {"label": v.lemma_label, "value": v.lemma_count, "description": v.aspect}
         });
-        $("#wordvis").append("<span>Frequency:</span>");
-        var gauge = new FrequencyGauge({ 
-          parentElement: "#wordvis",
-          config: { colors: ['#b74c4c', '	#999']} 
-        });
-        gauge.data(vis_data).draw();
+        $("#wordvis").append("");
+        if(vis_data.length > 0) {
+          var gauge = new FrequencyGauge({ 
+            parentElement: "#wordvis",
+            config: { colors: ['#b74c4c', '	#999']} 
+          });
+          gauge.data(vis_data).draw();
+        }
       } 
     }
   };
