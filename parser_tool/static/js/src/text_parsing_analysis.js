@@ -184,6 +184,9 @@
       var lemma_list_html = lemmas.map((lemma) => {
         let details = [];
         details.push(['Part of Speech', lemma.pos]);
+        if(lemma.gender) {
+          details.push(['Gender', lemma.gender]);
+        }
         if(lemma.aspect) {
           details.push(['Aspect', lemma.aspect]);
         }
