@@ -75,7 +75,7 @@ class TestHtmlGenerator(unittest.TestCase):
             self._maketokendict(token="dog", tokentype=tokenizer.TOKEN_WORD),
         ]
         html = htmlgenerator.tokens2html(tokens)
-        expected_html = '<pre class="words">(<span class="word parsed level1" data-form-ids="7599" data-level="1E">собака</span><span class="word">)</span> <span class="word">dog</span></pre>'
+        expected_html = '<pre class="words">(<span data-form-ids="7599" data-level="1E" class="word parsed level1">собака</span><span class="word">)</span> <span class="word">dog</span></pre>'
         self.assertEqual(expected_html, html)
         
     def test_tokens2html(self):
