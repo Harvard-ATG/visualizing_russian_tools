@@ -57,6 +57,7 @@ QUOTE_RAISED_RIGHT = '\u201c'
 RUS_PUNCT = '.…,/#!?$%^&*;:{}=_`~[]()‘’“”\'"|' + QUOTE_ANGLE_LEFT + QUOTE_ANGLE_RIGHT + QUOTE_RAISED_LEFT + QUOTE_RAISED_RIGHT + EN_DASH_CHAR + EM_DASH_CHAR + HYPHEN_CHAR
 
 # Diacritics
+ACUTE_ACCENT = '\u00B4'             # Diacritic used to mark end-stress on russian words
 COMBINING_ACCENT_CHAR = '\u0301'    # Diacritic used to mark stress on russian words
 COMBINING_X_ABOVE = '\u033D'        # Diacritic used to mark stress on russian words (non-standard usage)
 COMBINING_DIURESIS_CHAR = '\u0308'  # Diacritic used with the seventh letter of the russian alphabet (ё)
@@ -123,7 +124,7 @@ for mwe in MWES:
 
 # Translators
 TRANSLATOR_PUNCT_REMOVE = str.maketrans('', '', RUS_PUNCT)
-TRANSLATOR_DIACRITICS_REMOVE = str.maketrans('', '', COMBINING_ACCENT_CHAR + COMBINING_X_ABOVE)
+TRANSLATOR_DIACRITICS_REMOVE = str.maketrans('', '', COMBINING_ACCENT_CHAR + COMBINING_X_ABOVE + ACUTE_ACCENT)
 
 # Regular expressions
 RE_MATCH_DIGITS_ONLY = re.compile(r'^\d+$')
@@ -289,8 +290,16 @@ def canonical(token):
 
     This is intended to be used for doing lookups of words against the database.
     """
-    token = unicode_compose(strip_diacritics(unicode_decompose(normalize_hyphens(token))))
-    return token.lower()
+    # normalizing text case and hyphenation
+    token = token.lower()
+    token = normalize_hyphens(token)
+    
+    # remove diacritics in 2 passes, first removing standalone diacritics such as acute accents
+    # indicating end-stress, and then decomposing to remove any combining diacritics
+    token = strip_diacritics(token) 
+    token = unicode_compose(strip_diacritics(unicode_decompose(token)))
+    
+    return token
 
 
 TOKEN_PUNCT = "PUNCT"

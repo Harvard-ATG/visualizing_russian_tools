@@ -19,6 +19,13 @@ class TestTokenizer(unittest.TestCase):
         self.assertEqual(expected_tokens, actual_tokens)
         self.assertEqual(text, ''.join(actual_tokens))
 
+    def test_tokenize_sentence_with_end_stressed_word(self): 
+        text = 'Только его отец´ разговаривал за столом.'
+        expected_tokens = ['Только', ' ', 'его', ' ', 'отец´', ' ', 'разговаривал', ' ', 'за', ' ', 'столом', '.']
+        actual_tokens = tokenizer.tokenize(text)
+        self.assertEqual(expected_tokens, actual_tokens)
+        self.assertEqual(text, ''.join(actual_tokens))
+
     def test_tokenize_sentence_with_numbers(self):
         text = 'НАСА, высота 82,7 км'
         expected_tokens = ['НАСА', ',', ' ', 'высота', ' ', '82', ',', '7', ' ', 'км']
@@ -153,9 +160,13 @@ class TestTokenizerHelpers(unittest.TestCase):
                 "unaccented": 'мотор'
             },
             {
+                "accented": "отец´",
+                "unaccented": "отец"
+            },
+            {
                 "accented": "В не́которых ру́сских деревня́х по э́той техноло́гии вручну́ю де́лают матрёшек и сего́дня.",
                 "unaccented": 'В некоторых русских деревнях по этой технологии вручную делают матрёшек и сегодня.'
-            }
+            },
         ]
         for test in tests:
             (accented, unaccented) = test['accented'], test['unaccented']
@@ -198,6 +209,21 @@ class TestTokenizerHelpers(unittest.TestCase):
         for test in tests:
             (tokens, expected) = test['tokens'], test['expected']
             self.assertEqual(expected, tokenizer.split_punctuation(tokens))
+
+    def test_canonical(self):
+        tests = [
+            {
+                "token": "све́те",
+                "expected": "свете"
+            },
+            {
+                "token": "отец´",
+                "expected": "отец"
+            }
+        ]
+        for test in tests:
+            token, expected = test['token'], test['expected']
+            self.assertEqual(expected, tokenizer.canonical(token))
 
     def test_tokentype(self):
         tests = [
