@@ -233,7 +233,7 @@
         tabs.push({name: "Stress Patterns", content: stress_patterns_html});
       }
       if(word_info.lemmas.length > 0 && word_info.lemmas[0].pos == "verb") {
-        tabs.push({name: "Frequency", content: '<div id="wordvis"></div>' })
+        tabs.push({name: "Aspect Frequency", content: '<div id="wordvis"></div>' })
       }
 
       var tabs_html = tabs.map((tab, index) => {
