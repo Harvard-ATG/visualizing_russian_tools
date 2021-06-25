@@ -30,8 +30,7 @@
 
 
     class StressPatternTableComponent {
-        constructor({ selector, props }) {
-            this.selector = selector;
+        constructor({ props }) {
             this.props = props;
         }
 
@@ -45,7 +44,7 @@
             return pair;
         }
 
-        _template({ stress_pattern_semu }) {
+        _template({ label, stress_pattern_semu }) {
             const [singular, plural] = this._pattern(stress_pattern_semu);
             if(!singular && !plural) {
                 return "";
@@ -63,7 +62,7 @@
             }).join("");
 
             const table = `<table class="stress-pattern">
-                <thead><tr><th colspan="2">[${stress_pattern_semu}]</th></tr></thead>
+                <thead><tr><th colspan="2">${label} (${stress_pattern_semu})</th></tr></thead>
                 ${trs}
                 </table>`;
 
@@ -71,7 +70,11 @@
         }
 
         render() {
-            document.querySelector(this.selector).innerHTML = this._template(this.props);
+            return this._template(this.props);
+        }
+
+        renderTo(selector) {
+            document.querySelector(selector).innerHTML = this._template(this.props);
         }
     }
 

@@ -145,28 +145,22 @@
     render: function(word_info) {
       if(word_info) {
         $("#worddetails").html(this.template(word_info));
-        $("#wordvis").html("");
-        $("#wordstress").html("");
         this.showWordVis(word_info);
+        this.updatePosition();
       } else {
-        $("#worddetails").html("");
-        $("#wordvis").html("");
-        $("#wordstress").html("");
+        this.reset();
       }
       
     },
-    setPosition: function(position) {
-      var top = parseInt(position.top, 10);
-      if(top) {
-        $("#wordinfo").css({"top": top+"px"});
-      } else {
-        $("#wordinfo").css({"top": ""});
+    updatePosition: function() {
+      var top = window.scrollY - (document.getElementById("wordinfo").getBoundingClientRect().top + document.documentElement.scrollTop);
+      if(top < 0) {
+        top = 0;
       }
+      $("#worddetails").css({top: top+"px", position: "absolute"});
     },
     reset: function() {
       $("#worddetails").html("Click on a word.");
-      $("#wordvis").html("");
-      $("#wordstress").html("");
     },
     template: function(word_info) {
       var forms = word_info.forms.slice(0);
@@ -181,56 +175,105 @@
         return lookup;
       }, {});
 
-      var lemma_list_html = lemmas.map((lemma) => {
-        let details = [];
-        details.push(['Part of Speech', lemma.pos]);
-        if(lemma.gender) {
-          details.push(['Gender', lemma.gender]);
+      // -- Word details
+      var lemma_details_list = lemmas.map((lemma, index) => {
+        var label = lemma.stressed || lemma.label || '';
+        var pos = lemma.pos || '';
+        var gender = lemma.gender || '';
+        var aspect = lemma.aspect || '';
+        var level = lemma.level || '';
+        var translation = lemma.translation || 'n/a';
+        var stress_pattern_semu = lemma.stress_pattern_semu || 'n/a';
+        var cases = forms_by_lemma[lemma.id].map((form) => form.type).join(', ');
+
+        var item = {};
+        item.label = label;
+        item.values = [];
+        item.values.push(['Part of Speech', pos]);
+        if(gender) {
+          item.values.push(['Gender', gender]);
         }
-        if(lemma.aspect) {
-          details.push(['Aspect', lemma.aspect]);
+        if(pos == "verb") {
+          item.values.push(['Aspect', aspect || 'n/a']);
         }
-        details.push(['Level', lemma.level]);
-        details.push(['Cases', forms_by_lemma[lemma.id].map((form) => form.type).join(", ") ]);
-        details.push(['Translation', lemma.translation]);
-        details.push(['Stress Pattern', `<span class="wordstresspattern" data-pattern="${lemma.stress_pattern_semu}" style="cursor:pointer;">${lemma.stress_pattern_semu || 'n/a'}</span>`]);
-        let details_html = details.map((item) => `<span>${item[0]}:</span> <span class="textinfoval">${item[1]}</span>`).join("<br>");
-        return `<div style="margin-bottom: 10px;"><b>${lemma.stressed || lemma.label}</b><br>${details_html}</div>`;
+        item.values.push(['Level', level]);
+        item.values.push(['Cases', cases]);
+        item.values.push(['Translation', translation]);
+        item.values.push(['Stress Pattern', stress_pattern_semu]);
+
+        return item;
+      });
+
+      var lemma_details_html = lemma_details_list.map((item, index) => {
+        var dd_html = item.values.map((val) =>  `${val[0]}: <i>${val[1]}</i><br>`).join("");
+        return `<dt>${item.label}</dt><dd>${dd_html}</dd>`;
+      }).join("");
+      lemma_details_html = `<dl>${lemma_details_html}</dl>`;
+
+      // -- Stress Pattern
+      var stress_patterns_list = lemmas.map((lemma, index) => {
+        var item = {};
+        if(lemma.stress_pattern_semu) {
+          item.label = lemma.label;
+          item.stress_pattern_semu = lemma.stress_pattern_semu;
+        }
+        return item;
+      }).filter((item) => item.hasOwnProperty("label") && item.label);
+
+      var stress_patterns_html = stress_patterns_list.map((item, index) => {
+        var props = {label: item.label, stress_pattern_semu: item.stress_pattern_semu};
+        var c = new StressPatternTableComponent({props: props});
+        return c.render();
       }).join("");
 
-      var html = `<h3 class="wordtitle inline d-block">${form}</h3>${lemma_list_html}`;
+      // -- Setup word info tabs
+      var tabs = [];
+      tabs.push({name: "Lemmas", content: lemma_details_html});
+      if(stress_patterns_html) {
+        tabs.push({name: "Stress Patterns", content: stress_patterns_html});
+      }
+      if(word_info.lemmas.length > 0 && word_info.lemmas[0].pos == "verb") {
+        tabs.push({name: "Frequency", content: '<div id="wordvis"></div>' })
+      }
 
-      return html;
+      var tabs_html = tabs.map((tab, index) => {
+        var tab_id = `tab${index}`;
+        var tab_html = `
+            <input class="tab-radio" name="info-tabs" type="radio" id="${tab_id}" ${index == 0 ? 'checked="checked"' : ''}>
+            <label class="tab-label" for="${tab_id}"> ${tab.name}</label>
+            <div class="tab-content">${tab.content}</div>`;
+        return tab_html;
+      }).join("");
+
+      var yandex_translate_link = `(<a href="https://translate.yandex.com/?lang=ru-en&text=${encodeURIComponent(form)}" rel="noreferrer noopener" style="font-size: 80%;" target="_blank">Yandex Translate</a>)`;
+
+      tabs_html = `<p>Word: <b>${form}</b>${yandex_translate_link}</p><div class="tabs">${tabs_html}</div>`;
+
+      return tabs_html;
     },
     showWordVis: function(word_info) {
-      if(word_info.lemmas.length != 1) {
+      if(word_info.lemmas.length == 0) {
         return;
       }
-      var lemma = word_info.lemmas[0];
-      this._updateVerbFrequencyGauge(lemma);
-    },
-    showWordStress: function(stress_pattern_semu) {
-      var c = new StressPatternTableComponent({ 
-        selector: "#wordstress", 
-        props: {stress_pattern_semu}
-      });
-      c.render();
+      this._updateVerbFrequencyGauge(word_info.lemmas[0]);
     },
     _updateVerbFrequencyGauge: function(lemma) {
-      if(lemma.pos == "verb") {
-        var aspect_pair = (lemma.aspect_pair && lemma.aspect_pair.length == 2) ? lemma.aspect_pair : [];
-        var vis_data = aspect_pair.map((v) => { 
-          return {"label": v.lemma_label, "value": v.lemma_count, "description": v.aspect}
+      var aspect_pair = (lemma.pos == "verb" && lemma.aspect_pair && lemma.aspect_pair.length == 2) ? lemma.aspect_pair : [];
+      var aspect_data = aspect_pair.map((v) => {
+        return {"label": v.lemma_label, "value": v.lemma_count, "description": v.aspect}
+      });
+
+      let element = document.createElement("div");
+      if(aspect_pair.length == 2) {
+        let gauge = new FrequencyGauge({
+          parentElement: "#wordvis",
+          config: { colors: ['#b74c4c', '	#999']}
         });
-        $("#wordvis").append("");
-        if(vis_data.length > 0) {
-          var gauge = new FrequencyGauge({ 
-            parentElement: "#wordvis",
-            config: { colors: ['#b74c4c', '	#999']} 
-          });
-          gauge.data(vis_data).draw();
-        }
-      } 
+        gauge.data(aspect_data);
+        gauge.draw();
+      } else {
+        $("#wordvis").html('Frequency data not available');
+      }
     }
   };
 
@@ -395,8 +438,7 @@
         });
         e.target.classList.add("highlight");
         var form_ids = parsedTextCtrl.getElementDataFormIds($el);
-        var word_info = parseService.getWordInfo(form_ids)
-        wordInfoCtrl.setPosition({top: $el.position().top });
+        var word_info = parseService.getWordInfo(form_ids);
         wordInfoCtrl.render(word_info);
       }
       return false;
@@ -413,9 +455,6 @@
     onClickToggleChartLevels: function(e) {
       textInfoCtrl.toggleChartLevels();
       textInfoCtrl.render();
-    },
-    onClickWordStressPattern: function(e) {
-      wordInfoCtrl.showWordStress(e.target.dataset.pattern);
     },
     clearAnalysis: function() {
       parsedTextCtrl.reset();
@@ -436,7 +475,6 @@
     $(document).on('click', '.lemma-toggle', utils.logEvent(mainCtrl.onClickLemmaToggle));
     $(document).on('click', '#textinfocopy', utils.logEvent(mainCtrl.onClickCopyTextInfo));
     $(document).on('click', '#toggle-chart-levels', utils.logEvent(mainCtrl.onClickToggleChartLevels));
-    $(document).on('click', '.wordstresspattern', utils.logEvent(mainCtrl.onClickWordStressPattern));
     if(window.location.hash == "#demo") {
       window.demo();
     }

@@ -1,3 +1,6 @@
+#analysis {
+    padding-bottom: 25vh;
+}
 #parsed {
     position: relative;
     font-size: 18px;
@@ -6,22 +9,24 @@
     color: black; /* Ensure that non-word characters (e.g. space and punctuation) is black */
     margin-bottom: 400px;
 }
+
 pre.words {
     color: black;
     font-size: 18px;
     tab-size: 8; /* tab entities - &x9; or &tab; - only render in "pre" elements */
     font-family: Lato, sans-serif;
-    white-space: pre-wrap;       /* css-3 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -pre-wrap; /* Opera 4-6 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
 pre.words.mask.level0 .word.parsed {
     color: #999 !important;
 }
-pre.words.mask.level1 .word:not(.level1), 
+
+pre.words.mask.level1 .word:not(.level1),
 pre.words.mask.level1-2 .word:not(.level1):not(.level2),
 pre.words.mask.level1-3 .word:not(.level1):not(.level2):not(.level3),
 pre.words.mask.level1-4 .word:not(.level1):not(.level2):not(.level3):not(.level4),
@@ -30,8 +35,7 @@ pre.words.mask.level2-3 .word:not(.level2):not(.level3),
 pre.words.mask.level2-4 .word:not(.level2):not(.level3):not(.level4),
 pre.words.mask.level3 .word:not(.level3),
 pre.words.mask.level3-4 .word:not(.level3):not(.level4),
-pre.words.mask.level4 .word:not(.level4)
-{
+pre.words.mask.level4 .word:not(.level4) {
     color: inherit !important; /* mask the color of words for particular levels*/
 }
 
@@ -40,48 +44,122 @@ pre.words.mask.level4 .word:not(.level4)
     padding: 18px;
     height: 100%;
 }
+
 #textinfo:hover > #textinfocopy {
     display: block;
 }
+
 #textinfo:not(:hover) > #textinfocopy {
     display: none;
 }
+
 #wordinfo {
     position: relative;
 }
+
 .word.parsed:hover {
     background-color: yellow;
     cursor: pointer;
 }
+
 .word.parsed.highlight {
     background-color: yellow;
 }
 
- .btn-red {
+.btn-red {
     background-color: #990000;
     color: #DEDEDE;
     font-weight: bold;
- }
- .btn-red:hover {
-    background-color: #DEDEDE;
-    color: #990000;
- }
- .btn-red:active {
-    background-color: #DEDEDE;
-    color: #990000;
- }
-
-.textinfoval {
-    color: #990000;
-    font-weight: bold;
 }
-.underline { text-decoration: underline; }
-.indent { margin-left: 3em; }
 
- /* resize heading elements inside the container */
-.container h1 { font-size: 2rem; }
-.container h2 { font-size: 1.75rem; }
-.container h3 { font-size: 1.5rem; }
-.container h4 { font-size: 1.25rem; }
-.container h5 { font-size: 1rem; }
-.container h6 { font-size: .75rem; }
+.btn-red:hover {
+    background-color: #DEDEDE;
+    color: #990000;
+}
+
+.btn-red:active {
+    background-color: #DEDEDE;
+    color: #990000;
+}
+
+/* miscellaneous text */
+dl dd {
+    margin-inline-start: 20px;
+}
+dl dd i {
+    font-style: normal;
+    color: #990000;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.indent {
+    margin-left: 3em;
+}
+
+/* resize heading elements inside the container */
+.container h1 {
+    font-size: 2rem;
+}
+
+.container h2 {
+    font-size: 1.75rem;
+}
+
+.container h3 {
+    font-size: 1.5rem;
+}
+
+.container h4 {
+    font-size: 1.25rem;
+}
+
+.container h5 {
+    font-size: 1rem;
+}
+
+.container h6 {
+    font-size: .75rem;
+}
+
+/* tabs */
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tab-radio {
+    position: absolute;
+    opacity: 0;
+}
+
+.tab-label {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #dedede;
+    cursor: pointer;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background .3s, color .3s;
+    border-radius: 0.3rem;
+}
+
+.tab-label:active {
+    background: #ccc;
+}
+
+.tab-label:hover, input.tab-radio:checked + .tab-label {
+    background: #dedede;
+}
+
+.tab-content {
+    display: none;
+    width: 100%;
+    padding: 5px 0;
+}
+
+input.tab-radio:checked + .tab-label + .tab-content {
+    display: block;
+}
