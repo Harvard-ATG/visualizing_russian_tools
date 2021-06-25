@@ -247,7 +247,7 @@
 
       var yandex_translate_link = `(<a href="https://translate.yandex.com/?lang=ru-en&text=${encodeURIComponent(form)}" rel="noreferrer noopener" style="font-size: 80%;" target="_blank">Yandex Translate</a>)`;
 
-      tabs_html = `<p>Word: <b>${form}</b>${yandex_translate_link}</p><div class="tabs">${tabs_html}</div>`;
+      tabs_html = `<p>Word: <b>${form}</b> ${yandex_translate_link}</p><div class="tabs">${tabs_html}</div>`;
 
       return tabs_html;
     },
