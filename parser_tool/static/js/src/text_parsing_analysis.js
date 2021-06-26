@@ -157,7 +157,10 @@
       if(top < 0) {
         top = 0;
       }
-      $("#worddetails").css({top: top+"px", position: "absolute"});
+      $("#worddetails").css({
+        top: top+"px",
+        position: (top == 0 ? "static": "absolute")
+      });
     },
     reset: function() {
       $("#worddetails").html("Click on a word.");
