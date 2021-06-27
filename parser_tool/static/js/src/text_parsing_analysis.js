@@ -145,22 +145,11 @@
     render: function(word_info) {
       if(word_info) {
         $("#worddetails").html(this.template(word_info));
-        this.showWordVis(word_info);
-        this.updatePosition();
+        this.update(word_info);
       } else {
         this.reset();
       }
       
-    },
-    updatePosition: function() {
-      var top = window.scrollY - (document.getElementById("wordinfo").getBoundingClientRect().top + document.documentElement.scrollTop);
-      if(top < 0) {
-        top = 0;
-      }
-      $("#worddetails").css({
-        top: top+"px",
-        position: (top == 0 ? "static": "absolute")
-      });
     },
     reset: function() {
       $("#worddetails").html("Click on a word.");
@@ -236,7 +225,7 @@
         tabs.push({name: "Stress Patterns", content: stress_patterns_html});
       }
       if(word_info.lemmas.length > 0 && word_info.lemmas[0].pos == "verb") {
-        tabs.push({name: "Aspect Frequency", content: '<div id="wordvis"></div>' })
+        tabs.push({name: "Aspectual Ratios", content: '<div id="verb-aspect-ratio-gauge"></div>' })
       }
 
       var tabs_html = tabs.map((tab, index) => {
@@ -254,28 +243,37 @@
 
       return tabs_html;
     },
-    showWordVis: function(word_info) {
-      if(word_info.lemmas.length == 0) {
-        return;
+    update: function(word_info) {
+      this.updatePosition();
+      if(word_info.lemmas.length > 0) {
+        this.drawVerbAspectRatioGauge(word_info.lemmas[0]);
       }
-      this._updateVerbFrequencyGauge(word_info.lemmas[0]);
     },
-    _updateVerbFrequencyGauge: function(lemma) {
+    updatePosition: function() {
+      var top = window.scrollY - (document.getElementById("wordinfo").getBoundingClientRect().top + document.documentElement.scrollTop);
+      if(top < 0) {
+        top = 0;
+      }
+      $("#worddetails").css({
+        top: top+"px",
+        position: (top == 0 ? "static": "absolute")
+      });
+    },
+    drawVerbAspectRatioGauge: function(lemma) {
       var aspect_pair = (lemma.pos == "verb" && lemma.aspect_pair && lemma.aspect_pair.length == 2) ? lemma.aspect_pair : [];
       var aspect_data = aspect_pair.map((v) => {
         return {"label": v.lemma_label, "value": v.lemma_count, "description": v.aspect}
       });
 
-      let element = document.createElement("div");
       if(aspect_pair.length == 2) {
         let gauge = new FrequencyGauge({
-          parentElement: "#wordvis",
+          parentElement: "#verb-aspect-ratio-gauge",
           config: { colors: ['#b74c4c', '	#999']}
         });
         gauge.data(aspect_data);
         gauge.draw();
       } else {
-        $("#wordvis").html('Frequency data not available');
+        $("#verb-aspect-ratio-gauge").html('Aspectual ratio data not available');
       }
     }
   };
