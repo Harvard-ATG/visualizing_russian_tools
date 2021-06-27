@@ -30,23 +30,34 @@
 <body class="{% block body_class %}{% endblock %}" id="{% block body_id %}{% endblock %}">
 
     {% block topbar_base %}
-    <nav class="navbar navbar-expand-md navbar-light">
-        <div class="container-fluid">
-            <div class="navbar-nav">
-                <a class="navbar-brand" href="/">Visualizing Russian</a>
-                <a class="nav-item nav-link" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a>
-                <a class="nav-item nav-link" href="{% url 'mini_story_creator' %}">Mini-story Creator</a>
-                <a class="nav-item nav-link" href="{% url 'quick_lemma' %}">Quick Lemma</a>
-                <a class="nav-item nav-link" href="{% url 'word_formation' %}">Word Formation</a>
-                <a class="nav-item nav-link" href="{% url 'case_distribution' %}">Case Distribution</a>
-                <!-- <a class="nav-item nav-link" href="{% url 'verb_radar_chart' %}">Verb Radar Chart</a> -->
-                <a class="nav-item nav-link" href="{% url 'similarity' %}">Similarity Tool</a>
-            </div>
-            <div class="navbar-nav navbar-right">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/">Visualizing Russian</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item" id="nav-item-home"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item" id="nav-item-about"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+                <li class="nav-item" id="nav-item-visible-vocabulary"><a class="nav-link" href="{% url 'text_parsing_analysis' %}">Visible Vocabulary</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Additional Tools</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" id="nav-item-mini-story-creator" href="{% url 'mini_story_creator' %}">Mini-story Creator</a>
+                        <a class="dropdown-item" id="nav-item-quick-lemma" href="{% url 'quick_lemma' %}">Quick Lemma</a>
+                        <a class="dropdown-item" id="nav-item-word-formation" href="{% url 'word_formation' %}">Word Formation</a>
+                        <a class="dropdown-item" id="nav-item-case-distribution" href="{% url 'case_distribution' %}">Case Distribution</a>
+                        <!-- =<a class="dropdown-item" id="nav-item-verb-radar-charts" href="{% url 'verb_radar_chart' %}">Verb Radar Chart</a> -->
+                        <a class="dropdown-item" id="nav-item-similarity" href="{% url 'similarity' %}">Similarity Tool</a>
+                        <a class="dropdown-item" id="nav-item-html-colorizer" href="{% url 'html_colorizer' %}">HTML Colorizer</a>
+                    </div>
+                </li>
+            </ul>
+            <ul class="navbar-nav navbar-right">
             {% if request.user.is_authenticated and request.user.is_staff %}
-                <a class="nav-item nav-link" href="{% url 'admin:index' %}">Admin</a>
+                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
             {% endif %}
-          </div>
+            </ul>
         </div>
     </nav>
     {% endblock %}
@@ -77,6 +88,15 @@
         <script src="{% static 'vendor/bootstrap-4.3.1/js/bootstrap.min.js' %}"></script>
         <!-- <script src="{% static 'vendor/d3-5.15.0/d3.min.js' %}"></script> -->
         <script src="{% static 'vendor/c3-0.7.13/c3.min.js' %}"></script>
+        <script>
+            (function() {
+                // use the body ID to designate the "active" navigation item
+                let nav_el = document.getElementById("nav-item-"+document.body.id);
+                if(nav_el) {
+                    nav_el.classList.add("active");
+                }
+            })();
+        </script>
         {% block extra_script %}{% endblock %}
     {% endblock %}
 
