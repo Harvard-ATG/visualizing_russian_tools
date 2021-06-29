@@ -9,6 +9,7 @@ import parser_tool.api
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='homepage.html'), name='home'),
+    path('about', TemplateView.as_view(template_name='about.html'), name='about'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('healthcheck', lambda r: HttpResponse("")),
     path('admin/', admin.site.urls),
