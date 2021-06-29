@@ -155,93 +155,41 @@
       $("#worddetails").html("Click on a word.");
     },
     template: function(word_info) {
-      var forms = word_info.forms.slice(0);
-      var lemmas = word_info.lemmas.slice(0);
-      var form = forms[0].label;
+      var form = word_info.forms[0].label;
+      var lemma_details = this.getLemmaDetails(word_info);
 
-      var forms_by_lemma = forms.reduce((lookup, form) => {
-        if(!lookup.hasOwnProperty(form.lemma_id)) {
-          lookup[form.lemma_id] = [];
-        }
-        lookup[form.lemma_id].push(form);
-        return lookup;
-      }, {});
-
-      // -- Word details
-      var lemma_details_list = lemmas.map((lemma, index) => {
-        var label = lemma.stressed || lemma.label || '';
-        var pos = lemma.pos || '';
-        var gender = lemma.gender || '';
-        var aspect = lemma.aspect || '';
-        var level = lemma.level || '';
-        var translation = lemma.translation || 'n/a';
-        var stress_pattern_semu = lemma.stress_pattern_semu || 'n/a';
-        var cases = forms_by_lemma[lemma.id].map((form) => form.type).join(', ');
-
-        var item = {};
-        item.label = label;
-        item.values = [];
-        item.values.push(['Part of Speech', pos]);
-        if(gender) {
-          item.values.push(['Gender', gender]);
-        }
-        if(pos == "verb") {
-          item.values.push(['Aspect', aspect || 'n/a']);
-        }
-        item.values.push(['Level', level]);
-        item.values.push(['Cases', cases]);
-        item.values.push(['Translation', translation]);
-        item.values.push(['Stress Pattern', stress_pattern_semu]);
-
-        return item;
-      });
-
-      var lemma_details_html = lemma_details_list.map((item, index) => {
-        var dd_html = item.values.map((val) =>  `${val[0]}: <i>${val[1]}</i><br>`).join("");
-        return `<dt>${item.label}</dt><dd>${dd_html}</dd>`;
-      }).join("");
-      lemma_details_html = `<dl>${lemma_details_html}</dl>`;
-
-      // -- Stress Pattern
-      var stress_patterns_list = lemmas.map((lemma, index) => {
-        var item = {};
+      var lemma_details_html = lemma_details.map((lemma, index) => {
+        var stress_pattern_html = '';
         if(lemma.stress_pattern_semu) {
-          item.label = lemma.label;
-          item.stress_pattern_semu = lemma.stress_pattern_semu;
+          stress_pattern_html = StressPatternTableComponent.render({
+            props: {stress_pattern_semu: lemma.stress_pattern_semu}
+          });
         }
-        return item;
-      }).filter((item) => item.hasOwnProperty("label") && item.label);
 
-      var stress_patterns_html = stress_patterns_list.map((item, index) => {
-        var props = {label: item.label, stress_pattern_semu: item.stress_pattern_semu};
-        var c = new StressPatternTableComponent({props: props});
-        return c.render();
+        var html = `
+          <div class="wordinfo-heading">${lemma.label}</div>
+          <ul class="wordinfo-details">
+            <li>Part of Speech: <i>${lemma.pos}</i></li>
+            <li class="${lemma.gender?'':'d-none'}">Gender: <i>${lemma.gender}</i></li>
+            <li class="${lemma.aspect?'':'d-none'}">Aspect: <i>${lemma.aspect}</i></li>
+            <li class="${lemma.level?'':'d-none'}">Level: <i>${lemma.level}</i></li>
+            <li class="${lemma.cases?'':'d-none'}">Cases: <i>${lemma.cases}</i></li>
+            <li>Translation: <i>${lemma.translation||'n/a'}</i></li>
+            <li class="${lemma.stress_pattern_semu?'':'d-none'}">Stress Pattern: <i>${lemma.stress_pattern_semu}</i><br>${stress_pattern_html}</li>
+          </ul>
+        `;
+
+        return html;
       }).join("");
 
-      // -- Setup word info tabs
-      var tabs = [];
-      tabs.push({name: "Lemmas", content: lemma_details_html});
-      if(stress_patterns_html) {
-        tabs.push({name: "Stress Patterns", content: stress_patterns_html});
-      }
-      if(word_info.lemmas.length > 0 && word_info.lemmas[0].pos == "verb") {
-        tabs.push({name: "Aspectual Ratios", content: '<div id="verb-aspect-ratio-gauge"></div>' })
-      }
+      var html = `
+        <p>
+        Word: <b>${form}</b> (<a href="https://translate.yandex.com/?lang=ru-en&text=${encodeURIComponent(form)}" rel="noreferrer noopener" style="font-size: 80%;" target="_blank">Yandex Translate</a>)<br>
+        </p>
+        ${lemma_details_html}
+        <div id="verb-aspect-ratio-gauge"></div>`;
 
-      var tabs_html = tabs.map((tab, index) => {
-        var tab_id = `tab${index}`;
-        var tab_html = `
-            <input class="tab-radio" name="info-tabs" type="radio" id="${tab_id}" ${index == 0 ? 'checked="checked"' : ''}>
-            <label class="tab-label" for="${tab_id}"> ${tab.name}</label>
-            <div class="tab-content">${tab.content}</div>`;
-        return tab_html;
-      }).join("");
-
-      var yandex_translate_link = `(<a href="https://translate.yandex.com/?lang=ru-en&text=${encodeURIComponent(form)}" rel="noreferrer noopener" style="font-size: 80%;" target="_blank">Yandex Translate</a>)`;
-
-      tabs_html = `<p>Word: <b>${form}</b> ${yandex_translate_link}</p><div class="tabs">${tabs_html}</div>`;
-
-      return tabs_html;
+      return html;
     },
     update: function(word_info) {
       this.updatePosition();
@@ -272,9 +220,33 @@
         });
         gauge.data(aspect_data);
         gauge.draw();
-      } else {
-        $("#verb-aspect-ratio-gauge").html('Aspectual ratio data not available');
       }
+    },
+    getLemmaDetails: function(word_info) {
+      var forms = word_info.forms.slice(0);
+      var lemmas = word_info.lemmas.slice(0);
+      var forms_by_lemma = forms.reduce((lookup, form) => {
+        if(!lookup.hasOwnProperty(form.lemma_id)) {
+          lookup[form.lemma_id] = [];
+        }
+        lookup[form.lemma_id].push(form);
+        return lookup;
+      }, {});
+
+      var lemma_details = lemmas.map((lemma, index) => {
+        return {
+          label: lemma.label || '',
+          pos: lemma.pos || '',
+          gender: lemma.gender || '',
+          level: lemma.level || '',
+          aspect: lemma.aspect || '',
+          translation: lemma.translation || '',
+          stress_pattern_semu: lemma.stress_pattern_semu || '',
+          cases: forms_by_lemma[lemma.id].map((form) => form.type).join(', ')
+        }
+      });
+
+      return lemma_details;
     }
   };
 

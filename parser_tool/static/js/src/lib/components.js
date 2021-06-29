@@ -44,7 +44,8 @@
             return pair;
         }
 
-        _template({ label, stress_pattern_semu }) {
+        _template() {
+            const {stress_pattern_semu, show_header} = this.props;
             const [singular, plural] = this._pattern(stress_pattern_semu);
             if(!singular && !plural) {
                 return "";
@@ -61,8 +62,10 @@
                 return `<tr>${col1}${col2}</tr>`;
             }).join("");
 
+            const header = show_header ? `Stress Pattern: ${stress_pattern_semu}` : '';
+
             const table = `<table class="stress-pattern">
-                <thead><tr><th colspan="2">${label} (${stress_pattern_semu})</th></tr></thead>
+                <thead><tr><th colspan="2">${header}</th></tr></thead>
                 ${trs}
                 </table>`;
 
@@ -70,11 +73,16 @@
         }
 
         render() {
-            return this._template(this.props);
+            return this._template();
         }
 
         renderTo(selector) {
-            document.querySelector(selector).innerHTML = this._template(this.props);
+            document.querySelector(selector).innerHTML = this._template();
+        }
+        
+        static render(props) {
+            var component = new this(props);
+            return component.render();
         }
     }
 

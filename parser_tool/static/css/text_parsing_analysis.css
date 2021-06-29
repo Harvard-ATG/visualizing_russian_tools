@@ -82,83 +82,24 @@ pre.words.mask.level4 .word:not(.level4) {
 }
 
 /* miscellaneous text */
-dl dd {
-    margin-inline-start: 20px;
-}
-dl dd i {
-    font-style: normal;
-    color: #990000;
-}
-
-.underline {
-    text-decoration: underline;
-}
-
-.indent {
-    margin-left: 3em;
+.underline { text-decoration: underline; }
+.indent { margin-left: 3em; }
+.wordinfo-heading { 
+    font-weight: bold;
+ }
+ul.wordinfo-details { 
+    list-style-type: none; 
+    margin-inline-start: 20px;  
+    padding-left: 0; }
+ul.wordinfo-details i { 
+    font-style: normal; 
+    color: #990000; 
 }
 
 /* resize heading elements inside the container */
-.container h1 {
-    font-size: 2rem;
-}
-
-.container h2 {
-    font-size: 1.75rem;
-}
-
-.container h3 {
-    font-size: 1.5rem;
-}
-
-.container h4 {
-    font-size: 1.25rem;
-}
-
-.container h5 {
-    font-size: 1rem;
-}
-
-.container h6 {
-    font-size: .75rem;
-}
-
-/* tabs */
-.tabs {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.tab-radio {
-    position: absolute;
-    opacity: 0;
-}
-
-.tab-label {
-    width: 100%;
-    background: #fff;
-    border: 1px solid #dedede;
-    cursor: pointer;
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: background .3s, color .3s;
-    border-radius: 0.3rem;
-}
-
-.tab-label:active {
-    background: #ccc;
-}
-
-.tab-label:hover, input.tab-radio:checked + .tab-label {
-    background: #dedede;
-}
-
-.tab-content {
-    display: none;
-    width: 100%;
-    padding: 5px 0;
-}
-
-input.tab-radio:checked + .tab-label + .tab-content {
-    display: block;
-}
+.container h1 { font-size: 2rem; }
+.container h2 { font-size: 1.75rem; }
+.container h3 { font-size: 1.5rem; }
+.container h4 { font-size: 1.25rem; }
+.container h5 { font-size: 1rem; }
+.container h6 { font-size: .75rem; }
