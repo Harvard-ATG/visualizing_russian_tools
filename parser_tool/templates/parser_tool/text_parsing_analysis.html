@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block head_title %}Visible Vocabulary{% endblock %}
-{% block body_id %}visible-vocabulary-page{% endblock %}
+{% block body_id %}visible-vocabulary{% endblock %}
 {% block body_class %}{% endblock %}
 
 {% block extra_style %}
@@ -42,12 +42,12 @@
         <div class="mb-4">
             <div class="row mb-2">
                 <div class="col">
-                    <h2 class="parser-header">Input Russian Text:</h2>
-                    <textarea id="textinput" class="form-control" style="min-height:150px;"></textarea>
+                    <h2 class="parser-header">Visible Vocabulary Tool</h2>
+                    <textarea id="textinput" class="form-control" style="min-height:150px;" placeholder="Enter russian text to receive an analysis by word level"></textarea>
                 </div>
             </div>
             <div class="d-flex justify-content-between" style="margin-bottom: 1em;">
-                <button type="button" align="left" class="btn btn-lg btn-primary" id="parsebtn">Parse Text <i id="parsespinner" class="spinner-border d-none" role="status"><span class="sr-only"></span></i></button>
+                <button type="button" align="left" class="btn btn-lg btn-primary" id="parsebtn">Analyze Text <i id="parsespinner" class="spinner-border d-none" role="status"><span class="sr-only"></span></i></button>
                 <button type="button" align="left" class="btn btn-lg btn-dark" id="clearbtn">Clear</button>
             </div>
             <div id="parser-error" class="alert alert-danger d-none"></div>
