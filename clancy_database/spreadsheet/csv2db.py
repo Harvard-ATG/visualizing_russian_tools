@@ -7,6 +7,7 @@ import time
 import logging
 import unicodedata
 
+
 FILE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 CSV_FIELD_NAMES = ['UniqueId', 'Russian', 'SecondRussian', 'POS', 'POS_Subtype', 'Animacy', 'Level', 'English', 'Rank', 'Count', 'Chapter', 'AdjAdvProp', 'Collocations', 'Domain', 'DomainTags', 'Strеssеd_Russiаn', 'Transliteration', 'Prefixes', 'Roots', 'Suffixes', 'Length', 'Classes', 'Location_Type', 'Notes', 'Notes_declension', 'Notes_conjugation', 'Inflected', 'Indeclinable', 'Stem', 'Hard_Soft', 'Word_Type', 'Stress_Pattern_SEMU', 'Inflected_Forms', 'Inflected_Stressed_Forms', 'Constructicon', 'Reverse_inflection', 'myKnown', 'myNew', 'myTarget', 'Drawing_Image', 'Photo_Image', 'Related_Words', 'Synonyms', 'Antonyms', 'Hyponyms', 'Co.Hyponyms', 'Hyperonyms', 'Example1', 'Example2', 'Example3', 'Gender_Counterparts', 'NOMsg_stressed', 'ACCsg_stressed', 'GENsg_stressed', 'LOCsg_stressed', 'DATsg_stressed', 'INSTsg_stressed', 'INSTaltsg_stressed', 'NOMpl_stressed', 'ACCpl_stressed', 'GENpl_stressed', 'LOCpl_stressed', 'DATpl_stressed', 'INSTpl_stressed', 'GEN2sg_stressed', 'LOC2sg_stressed', 'VOCsg_stressed', 'GEN3sg_stressed', 'Gender', 'Details', 'Declension', 'NOMsg', 'ACCsg', 'GENsg', 'LOCsg', 'DATsg', 'INSTsg', 'INSTaltsg', 'NOMpl', 'ACCpl', 'GENpl', 'LOCpl', 'DATpl', 'INSTpl', 'GEN2sg', 'LOC2sg', 'VOCsg', 'GEN3sg', 'Freq_NOMsg', 'Freq_ACCsg', 'Freq_GENsg', 'Freq_LOCsg', 'Freq_DATsg', 'Freq_INSTsg', 'Freq_INSTaltsg', 'Freq_NOMpl', 'Freq_ACCpl', 'Freq_GENpl', 'Freq_LOCpl', 'Freq_DATpl', 'Freq_INSTpl', 'Freq_GEN2sg', 'Freq_LOC2sg', 'Freq_VOCsg', 'Freq_GEN3sg', 'Infinitive_stressed', 'sg1_stressed', 'sg2_stressed', 'sg3_stressed', 'pl1_stressed', 'pl2_stressed', 'pl3_stressed', 'Mpast_stressed', 'Fpast_stressed', 'Npast_stressed', 'Ppast_stressed', 'Imper_sg_stressed', 'Imper_pl_stressed', 'future_stressed', 'PrAP_stressed', 'PrAP_forms_stressed', 'PAP_stressed', 'PAP_forms_stressed', 'PrPP_stressed', 'PrPP_forms_stressed', 'PPP_stressed', 'PPP_forms_stressed', 'VbAdv1_stressed', 'VbAdv2_stressed', 'Aspect', 'Transitivity', 'Impersonal', 'Reflexive', 'Verb_Details', 'Aspectual_Grouping', 'Aspectual_Counterpart', 'Infinitive', 'sg1', 'sg2', 'sg3', 'pl1', 'pl2', 'pl3', 'Mpast', 'Fpast', 'Npast', 'Ppast', 'Imper_sg', 'Imper_pl', 'future', 'PrAP', 'PrAP_forms', 'PAP', 'PAP_forms', 'PrPP', 'PrPP_forms', 'PPP', 'PPP_forms', 'VbAdv1', 'VbAdv2', 'Freq_Infinitive', 'Freq_sg1', 'Freq_sg2', 'Freq_sg3', 'Freq_pl1', 'Freq_pl2', 'Freq_pl3', 'Freq_Mpast', 'Freq_Fpast', 'Freq_Npast', 'Freq_Ppast', 'Freq_Imper_sg', 'Freq_Imper_pl', 'Freq_PrAP', 'Freq_PAP', 'Freq_PrPP', 'Freq_PPP', 'Freq_VbAdv1', 'Freq_VbAdv2', 'Lemma_Total', 'Forms_Total', 'Prop_Infinitive', 'Prop_sg1', 'Prop_sg2', 'Prop_sg3', 'Prop_pl1', 'Prop_pl2', 'Prop_pl3', 'Prop_Mpast', 'Prop_Fpast', 'Prop_Npast', 'Prop_Ppast', 'Prop_Imper_sg', 'Prop_Imper_pl', 'Prop_PrAP', 'Prop_PAP', 'Prop_PrPP', 'Prop_PPP', 'Prop_VbAdv1', 'Prop_VbAdv2', 'Prop_Check', 'mNOMsg_stressed', 'mACCsgAN_stressed', 'mACCsgIN_stressed', 'mGENsg_stressed', 'mLOCsg_stressed', 'mDATsg_stressed', 'mINSTsg_stressed', 'nNOMsg_stressed', 'nACCsg_stressed', 'nGENsg_stressed', 'nLOCsg_stressed', 'nDATsg_stressed', 'nINSTsg_stressed', 'fNOMsg_stressed', 'fACCsg_stressed', 'fGENsg_stressed', 'fLOCsg_stressed', 'fDATsg_stressed', 'fINSTsg_stressed', 'fINSTaltsg_stressed', 'plNOMpl_stressed', 'plACCplAN_stressed', 'plACCplIN_stressed', 'plGENpl_stressed', 'plLOCpl_stressed', 'plDATpl_stressed', 'plINSTpl_stressed', 'mshort_stressed', 'nshort_stressed', 'fshort_stressed', 'plshort_stressed', 'comparative_stressed', 'extracomparatives_stressed', 'stem', 'ending', 'mNOMsg', 'mACCsgAN', 'mACCsgIN', 'mGENsg', 'mLOCsg', 'mDATsg', 'mINSTsg', 'nNOMsg', 'nACCsg', 'nGENsg', 'nLOCsg', 'nDATsg', 'nINSTsg', 'fNOMsg', 'fACCsg', 'fGENsg', 'fLOCsg', 'fDATsg', 'fINSTsg', 'fINSTaltsg', 'plNOMpl', 'plACCplAN', 'plACCplIN', 'plGENpl', 'plLOCpl', 'plDATpl', 'plINSTpl', 'mshort', 'nshort', 'fshort', 'plshort', 'comparative', 'extracomparatives', 'mNOMsgFreq', 'mACCsgANFreq', 'mACCsgINFreq', 'mGENsgFreq', 'mLOCsgFreq', 'mDATsgFreq', 'mINSTsgFreq', 'nNOMsgFreq', 'nACCsgFreq', 'nGENsgFreq', 'nLOCsgFreq', 'nDATsgFreq', 'nINSTsgFreq', 'fNOMsgFreq', 'fACCsgFreq', 'fGENsgFreq', 'fLOCsgFreq', 'fDATsgFreq', 'fINSTsgFreq', 'fINSTaltsgFreq', 'plNOMplFreq', 'plACCplANFreq', 'plACCplINFreq', 'plGENplFreq', 'plLOCplFreq', 'plDATplFreq', 'plINSTplFreq', 'mshortFreq', 'nshortFreq', 'fshortFreq', 'plshortFreq', 'comparativeFreq', 'extracomparativesFreq', 'FinalColumn']
@@ -141,92 +142,147 @@ def create_schema(cursor):
         cursor.executescript(schema)
 
 
-def process_data(cursor, filename, verbose=False):
+def process_data(cursor, filename):
+    '''
+    First pass at inserting the data from the CSV.
+    '''
     with open(filename, encoding='utf-8') as csvfile:
         csvreader = csv.DictReader(csvfile, fieldnames=CSV_FIELD_NAMES)
-        lemma_to_sheet_row = {}
         for rowid, row in enumerate(csvreader, start=1):
             if rowid == 1:
                 continue
-            if can_insert_lemma(row, verbose=verbose):
-                lemma = insert_lemma(cursor, row, verbose=verbose)
-                lemma_pk = lemma['id']
-                lemma_to_sheet_row[lemma_pk] = row
-                insert_inflections(cursor, lemma_pk, row, verbose=verbose)
-                insert_mwes(cursor, lemma_pk, row, verbose=verbose)
-        insert_aspect_pairs(cursor, verbose, lemma_to_sheet_row)
+            if can_insert_lemma(row):
+                row['Russian'] = unicode_normalize(row['Russian'])
+                row['SecondRussian'] = unicode_normalize(row['SecondRussian'])
+                inserted_lemma = insert_lemma(cursor, row)
+                insert_aspect_counterpart(cursor, inserted_lemma, row)
+                insert_inflections(cursor, inserted_lemma, row)
+                insert_mwes(cursor, inserted_lemma, row)
+
+    insert_missing_inflections(cursor)
+    cleanup_aspect_counterparts(cursor)
+    insert_aspect_pairs(cursor)
 
 
-def insert_aspect_pairs(cursor, verbose=False, lemma_to_sheet_row=None):
+def insert_missing_inflections(cursor):
+    '''
+    Inserts missing inflections (e.g. due to punctuation variations).
+    This should ideally be handled by updating the original data source (e.g. spreadsheet/CSV).
+    '''
+    missing_lemma_forms = [
+        # lemma, form
+        ("потому что", "потому, что"),
+    ]
+
+    for (lemma, form) in missing_lemma_forms:
+        cursor.execute("SELECT 1 FROM inflection WHERE form = ? AND NOT EXISTS (SELECT 1 FROM inflection WHERE form = ?)", [lemma, form])
+        row = cursor.fetchone()
+        if row is None:
+            sql = "INSERT INTO inflection (lemma_id, form, stressed, type, frequency) SELECT lemma_id, ?, stressed, type, frequency FROM inflection WHERE form = ?"
+            cursor.execute(sql, [form, lemma])
+
+
+def insert_aspect_counterpart(cursor, inserted_lemma, row):
+    '''
+    Inserts aspect counterpart for a given verb.
+    '''
+    lemma_pk = inserted_lemma['id']
+    lemma = inserted_lemma['lemma']
+    count = inserted_lemma['count']
+    aspect = inserted_lemma['aspect']
+    if not aspect:
+        return
+
+    second_russian = row['SecondRussian'].strip()
+    if second_russian == lemma or second_russian in ("", "0"):
+        logging.debug(f"Verb {lemma} has no aspect counterpart. SecondRussian field is: {second_russian}")
+        return
+
+    counterparts = [second_russian]
+    if ';' in second_russian:
+        counterparts = [s.strip() for s in second_russian.split(";") if s.strip() != lemma]
+
+    sql = 'INSERT INTO aspect_counterpart (lemma_id, lemma_label, lemma_count, aspect, counterpart, counterpart_index) VALUES (?, ?, ?, ?, ?, ?)'
+    inserts = []
+    for index, counterpart in enumerate(counterparts):
+        inserts.append([lemma_pk, lemma, count, aspect, counterpart, index])
+
+    for insert in inserts:
+        try:
+            logging.debug("insert aspect_counterpart: %s" % insert)
+            cursor.execute(sql, insert)
+        except sqlite3.Error as e:
+            logging.exception("inflection: %s" % insert)
+            raise e
+
+
+def cleanup_aspect_counterparts(cursor):
+    '''
+    Ensures that every counterpart entry in the aspect_counterpart table actually exists in the lemma table.
+    '''
+    sql = 'DELETE FROM aspect_counterpart WHERE NOT EXISTS (SELECT 1 FROM lemma WHERE aspect_counterpart.counterpart = lemma.lemma);'
+    cursor.execute(sql)
+
+
+def insert_aspect_pairs(cursor):
     '''
     Inserts relations for imperfective/perfective aspect pairs for verbs
     (as identified by "SecondRussian" in the original spreadsheet).
+
+    Assumes that every verb entry (lemma or counterpart) has an entry in the main lemma table.
     '''
-    if lemma_to_sheet_row is None:
-        lemma_to_sheet_row = {}
 
-    # collect aspect pairs from existing lemma data
-    imperfectives = {}
-    query = "SELECT id, lemma, aspect FROM lemma WHERE aspect IS NOT NULL AND aspect = ?"
-    cursor.execute(query, ['imperfective'])
-    rows = cursor.fetchall()
-    for row in rows:
-        (lemma_id, lemma, aspect) = row
-        sheet_row = lemma_to_sheet_row[lemma_id]
-        second_russian = sheet_row['SecondRussian'].strip()
-        if second_russian == "0" or second_russian == "" or lemma == second_russian:
-            continue
+    # partition verbs into buckets according to aspect
+    cursor.execute("SELECT id, lemma_id, lemma_label, lemma_count, aspect, counterpart, counterpart_index FROM aspect_counterpart ORDER BY lemma_id, counterpart_index")
+    aspect_counterpart_rows = cursor.fetchall()
+    aspects = {"imperfective": {}, "perfective": {}, "biaspectual": {}}
+    for row in aspect_counterpart_rows:
+        pk, lemma_id, lemma_label, lemma_count, aspect, counterpart, counterpart_index = row
+        aspects[aspect].setdefault(lemma_label, []).append(counterpart)
 
-        lemma = unicodedata.normalize('NFKC', unicodedata.normalize('NFKD', lemma))
-        second_russian = unicodedata.normalize('NFKC', unicodedata.normalize('NFKD', second_russian))
+    # pair up imperfective/perfective verbs
+    #
+    # 1) it's possible that there's a perfective/imperfective entry but not a imperfective/perfective entry
+    # which is why we need to iterate over both aspects.
+    # 2) it's possible that an imperfective may have multiple possible perfective counterparts:
+    #   играть/сыграть
+    #   играть/поиграть
+    #   играть/заиграть
+    pairs = {}
+    for imperfective, counterparts in aspects["imperfective"].items():
+        perfective = counterparts[0]
+        pairs[(imperfective, perfective)] = True
+    for perfective, counterparts in aspects["perfective"].items():
+        imperfective = counterparts[0]
+        pairs[(imperfective, perfective)] = True
 
-        if ";" in second_russian:
-            # TODO: handle motion verbs
-            # For now, just take the first verb if there are multiple entries
-            multiple_second_russian = [s.strip() for s in second_russian.split(";") if s.strip() != lemma]
-            if len(multiple_second_russian) > 0:
-                perfective_verb = multiple_second_russian[0]
-        elif " " in second_russian:
-            continue
-        else:
-            perfective_verb = second_russian
+    # get mapping of lemmas in the database
+    cursor.execute("SELECT lemma, id, count FROM lemma")
+    lookup = {row[0]: {"lemma_id": row[1], "lemma_count": row[2]} for row in cursor.fetchall()}
 
-        imperfectives[lemma] = perfective_verb
-
-    # insert into the aspect_pairs table
-    pair_id = 0
+    # generate inserts of pairs
     inserts = []
-    for (imperfective_verb, perfective_verb) in imperfectives.items():
-        aspect_pair = [imperfective_verb, perfective_verb]
-        pair_id += 1
-        pair_name = "-".join(aspect_pair)
+    for pair_id, pair_key in enumerate(sorted(pairs.keys()), start=1):
+        (imperfective, perfective) = pair_key
+        pair_name = f"{imperfective}-{perfective}"
+        pair_index = 0
+        if imperfective in aspects["imperfective"] and perfective in aspects["imperfective"][imperfective]:
+            pair_index = aspects["imperfective"][imperfective].index(perfective)
 
-        aspect_pair_inserts = []
-        for verb in aspect_pair:
-            cursor.execute("SELECT id, aspect, count FROM lemma WHERE lemma = ? AND aspect in ('imperfective', 'perfective')", [verb])
-            row = cursor.fetchone()
-            if row is None:
-                # print("WARNING: verb %s not found in database for pair %s" % (verb, pair_name))
-                continue
-            (lemma_id, aspect, lemma_count) = row
-            aspect_pair_inserts.append([pair_id, pair_name, aspect, lemma_id, verb, lemma_count])
+        inserts.append([pair_id, pair_name, pair_index, "imperfective", lookup[imperfective]["lemma_id"], imperfective, lookup[imperfective]["lemma_count"]])
+        inserts.append([pair_id, pair_name, pair_index, "perfective", lookup[perfective]["lemma_id"], perfective, lookup[perfective]["lemma_count"]])
 
-        # for now, we are requiring pairs of verbs
-        if len(aspect_pair_inserts) == 2:
-            inserts.extend(aspect_pair_inserts)
-
-    sql = "INSERT INTO aspect_pair (pair_id, pair_name, aspect, lemma_id, lemma_label, lemma_count) VALUES (?, ?, ?, ?, ?, ?)"
+    sql = "INSERT INTO aspect_pair (pair_id, pair_name, pair_index, aspect, lemma_id, lemma_label, lemma_count) VALUES (?, ?, ?, ?, ?, ?, ?)"
     for insert in inserts:
         try:
-            if verbose:
-                print("Insert aspect_pair: %s" % insert)
+            logging.debug("Insert aspect_pair: %s" % insert)
             cursor.execute(sql, insert)
         except sqlite3.Error as e:
             logging.exception("aspect_pair: %s" % insert)
             raise e
 
 
-def can_insert_lemma(row, verbose=False):
+def can_insert_lemma(row):
     # Skip 6O lemmas since these should be omitted
     # as they don't fit in the schema right now (includes some MWEs, etc)
     if row['Level'].strip() == "6O":
@@ -234,11 +290,11 @@ def can_insert_lemma(row, verbose=False):
     return True
 
 
-def insert_lemma(cursor, row, verbose=False):
+def insert_lemma(cursor, row):
     data = {
         'external_id':         row['UniqueId'],
-        'lemma':               row['Russian'].strip(),
-        'stressed':            row['Strеssеd_Russiаn'].strip(),
+        'lemma':               row['Russian'].replace(';', ',').strip(),
+        'stressed':            row['Strеssеd_Russiаn'].replace(';', ',').strip(),
         'translation':         row['English'].strip(),
         'pos':                 row['POS'].strip(),
         'pos_subtype':         row['POS_Subtype'].strip(),
@@ -272,7 +328,8 @@ def insert_lemma(cursor, row, verbose=False):
     return data
 
 
-def insert_inflections(cursor, lemma_pk, row, verbose=False):
+def insert_inflections(cursor, inserted_lemma, row):
+    lemma_pk = inserted_lemma['id']
     sql = 'INSERT INTO inflection (lemma_id, form, stressed, type, frequency) VALUES (?, ?, ?, ?, ?)'
     inserts = []
 
@@ -289,8 +346,7 @@ def insert_inflections(cursor, lemma_pk, row, verbose=False):
     if len(inserts) == 0:
         inserts = handle_lemma_forms(lemma_pk, row)
 
-    if verbose:
-        print("[%s:%s] %s => %d inserts (%s)\n" % (row['UniqueId'], row['POS'], row['Russian'], len(inserts), ",".join([insert[3] for insert in inserts])))
+    logging.debug("[%s:%s] %s => %d inserts (%s)\n" % (row['UniqueId'], row['POS'], row['Russian'], len(inserts), ",".join([insert[3] for insert in inserts])))
 
     for insert in inserts:
         try:
@@ -300,11 +356,12 @@ def insert_inflections(cursor, lemma_pk, row, verbose=False):
             raise e
 
 
-def insert_mwes(cursor, lemma_pk, row, verbose=False):
+def insert_mwes(cursor, inserted_lemma, row):
     """
     Inserts MWEs or sequences of 2 or more words that should be treated
     as a single unit of meaning.
     """
+    lemma_pk = inserted_lemma['id']
     sql = 'INSERT INTO mwe (text, cardinality, lemma_id) VALUES (?, ?, ?)'
     if 'mwe' not in row['POS_Subtype']:
         return
@@ -324,8 +381,7 @@ def insert_mwes(cursor, lemma_pk, row, verbose=False):
             logging.exception("inflection: %s" % insert)
             raise e
 
-    if verbose:
-        print("[%s:%s:%s] %d inserts (%s)\n" % (row['UniqueId'], row['POS'], row['POS_Subtype'], len(inserts), [insert[0] for insert in inserts]))
+    logging.debug("[%s:%s:%s] %d inserts (%s)\n" % (row['UniqueId'], row['POS'], row['POS_Subtype'], len(inserts), [insert[0] for insert in inserts]))
 
 
 def get_row_freq(row, colname):
@@ -449,12 +505,16 @@ def csv_get_fields(filename):
     return fields
 
 
-def main(csvfile, dbfile, verbose=False):
+def unicode_normalize(str):
+    return unicodedata.normalize('NFKC', unicodedata.normalize('NFKD', str))
+
+
+def main(csvfile, dbfile):
     """Main task runner -- expected to be called from a script passing in the required arguments."""
     CONN = sqlite3.connect(dbfile)
     cursor = CONN.cursor()
     create_schema(cursor)
-    process_data(cursor, csvfile, verbose=verbose)
+    process_data(cursor, csvfile)
     CONN.commit()
     CONN.close()
 
@@ -464,13 +524,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", help="Name of the CSV file with russian spreadsheet data.", default="NewVisualizingRussian21January2019.csv")
     parser.add_argument("--output", help="Name of the SQLite database.", default="russian.sqlite3")
-    parser.add_argument("-v", "--verbose", help="Increase output verbosity.", action="store_true")
     args = parser.parse_args()
-    csvfile = args.input
-    dbfile = args.output
-    sys.stdout.write("=> Processing...\n")
+
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logging.info("=> Processing...\n")
     start = time.time()
-    main(csvfile, dbfile, verbose=args.verbose)
+    main(args.input, args.output)
     end = time.time()
-    sys.stdout.write("=> Completed. Execution time: %f seconds\n" % (end - start))
-    sys.stdout.write("=> Database saved to %s\n" % dbfile)
+
+    logging.info("=> Completed. Execution time: %f seconds\n" % (end - start))
+    logging.info("=> Database saved to %s\n" % args.output)

@@ -66,6 +66,7 @@ COMBINING_BREVE_CHAR = '\u0306'     # Diacritic used with the eleventh letter of
 # Special cases where hyphenated words that should not be split up
 # Word beginning with по- should also be privileged.
 HYPHENATED_WORDS = (
+    'Санкт-Петербург',
     'всё-таки',
     'все-таки',
     'из-за',
@@ -78,49 +79,84 @@ HYPHENATED_WORDS = (
     'в-шестых',
     'в-седьмых',
     'в-девятых',
+    'где-нибудь',
+    'где-то',
+    'как-нибудь',
+    'как-то',
+    'какой-нибудь',
+    'какой-то',
+    'когда-нибудь',
+    'когда-то',
+    'кто-нибудь',
+    'кто-то',
+    'куда-нибудь',
+    'куда-то',
+    'наконец-то',
+    'почему-нибудь',
+    'почему-то',
+    'что-нибудь',
+    'что-то',
 )
 
 # Multi-word expressions
 MWES = (
+    'в будущем времени',
+    'в настоящем времени',
+    'в одиночку',
+    'в приложении',
+    'в прошедшем времени',
+    'в течение',
+    'во время',
+    'вряд ли',
+    'все равно',
     'до сих пор',
     'до того как',
     'до того, как',
+    'добро пожаловать',
+    'жду не дождусь',
+    'жду, не дождусь',
     'за границей',
     'за границу',
+    'и так далее',
     'и то и другое',
-    'и то, и другое',
     'и то и то',
+    'и то, и другое',
     'и то, и то',
     'из дома',
     'из дому',
     'из-за границы',
+    'из-за того, что',
     'к сожалению',
     'к счастью',
     'как раз',
+    'как следует',
     'как только',
     'между прочим',
+    'на всякий случай',
     'на самом деле',
     'на связи',
     'не за что',
+    'недалеко от',
+    'несмотря на',
+    'ни в коем случае',
     'ни за что',
+    'перед тем как',
     'перед тем, как',
+    'по Фаренгейту',
+    'по Цельсию',
+    'после того как',
+    'после того, как',
     'потому что',
     'потому, что',
     'с тех пор',
+    'с тех пор как',
+    'с уважением',
     'с удовольствием',
     'так же',
     'так как',
     'так что',
     'только что',
 )
-
-# Trie of multi-word expressions
-MWE_MAXSIZE = 0
-MWE_TRIE = pygtrie.CharTrie()
-for mwe in MWES:
-    tokens = [t for t in re.split(r'([ ,])', mwe) if t != '']
-    MWE_MAXSIZE = max(len(tokens), MWE_MAXSIZE)
-    MWE_TRIE[mwe] = True
 
 # Translators
 TRANSLATOR_PUNCT_REMOVE = str.maketrans('', '', RUS_PUNCT)
@@ -148,11 +184,24 @@ def tokenize(text):
     >>> tokenize("э̽той техноло́гии")
     ['э̽той', ' ', 'техноло́гии']
     """
+    return tokenize_multi_word_expressions(text)
+
+
+def tokenize_words(text):
+    """
+    Returns a list of tokens that have been split into words, taking into account punctuation and hyphenation.
+    """
     tokens = re.split(r'(\s+)', text)
     tokens = split_punctuation(tokens)
     tokens = split_hyphenated(tokens)
-    tokens = merge_multiwordexpr(tokens)
     return tokens
+
+
+def tokenize_multi_word_expressions(text):
+    """
+    Returns a list of tokens split into words and merging multi-word expressions.
+    """
+    return merge_multi_word_expressions(tokenize_words(text))
 
 
 def split_punctuation(tokens, punct=RUS_PUNCT, hyphen_char=HYPHEN_CHAR):
@@ -191,13 +240,13 @@ def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_
     return new_tokens
 
 
-def merge_multiwordexpr(tokens):
+def merge_multi_word_expressions(tokens):
     """
     Merge multiple tokens that should be treated as a single unit (e.g. multiword expressions).
 
-    >>> merge_multiwordexpr(['это', ' ', 'только', ' ', 'потому', ',', ' ', 'что', ' ', 'боитесь', ' ', 'меня'])
+    >>> merge_multi_word_expressions(['это', ' ', 'только', ' ', 'потому', ',', ' ', 'что', ' ', 'боитесь', ' ', 'меня'])
     ['это', ' ', 'только', ' ', 'потому, что', ' ', 'боитесь', ' ', 'меня']
-    >>> merge_multiwordexpr(['потому', ' ', 'что', ' ', 'в', ' ', 'теплоте'])
+    >>> merge_multi_word_expressions(['потому', ' ', 'что', ' ', 'в', ' ', 'теплоте'])
     ['потому что', ' ', 'в', ' ', 'теплоте']
     """
     new_tokens = []
@@ -362,3 +411,28 @@ def is_numeric(token):
 
 def is_equal(text1, text2):
     return unicode_decompose(text1) == unicode_decompose(text2)
+
+
+def _make_trie(mwes=None):
+    '''
+    Creates a Trie of multi-word expressions for fast lookups.
+    Returns the trie and the maximum size of any token in that trie.
+
+    Notes:
+        - The MWEs are tokenized in the standard way
+        - The MWEs are added to the trie in "canonical" form (e.g. lowercase, etc)
+    '''
+    trie = pygtrie.CharTrie()
+    if mwes is None:
+        return trie
+
+    mwe_maxsize = 0
+    for mwe in mwes:
+        tokens = tokenize_words(mwe)
+        mwe_maxsize = max(len(tokens), mwe_maxsize)
+        trie[canonical(mwe)] = True
+
+    return trie, mwe_maxsize
+
+
+MWE_TRIE, MWE_MAXSIZE = _make_trie(MWES)

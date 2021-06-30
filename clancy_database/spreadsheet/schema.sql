@@ -55,11 +55,26 @@ CREATE TABLE IF NOT EXISTS inflection (
 );
 CREATE INDEX inflection_form_index ON inflection(form);
 
+-- Aspect counterpart table for relating imperfective and perfective verbs
+CREATE TABLE IF NOT EXISTS aspect_counterpart (
+  id                     INTEGER PRIMARY KEY,
+  lemma_id               INTEGER NOT NULL,
+  lemma_label            TEXT NOT NULL,
+  lemma_count            REAL, -- This value should come from the lemma table; duplicated here for performance reasons
+  aspect                 TEXT NOT NULL,
+  counterpart            TEXT NOT NULL,
+  counterpart_index      INTEGER NOT NULL DEFAULT 0, -- Nonzero when a verb has multiple possible counterparts
+
+  FOREIGN KEY (lemma_id) REFERENCES lemma(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (aspect) REFERENCES aspect(key) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
 -- Aspect pair table for relating imperfective and perfective verbs
 CREATE TABLE IF NOT EXISTS aspect_pair (
   id                     INTEGER PRIMARY KEY,
   pair_id                INTEGER NOT NULL,
   pair_name              TEXT NOT NULL,
+  pair_index             INTEGER NOT NULL DEFAULT 0, -- Nonzero if imperfective is repeated in another pair
   lemma_id               INTEGER NOT NULL,
   lemma_label            TEXT NOT NULL,
   lemma_count            REAL, -- This value should come from the lemma table; duplicated here for performance reasons

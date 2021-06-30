@@ -1,6 +1,5 @@
 from django.db import models
-from django.db.models import Subquery
-
+import operator
 
 class Lemma(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)
@@ -28,10 +27,28 @@ class Lemma(models.Model):
         return "%s [%s:%s] " % (self.lemma, self.pos, self.id)
 
     def get_aspect_pair(self):
-        pair_id_subquery = AspectPair.objects.filter(lemma_id=self.id).values('pair_id')
-        aspect_pair_qs = AspectPair.objects.filter(pair_id__in=Subquery(pair_id_subquery))
+        '''
+        Returns a 2-element list containing the first matching aspect pair for this lemma, or an empty list
+        if no aspect pairs were found with the lemma.
+
+        Note that there can be multiple pairs for a given lemma. For example, lemma "играть" can mach the following
+        aspect pairs:
+            играть/сыграть
+            играть/поиграть
+            играть/заиграть
+
+        In this case, the pairs are assigned an index according to how they appear in the source data (e.g. Steven's
+        spreadsheet). We can use that ordering to select one.
+        '''
+        aspect_pairs_qs = AspectPair.objects.filter(lemma_id=self.id).order_by('pair_index').values('pair_id')
+        try:
+            pair = aspect_pairs_qs[0]
+        except IndexError:
+            return []
+
+        aspect_pair_qs = AspectPair.objects.filter(pair_id=pair['pair_id'])
         if len(aspect_pair_qs) == 2:
-            return [aspect_pair.to_dict() for aspect_pair in aspect_pair_qs]
+            return [aspect_pair.to_dict() for aspect_pair in sorted(aspect_pair_qs, key=operator.attrgetter('aspect'))]
         return []
 
     def to_dict(self):
@@ -72,6 +89,7 @@ class AspectPair(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)
     pair_id = models.IntegerField()
     pair_name = models.TextField()
+    pair_index = models.IntegerField()
     lemma = models.ForeignKey('Lemma', related_name='+', on_delete=models.CASCADE)
     lemma_label = models.TextField()
     lemma_count = models.FloatField(blank=True, null=True)
@@ -82,6 +100,7 @@ class AspectPair(models.Model):
             "id": self.id,
             "pair_id": self.pair_id,
             "pair_name": self.pair_name,
+            "pair_index": self.pair_index,
             "lemma_label": self.lemma_label,
             "lemma_id": self.lemma_id,
             "lemma_count": self.lemma_count,
