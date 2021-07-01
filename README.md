@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/Harvard-ATG/visualizing_russian_tools.svg?branch=master)](https://travis-ci.org/Harvard-ATG/visualizing_russian_tools)
 ![Coverage Status](./coverage.svg)
 
 # Visualizing Russian Tools
