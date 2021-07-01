@@ -145,34 +145,86 @@
     render: function(word_info) {
       if(word_info) {
         $("#worddetails").html(this.template(word_info));
-        $("#wordvis").html("");
-        $("#wordstress").html("");
-        this.showWordVis(word_info);
+        this.update(word_info);
       } else {
-        $("#worddetails").html("");
-        $("#wordvis").html("");
-        $("#wordstress").html("");
+        this.reset();
       }
       
     },
-    setPosition: function(position) {
-      var top = parseInt(position.top, 10);
-      if(top) {
-        $("#wordinfo").css({"top": top+"px"});
-      } else {
-        $("#wordinfo").css({"top": ""});
-      }
-    },
     reset: function() {
       $("#worddetails").html("Click on a word.");
-      $("#wordvis").html("");
-      $("#wordstress").html("");
     },
     template: function(word_info) {
+      var form = word_info.forms[0].label;
+      var lemma_details = this.getLemmaDetails(word_info);
+
+      var lemma_details_html = lemma_details.map((lemma, index) => {
+        var stress_pattern_html = '';
+        if(lemma.stress_pattern_semu) {
+          stress_pattern_html = StressPatternTableComponent.render({
+            props: {stress_pattern_semu: lemma.stress_pattern_semu}
+          });
+        }
+
+        var html = `
+          <div class="wordinfo-heading">${lemma.label}</div>
+          <ul class="wordinfo-details">
+            <li>Part of Speech: <i>${lemma.pos}</i></li>
+            <li class="${lemma.gender?'':'d-none'}">Gender: <i>${lemma.gender}</i></li>
+            <li class="${lemma.aspect?'':'d-none'}">Aspect: <i>${lemma.aspect}</i></li>
+            <li class="${lemma.level?'':'d-none'}">Level: <i>${lemma.level}</i></li>
+            <li class="${lemma.cases?'':'d-none'}">Cases: <i>${lemma.cases}</i></li>
+            <li>Translation: <i>${lemma.translation||'n/a'}</i></li>
+            <li class="${lemma.stress_pattern_semu?'':'d-none'}">Stress Pattern: <i>${lemma.stress_pattern_semu}</i><br>${stress_pattern_html}</li>
+          </ul>
+        `;
+
+        return html;
+      }).join("");
+
+      var html = `
+        <p>
+        Word: <b>${form}</b> (<a href="https://translate.yandex.com/?lang=ru-en&text=${encodeURIComponent(form)}" rel="noreferrer noopener" style="font-size: 80%;" target="_blank">Yandex Translate</a>)<br>
+        </p>
+        ${lemma_details_html}
+        <div id="verb-aspect-ratio-gauge"></div>`;
+
+      return html;
+    },
+    update: function(word_info) {
+      this.updatePosition();
+      if(word_info.lemmas.length > 0) {
+        this.drawVerbAspectRatioGauge(word_info.lemmas[0]);
+      }
+    },
+    updatePosition: function() {
+      var top = window.scrollY - (document.getElementById("wordinfo").getBoundingClientRect().top + document.documentElement.scrollTop);
+      if(top < 0) {
+        top = 0;
+      }
+      $("#worddetails").css({
+        top: top+"px",
+        position: (top == 0 ? "static": "absolute")
+      });
+    },
+    drawVerbAspectRatioGauge: function(lemma) {
+      var aspect_pair = (lemma.pos == "verb" && lemma.aspect_pair && lemma.aspect_pair.length == 2) ? lemma.aspect_pair : [];
+      var aspect_data = aspect_pair.map((v) => {
+        return {"label": v.lemma_label, "value": v.lemma_count, "description": v.aspect}
+      });
+
+      if(aspect_pair.length == 2) {
+        let gauge = new FrequencyGauge({
+          parentElement: "#verb-aspect-ratio-gauge",
+          config: { colors: ['#b74c4c', '	#999']}
+        });
+        gauge.data(aspect_data);
+        gauge.draw();
+      }
+    },
+    getLemmaDetails: function(word_info) {
       var forms = word_info.forms.slice(0);
       var lemmas = word_info.lemmas.slice(0);
-      var form = forms[0].label;
-
       var forms_by_lemma = forms.reduce((lookup, form) => {
         if(!lookup.hasOwnProperty(form.lemma_id)) {
           lookup[form.lemma_id] = [];
@@ -181,56 +233,20 @@
         return lookup;
       }, {});
 
-      var lemma_list_html = lemmas.map((lemma) => {
-        let details = [];
-        details.push(['Part of Speech', lemma.pos]);
-        if(lemma.gender) {
-          details.push(['Gender', lemma.gender]);
+      var lemma_details = lemmas.map((lemma, index) => {
+        return {
+          label: lemma.label || '',
+          pos: lemma.pos || '',
+          gender: lemma.gender || '',
+          level: lemma.level || '',
+          aspect: lemma.aspect || '',
+          translation: lemma.translation || '',
+          stress_pattern_semu: lemma.stress_pattern_semu || '',
+          cases: forms_by_lemma[lemma.id].map((form) => form.type).join(', ')
         }
-        if(lemma.aspect) {
-          details.push(['Aspect', lemma.aspect]);
-        }
-        details.push(['Level', lemma.level]);
-        details.push(['Cases', forms_by_lemma[lemma.id].map((form) => form.type).join(", ") ]);
-        details.push(['Translation', lemma.translation]);
-        details.push(['Stress Pattern', `<span class="wordstresspattern" data-pattern="${lemma.stress_pattern_semu}" style="cursor:pointer;">${lemma.stress_pattern_semu || 'n/a'}</span>`]);
-        let details_html = details.map((item) => `<span>${item[0]}:</span> <span class="textinfoval">${item[1]}</span>`).join("<br>");
-        return `<div style="margin-bottom: 10px;"><b>${lemma.stressed || lemma.label}</b><br>${details_html}</div>`;
-      }).join("");
-
-      var html = `<h3 class="wordtitle inline d-block">${form}</h3>${lemma_list_html}`;
-
-      return html;
-    },
-    showWordVis: function(word_info) {
-      if(word_info.lemmas.length != 1) {
-        return;
-      }
-      var lemma = word_info.lemmas[0];
-      this._updateVerbFrequencyGauge(lemma);
-    },
-    showWordStress: function(stress_pattern_semu) {
-      var c = new StressPatternTableComponent({ 
-        selector: "#wordstress", 
-        props: {stress_pattern_semu}
       });
-      c.render();
-    },
-    _updateVerbFrequencyGauge: function(lemma) {
-      if(lemma.pos == "verb") {
-        var aspect_pair = (lemma.aspect_pair && lemma.aspect_pair.length == 2) ? lemma.aspect_pair : [];
-        var vis_data = aspect_pair.map((v) => { 
-          return {"label": v.lemma_label, "value": v.lemma_count, "description": v.aspect}
-        });
-        $("#wordvis").append("");
-        if(vis_data.length > 0) {
-          var gauge = new FrequencyGauge({ 
-            parentElement: "#wordvis",
-            config: { colors: ['#b74c4c', '	#999']} 
-          });
-          gauge.data(vis_data).draw();
-        }
-      } 
+
+      return lemma_details;
     }
   };
 
@@ -395,8 +411,7 @@
         });
         e.target.classList.add("highlight");
         var form_ids = parsedTextCtrl.getElementDataFormIds($el);
-        var word_info = parseService.getWordInfo(form_ids)
-        wordInfoCtrl.setPosition({top: $el.position().top });
+        var word_info = parseService.getWordInfo(form_ids);
         wordInfoCtrl.render(word_info);
       }
       return false;
@@ -413,9 +428,6 @@
     onClickToggleChartLevels: function(e) {
       textInfoCtrl.toggleChartLevels();
       textInfoCtrl.render();
-    },
-    onClickWordStressPattern: function(e) {
-      wordInfoCtrl.showWordStress(e.target.dataset.pattern);
     },
     clearAnalysis: function() {
       parsedTextCtrl.reset();
@@ -436,7 +448,6 @@
     $(document).on('click', '.lemma-toggle', utils.logEvent(mainCtrl.onClickLemmaToggle));
     $(document).on('click', '#textinfocopy', utils.logEvent(mainCtrl.onClickCopyTextInfo));
     $(document).on('click', '#toggle-chart-levels', utils.logEvent(mainCtrl.onClickToggleChartLevels));
-    $(document).on('click', '.wordstresspattern', utils.logEvent(mainCtrl.onClickWordStressPattern));
     if(window.location.hash == "#demo") {
       window.demo();
     }

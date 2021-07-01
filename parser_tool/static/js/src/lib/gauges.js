@@ -63,8 +63,8 @@
 
             // determine size based on parent element
             const parentElement = document.querySelector(vis._parentElement);
-            const width = Math.max(parentElement.clientWidth, 200);
-            const height = Math.max(parentElement.clientHeight, 200);
+            const width = Math.max(parentElement.clientWidth, 272);
+            const height = Math.max(parentElement.clientHeight, 272);
             const radius = Math.min(width, height) / 2;
             let fontSize = Math.max(Math.round(width / 16), 14);
 
