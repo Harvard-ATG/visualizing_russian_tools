@@ -23,6 +23,7 @@ urlpatterns = [
     path('case-distribution', parser_tool.views.case_distribution,  name='case_distribution'),
     path('verb-radar-chart', parser_tool.views.verb_radar_chart,  name='verb_radar_chart'),
     path('similarity', parser_tool.views.similarity,  name='similarity'),
+    path('verb_histograms', parser_tool.views.verb_histograms,  name='verb_histograms'),
 
 
     # API endpoints
