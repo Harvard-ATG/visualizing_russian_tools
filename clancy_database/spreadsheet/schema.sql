@@ -285,3 +285,4 @@ INSERT INTO stress_pattern_semu (key, description) VALUES('US', 'Singular u-retr
 INSERT INTO stress_pattern_semu (key, description) VALUES('_E', 'Singular does not occur, Plural end stress');
 INSERT INTO stress_pattern_semu (key, description) VALUES('_M', 'Singular does not occur, Plural mixed stress');
 INSERT INTO stress_pattern_semu (key, description) VALUES('_S', 'Singular does not occur, plural stem stress');
+INSERT INTO stress_pattern_semu (key, description) VALUES('SS,EE', 'Singular/plural stem stress OR Singular/plural end stress');
