@@ -99,6 +99,11 @@ class TestTokenizer(unittest.TestCase):
                 'text': 'С тех пор узнаёт он в любом!',
                 'occurrences': 1,
             },
+            {
+                'mwe': 'Во время',
+                'text': 'Во время встречи он встал и вышел в коридор. В это время мы еще не поняли, в чем дело.',
+                'occurrences': 1,
+            }
         ]
         for test in tests:
             (mwe, text, expected_occurrences) = test['mwe'], test['text'], test['occurrences']
