@@ -148,12 +148,11 @@ def process_data(cursor, filename):
     '''
     with open(filename, encoding='utf-8') as csvfile:
         csvreader = csv.DictReader(csvfile, fieldnames=CSV_FIELD_NAMES)
-        for rowid, row in enumerate(csvreader, start=1):
+        for rowid, rowdata in enumerate(csvreader, start=1):
             if rowid == 1:
                 continue
+            row = normalize_row(rowdata)
             if can_insert_lemma(row):
-                row['Russian'] = unicode_normalize(row['Russian'])
-                row['SecondRussian'] = unicode_normalize(row['SecondRussian'])
                 inserted_lemma = insert_lemma(cursor, row)
                 insert_aspect_counterpart(cursor, inserted_lemma, row)
                 insert_inflections(cursor, inserted_lemma, row)
@@ -162,6 +161,32 @@ def process_data(cursor, filename):
     insert_missing_inflections(cursor)
     cleanup_aspect_counterparts(cursor)
     insert_aspect_pairs(cursor)
+
+
+def normalize_row(rowdata):
+    '''
+    Normalizes the data from a single row of the spreadsheet.
+    '''
+    row = rowdata.copy()
+
+    ### Normalize unicode for the two Russian fields
+    row['Russian'] = unicode_normalize(row['Russian'])
+    row['SecondRussian'] = unicode_normalize(row['SecondRussian'])
+
+    ### Strip any extra whitespace that was introduced in the spreadsheet cells
+    for colname, colvalue in row.items():
+        row[colname] = colvalue.strip()
+
+    ### Convert semicolons to commas in specific fields
+    # Historical note: This is necessary because early versions of the spreadsheet 
+    # were imported into a graph databse (Neo4j) and unescaped commas would break 
+    # the import process. The team chose to substitute semicolons and this artifact
+    # has stuck around.
+    for colname in ('Russian', 'Strеssеd_Russiаn'):
+        row[colname] = row[colname].replace(';', ',')
+    row['Stress_Pattern_SEMU'] = ','.join([s.strip() for s in row['Stress_Pattern_SEMU'].split(';')])
+    
+    return row
 
 
 def insert_missing_inflections(cursor):
@@ -293,25 +318,25 @@ def can_insert_lemma(row):
 def insert_lemma(cursor, row):
     data = {
         'external_id':         row['UniqueId'],
-        'lemma':               row['Russian'].replace(';', ',').strip(),
-        'stressed':            row['Strеssеd_Russiаn'].replace(';', ',').strip(),
-        'translation':         row['English'].strip(),
-        'pos':                 row['POS'].strip(),
-        'pos_subtype':         row['POS_Subtype'].strip(),
-        'rank':                row['Rank'].strip(),
-        'count':               row['Count'].strip(),
-        'level':               row['Level'].strip(),
-        'gender':              row['Gender'].strip(),
-        'animacy':             row['Animacy'].strip(),
-        'stem':                row['stem'].strip(),
-        'ending':              row['ending'].strip(),
-        'domain':              row['Domain'].strip(),
-        'aspect':              row['Aspect'].strip(),
-        'transitivity':        row['Transitivity'].strip(),
-        'stress_pattern_semu': row['Stress_Pattern_SEMU'].strip(),
-        'prefixes':            row['Prefixes'].strip(),
-        'roots':               row['Roots'].strip(),
-        'suffixes':            row['Suffixes'].strip(),
+        'lemma':               row['Russian'],
+        'stressed':            row['Strеssеd_Russiаn'],
+        'translation':         row['English'],
+        'pos':                 row['POS'],
+        'pos_subtype':         row['POS_Subtype'],
+        'rank':                row['Rank'],
+        'count':               row['Count'],
+        'level':               row['Level'],
+        'gender':              row['Gender'],
+        'animacy':             row['Animacy'],
+        'stem':                row['stem'],
+        'ending':              row['ending'],
+        'domain':              row['Domain'],
+        'aspect':              row['Aspect'],
+        'transitivity':        row['Transitivity'],
+        'stress_pattern_semu': row['Stress_Pattern_SEMU'],
+        'prefixes':            row['Prefixes'],
+        'roots':               row['Roots'],
+        'suffixes':            row['Suffixes'],
     }
     items = data.items()
     fieldstr = ','.join(["'%s'" % k for k, v in items])
@@ -415,7 +440,7 @@ def get_cell_multi_forms(form, stressed=''):
 def has_second_russian(row):
     if row['POS'] in ('phrase', 'prefix', 'prep'):
         return True
-    if row['POS'] == 'conj' and 'mwe' in row['POS_Subtype']:
+    if 'mwe' in row['POS_Subtype']:
         return True
     return False
 

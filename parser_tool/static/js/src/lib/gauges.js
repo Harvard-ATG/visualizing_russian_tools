@@ -63,10 +63,10 @@
 
             // determine size based on parent element
             const parentElement = document.querySelector(vis._parentElement);
-            const width = Math.max(parentElement.clientWidth, 272);
-            const height = Math.max(parentElement.clientHeight, 272);
-            const radius = Math.min(width, height) / 2;
-            let fontSize = Math.max(Math.round(width / 16), 14);
+            const width = Math.max(Math.min(parentElement.clientWidth, 272), 136);
+            const height = Math.max(Math.min(parentElement.clientHeight, 272), 136);
+            const radius = width / 2;
+            let fontSize = Math.round(width / 16);
 
             // setup shape primitives and scales
             const pieGenerator = d3.pie()
