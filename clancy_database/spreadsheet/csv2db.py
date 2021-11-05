@@ -16,7 +16,7 @@ CSV_FIELD_NAMES = ['UniqueId', 'Russian', 'SecondRussian', 'POS', 'POS_Subtype',
 # Fields may contain commas to separate multiple forms.
 # For example, the "SecondRussian" field may contain three forms: "о, об, обо".
 # This defines a symbol that we can use to locate all instances where this is significant.
-COMMA = ','
+VALUE_SEPARATOR = ','
 
 # These values will be considered "empty" or "missing" if they occur in a cell.
 EMPTY_VALS = ('', '0', 'NA', '-', '—')
@@ -184,18 +184,11 @@ def normalize_row(rowdata):
     for colname, colvalue in row.items():
         row[colname] = colvalue.strip()
 
-    ### Strip whitespace around commas inside some specific cells
-    # General Note:
-    #       We don't strip whitespace around commas for all fields, because in some fields,
-    #       such as the "English" definition, this whitespace is significant.
-    # Historical Note: In previous versions of the spreadsheet, these fields
-    #       contained semicolons to separate multiple values within a cell. The only
-    #       reason they were semicolons was to avoid parsing issues with other systems
-    #       that handled CSV. In Oct 2021, these semicolons were replaced with commas.
-    for colname in ('Russian', 'Strеssеd_Russiаn', 'POS_Subtype', 'Stress_Pattern_SEMU'):
-        if COMMA in row[colname]:
-            row[colname] = COMMA.join([s.strip() for s in row[colname].split(COMMA)])
-    
+    ### Strip whitespace around commas inside specific cells
+    for colname in ('POS_Subtype', 'Stress_Pattern_SEMU'):
+        if VALUE_SEPARATOR in row[colname]:
+            row[colname] = VALUE_SEPARATOR.join([s.strip() for s in row[colname].split(VALUE_SEPARATOR)])
+
     return row
 
 
@@ -234,8 +227,8 @@ def insert_aspect_counterpart(cursor, inserted_lemma, row):
         return
 
     counterparts = [second_russian]
-    if COMMA in second_russian:
-        counterparts = [s for s in second_russian.split(COMMA) if s != lemma]
+    if VALUE_SEPARATOR in second_russian:
+        counterparts = [s.strip() for s in second_russian.split(VALUE_SEPARATOR) if s.strip() != lemma]
 
     sql = 'INSERT INTO aspect_counterpart (lemma_id, lemma_label, lemma_count, aspect, counterpart, counterpart_index) VALUES (?, ?, ?, ?, ?, ?)'
     inserts = []
@@ -445,9 +438,9 @@ def get_row_freq(row, colname):
 
 def get_cell_multi_forms(form, stressed=''):
     forms_with_stressed = []
-    if COMMA in form:
-        forms = [f for f in form.strip().split(COMMA) if f not in EMPTY_VALS]
-        stressed_forms = [s.strip() for s in stressed.strip().split(COMMA) if s and s not in EMPTY_VALS]
+    if VALUE_SEPARATOR in form:
+        forms = [f.strip() for f in form.strip().split(VALUE_SEPARATOR) if f.strip() not in EMPTY_VALS]
+        stressed_forms = [s.strip() for s in stressed.strip().split(VALUE_SEPARATOR) if s and s.strip() not in EMPTY_VALS]
         if len(stressed_forms) == len(forms):
             forms_with_stressed = list(zip(forms, stressed_forms))
         else:
