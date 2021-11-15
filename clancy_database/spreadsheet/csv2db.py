@@ -10,9 +10,16 @@ import unicodedata
 
 FILE_DIR = os.path.dirname(os.path.realpath(__file__))
 
+# List of CSV columns or field names that will be parsed
 CSV_FIELD_NAMES = ['UniqueId', 'Russian', 'SecondRussian', 'POS', 'POS_Subtype', 'Animacy', 'Level', 'English', 'Rank', 'Count', 'Chapter', 'AdjAdvProp', 'Collocations', 'Domain', 'DomainTags', 'Strеssеd_Russiаn', 'Transliteration', 'Prefixes', 'Roots', 'Suffixes', 'Length', 'Classes', 'Location_Type', 'Notes', 'Notes_declension', 'Notes_conjugation', 'Inflected', 'Indeclinable', 'Stem', 'Hard_Soft', 'Word_Type', 'Stress_Pattern_SEMU', 'Inflected_Forms', 'Inflected_Stressed_Forms', 'Constructicon', 'Reverse_inflection', 'myKnown', 'myNew', 'myTarget', 'Drawing_Image', 'Photo_Image', 'Related_Words', 'Synonyms', 'Antonyms', 'Hyponyms', 'Co.Hyponyms', 'Hyperonyms', 'Example1', 'Example2', 'Example3', 'Gender_Counterparts', 'NOMsg_stressed', 'ACCsg_stressed', 'GENsg_stressed', 'LOCsg_stressed', 'DATsg_stressed', 'INSTsg_stressed', 'INSTaltsg_stressed', 'NOMpl_stressed', 'ACCpl_stressed', 'GENpl_stressed', 'LOCpl_stressed', 'DATpl_stressed', 'INSTpl_stressed', 'GEN2sg_stressed', 'LOC2sg_stressed', 'VOCsg_stressed', 'GEN3sg_stressed', 'Gender', 'Details', 'Declension', 'NOMsg', 'ACCsg', 'GENsg', 'LOCsg', 'DATsg', 'INSTsg', 'INSTaltsg', 'NOMpl', 'ACCpl', 'GENpl', 'LOCpl', 'DATpl', 'INSTpl', 'GEN2sg', 'LOC2sg', 'VOCsg', 'GEN3sg', 'Freq_NOMsg', 'Freq_ACCsg', 'Freq_GENsg', 'Freq_LOCsg', 'Freq_DATsg', 'Freq_INSTsg', 'Freq_INSTaltsg', 'Freq_NOMpl', 'Freq_ACCpl', 'Freq_GENpl', 'Freq_LOCpl', 'Freq_DATpl', 'Freq_INSTpl', 'Freq_GEN2sg', 'Freq_LOC2sg', 'Freq_VOCsg', 'Freq_GEN3sg', 'Infinitive_stressed', 'sg1_stressed', 'sg2_stressed', 'sg3_stressed', 'pl1_stressed', 'pl2_stressed', 'pl3_stressed', 'Mpast_stressed', 'Fpast_stressed', 'Npast_stressed', 'Ppast_stressed', 'Imper_sg_stressed', 'Imper_pl_stressed', 'future_stressed', 'PrAP_stressed', 'PrAP_forms_stressed', 'PAP_stressed', 'PAP_forms_stressed', 'PrPP_stressed', 'PrPP_forms_stressed', 'PPP_stressed', 'PPP_forms_stressed', 'VbAdv1_stressed', 'VbAdv2_stressed', 'Aspect', 'Transitivity', 'Impersonal', 'Reflexive', 'Verb_Details', 'Aspectual_Grouping', 'Aspectual_Counterpart', 'Infinitive', 'sg1', 'sg2', 'sg3', 'pl1', 'pl2', 'pl3', 'Mpast', 'Fpast', 'Npast', 'Ppast', 'Imper_sg', 'Imper_pl', 'future', 'PrAP', 'PrAP_forms', 'PAP', 'PAP_forms', 'PrPP', 'PrPP_forms', 'PPP', 'PPP_forms', 'VbAdv1', 'VbAdv2', 'Freq_Infinitive', 'Freq_sg1', 'Freq_sg2', 'Freq_sg3', 'Freq_pl1', 'Freq_pl2', 'Freq_pl3', 'Freq_Mpast', 'Freq_Fpast', 'Freq_Npast', 'Freq_Ppast', 'Freq_Imper_sg', 'Freq_Imper_pl', 'Freq_PrAP', 'Freq_PAP', 'Freq_PrPP', 'Freq_PPP', 'Freq_VbAdv1', 'Freq_VbAdv2', 'Lemma_Total', 'Forms_Total', 'Prop_Infinitive', 'Prop_sg1', 'Prop_sg2', 'Prop_sg3', 'Prop_pl1', 'Prop_pl2', 'Prop_pl3', 'Prop_Mpast', 'Prop_Fpast', 'Prop_Npast', 'Prop_Ppast', 'Prop_Imper_sg', 'Prop_Imper_pl', 'Prop_PrAP', 'Prop_PAP', 'Prop_PrPP', 'Prop_PPP', 'Prop_VbAdv1', 'Prop_VbAdv2', 'Prop_Check', 'mNOMsg_stressed', 'mACCsgAN_stressed', 'mACCsgIN_stressed', 'mGENsg_stressed', 'mLOCsg_stressed', 'mDATsg_stressed', 'mINSTsg_stressed', 'nNOMsg_stressed', 'nACCsg_stressed', 'nGENsg_stressed', 'nLOCsg_stressed', 'nDATsg_stressed', 'nINSTsg_stressed', 'fNOMsg_stressed', 'fACCsg_stressed', 'fGENsg_stressed', 'fLOCsg_stressed', 'fDATsg_stressed', 'fINSTsg_stressed', 'fINSTaltsg_stressed', 'plNOMpl_stressed', 'plACCplAN_stressed', 'plACCplIN_stressed', 'plGENpl_stressed', 'plLOCpl_stressed', 'plDATpl_stressed', 'plINSTpl_stressed', 'mshort_stressed', 'nshort_stressed', 'fshort_stressed', 'plshort_stressed', 'comparative_stressed', 'extracomparatives_stressed', 'stem', 'ending', 'mNOMsg', 'mACCsgAN', 'mACCsgIN', 'mGENsg', 'mLOCsg', 'mDATsg', 'mINSTsg', 'nNOMsg', 'nACCsg', 'nGENsg', 'nLOCsg', 'nDATsg', 'nINSTsg', 'fNOMsg', 'fACCsg', 'fGENsg', 'fLOCsg', 'fDATsg', 'fINSTsg', 'fINSTaltsg', 'plNOMpl', 'plACCplAN', 'plACCplIN', 'plGENpl', 'plLOCpl', 'plDATpl', 'plINSTpl', 'mshort', 'nshort', 'fshort', 'plshort', 'comparative', 'extracomparatives', 'mNOMsgFreq', 'mACCsgANFreq', 'mACCsgINFreq', 'mGENsgFreq', 'mLOCsgFreq', 'mDATsgFreq', 'mINSTsgFreq', 'nNOMsgFreq', 'nACCsgFreq', 'nGENsgFreq', 'nLOCsgFreq', 'nDATsgFreq', 'nINSTsgFreq', 'fNOMsgFreq', 'fACCsgFreq', 'fGENsgFreq', 'fLOCsgFreq', 'fDATsgFreq', 'fINSTsgFreq', 'fINSTaltsgFreq', 'plNOMplFreq', 'plACCplANFreq', 'plACCplINFreq', 'plGENplFreq', 'plLOCplFreq', 'plDATplFreq', 'plINSTplFreq', 'mshortFreq', 'nshortFreq', 'fshortFreq', 'plshortFreq', 'comparativeFreq', 'extracomparativesFreq', 'FinalColumn']
 
-EMPTY_VALS = ('', 'NA', '-', '—')
+# Fields may contain commas to separate multiple forms.
+# For example, the "SecondRussian" field may contain three forms: "о, об, обо".
+# This defines a symbol that we can use to locate all instances where this is significant.
+VALUE_SEPARATOR = ','
+
+# These values will be considered "empty" or "missing" if they occur in a cell.
+EMPTY_VALS = ('', '0', 'NA', '-', '—')
 
 POS = {
     'inflected': {
@@ -138,7 +145,7 @@ VERB_CONJUGATIONS = [
 def create_schema(cursor):
     with open(os.path.join(FILE_DIR, 'schema.sql'), 'r', encoding='utf-8') as f:
         schema = f.read()
-        cursor.execute("PRAGMA foreign_keys = ON;")
+        cursor.execute("PRAGMA foreign_keys = ON")
         cursor.executescript(schema)
 
 
@@ -169,7 +176,7 @@ def normalize_row(rowdata):
     '''
     row = rowdata.copy()
 
-    ### Normalize unicode for the two Russian fields
+    ### Normalize unicode for the primary and secondary Russian fields
     row['Russian'] = unicode_normalize(row['Russian'])
     row['SecondRussian'] = unicode_normalize(row['SecondRussian'])
 
@@ -177,15 +184,11 @@ def normalize_row(rowdata):
     for colname, colvalue in row.items():
         row[colname] = colvalue.strip()
 
-    ### Convert semicolons to commas in specific fields
-    # Historical note: This is necessary because early versions of the spreadsheet 
-    # were imported into a graph databse (Neo4j) and unescaped commas would break 
-    # the import process. The team chose to substitute semicolons and this artifact
-    # has stuck around.
-    for colname in ('Russian', 'Strеssеd_Russiаn'):
-        row[colname] = row[colname].replace(';', ',')
-    row['Stress_Pattern_SEMU'] = ','.join([s.strip() for s in row['Stress_Pattern_SEMU'].split(';')])
-    
+    ### Strip whitespace around commas inside specific cells
+    for colname in ('POS_Subtype', 'Stress_Pattern_SEMU'):
+        if VALUE_SEPARATOR in row[colname]:
+            row[colname] = VALUE_SEPARATOR.join([s.strip() for s in row[colname].split(VALUE_SEPARATOR)])
+
     return row
 
 
@@ -218,14 +221,14 @@ def insert_aspect_counterpart(cursor, inserted_lemma, row):
     if not aspect:
         return
 
-    second_russian = row['SecondRussian'].strip()
-    if second_russian == lemma or second_russian in ("", "0"):
+    second_russian = row['SecondRussian']
+    if second_russian == lemma or second_russian in EMPTY_VALS:
         logging.debug(f"Verb {lemma} has no aspect counterpart. SecondRussian field is: {second_russian}")
         return
 
     counterparts = [second_russian]
-    if ';' in second_russian:
-        counterparts = [s.strip() for s in second_russian.split(";") if s.strip() != lemma]
+    if VALUE_SEPARATOR in second_russian:
+        counterparts = [s.strip() for s in second_russian.split(VALUE_SEPARATOR) if s.strip() != lemma]
 
     sql = 'INSERT INTO aspect_counterpart (lemma_id, lemma_label, lemma_count, aspect, counterpart, counterpart_index) VALUES (?, ?, ?, ?, ?, ?)'
     inserts = []
@@ -245,7 +248,7 @@ def cleanup_aspect_counterparts(cursor):
     '''
     Ensures that every counterpart entry in the aspect_counterpart table actually exists in the lemma table.
     '''
-    sql = 'DELETE FROM aspect_counterpart WHERE NOT EXISTS (SELECT 1 FROM lemma WHERE aspect_counterpart.counterpart = lemma.lemma);'
+    sql = 'DELETE FROM aspect_counterpart WHERE NOT EXISTS (SELECT 1 FROM lemma WHERE aspect_counterpart.counterpart = lemma.lemma)'
     cursor.execute(sql)
 
 
@@ -308,9 +311,17 @@ def insert_aspect_pairs(cursor):
 
 
 def can_insert_lemma(row):
-    # Skip 6O lemmas since these should be omitted
-    # as they don't fit in the schema right now (includes some MWEs, etc)
-    if row['Level'].strip() == "6O":
+    '''
+    Returns true if the row contains a valid lemma that should be added to the DB.
+    Notes:
+        - A row MUST have a "UniqueId" defined in order for it to be inserted.
+        - It also must have a "Level" that isn't omitted. The only level omitted
+          currently is "6O", since Steven Clancy uses this to mark items that
+          don't fit into the schema right now (includes some MWEs, for example).
+    '''
+    if not row['UniqueId']:
+        return False
+    if row['Level'] == "6O":
         return False
     return True
 
@@ -385,15 +396,22 @@ def insert_mwes(cursor, inserted_lemma, row):
     """
     Inserts MWEs or sequences of 2 or more words that should be treated
     as a single unit of meaning.
+
+    This will insert any values that occur with a part-of-speech subtype that starts with "mwe".
+    There are several possibilities, such as:
+        - mwe
+        - mwe, conditional
+        - mwe, proper,
+        - mwe, temporal
     """
+    if not row['POS_Subtype'].startswith('mwe'):
+        return
+
     lemma_pk = inserted_lemma['id']
     sql = 'INSERT INTO mwe (text, cardinality, lemma_id) VALUES (?, ?, ?)'
-    if 'mwe' not in row['POS_Subtype']:
-        return
 
     inserts = []
     for text in (row['Russian'], row['SecondRussian']):
-        text = text.replace(';', ',')
         words = [w for w in re.split(r'[ ,.]', text) if w != ""]
         cardinality = len(words)
         if cardinality >= 2:
@@ -420,9 +438,9 @@ def get_row_freq(row, colname):
 
 def get_cell_multi_forms(form, stressed=''):
     forms_with_stressed = []
-    if ';' in form:
-        forms = [f for f in form.strip().split(';') if f not in EMPTY_VALS]
-        stressed_forms = [s.strip() for s in stressed.strip().split(';') if s and s not in EMPTY_VALS]
+    if VALUE_SEPARATOR in form:
+        forms = [f.strip() for f in form.strip().split(VALUE_SEPARATOR) if f.strip() not in EMPTY_VALS]
+        stressed_forms = [s.strip() for s in stressed.strip().split(VALUE_SEPARATOR) if s and s.strip() not in EMPTY_VALS]
         if len(stressed_forms) == len(forms):
             forms_with_stressed = list(zip(forms, stressed_forms))
         else:
@@ -450,7 +468,7 @@ def handle_inflected_forms(pk, row):
     uniq = {}
     for declension in DECLENSIONS:
         colname, inflection_type = declension
-        form = row[colname].strip()
+        form = row[colname]
         if form in EMPTY_VALS:
             form = ''
         stressed = row.get('%s_stressed' % colname, '')
@@ -472,7 +490,7 @@ def handle_noninflected_forms(pk, row):
     inserts = []
     uniq = {}
     inflection_type = noninflected[row['POS']]
-    form = row['Russian'].strip()
+    form = row['Russian']
     if form in EMPTY_VALS:
         form = ''
     stressed = row['Strеssеd_Russiаn']
@@ -494,7 +512,7 @@ def handle_verb_forms(pk, row):
     uniq = {}
     for conjugation in VERB_CONJUGATIONS:
         colname, inflection_type = conjugation
-        form = row[colname].strip()
+        form = row[colname]
         if form in EMPTY_VALS:
             form = ''
         frequency = get_row_freq(row, colname)
@@ -510,7 +528,7 @@ def handle_verb_forms(pk, row):
 def handle_lemma_forms(pk, row):
     inserts = []
     colname = POS['inflected'].get(row['POS']) or POS['noninflected'].get(row['POS']) or ''
-    forms_with_stressed = get_cell_multi_forms(row['Russian'].strip(), row['Strеssеd_Russiаn'].strip())
+    forms_with_stressed = get_cell_multi_forms(row['Russian'], row['Strеssеd_Russiаn'])
     for form, stressed in forms_with_stressed:
         inserts.append([pk, form.strip(), stressed, colname, None])
     return inserts
