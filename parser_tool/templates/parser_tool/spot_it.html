@@ -1,0 +1,61 @@
+{% extends "site_base.html" %}
+{% load static %}
+
+{% block head_title %}Similarity Tool{% endblock %}
+{% block body_id %}similarity{% endblock %}
+{% block body_class %}{% endblock %}
+
+{% block extra_style %}
+{{ block.super }}
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
+<style>
+   .card {
+		border: 1px solid #ddd;
+		border-radius: 100%;
+		max-width: 450px;
+		max-height: 350px;
+		text-align: center;
+    }
+    .custom-button , .custom-button:focus {
+        outline: none;
+        background: transparent;
+        border: 1px solid transparent;
+    }
+    .custom-button:active    {
+        outline: none;
+        background: transparent;
+        border: 1px solid transparent;
+    }
+</style>
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/src/spot_it.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+<a name="top"></a>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+</div>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div class="form-group">
+            <button type="button" class="formbtn btn btn-primary mt-2 mb-2" id="7-cards">
+                Generate 4 images, total 13 cards
+            </button>
+            <div id="p1Score">Player 1 Score: 0</div>
+            <div id="p2Score">Player 2 Score: 0</div>
+        </div>
+        <div id="central-card">Placeholder central card</div>
+        <div class="d-flex justify-content-between">
+            <div id="p1">Player 1 placeholder</div>
+            <div id="p2">Player 2 placeholder</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
