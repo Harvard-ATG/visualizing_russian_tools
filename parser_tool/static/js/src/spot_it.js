@@ -7,31 +7,28 @@
 	 **/
 	const generateDeckFromPrimeNum = (n) => {
 		let i, j, k;
-		let r = 1;
 		let deck = [];
 		let c = [];
 		// for first card containing n+1 symbols
-		for (i = 1; i <= n + 1; i++) {
+		for (i = 0; i <= n; i++) {
 			c.push(i);
 		}
 		deck.push(c);
 		// for generating cards up to n
-		for (j = 1; j <= n; j++) {
-			r = r + 1;
-			c = [1];
-			for (k = 1; k <= n; k++) {
-				c.push(n + n * (j - 1) + k + 1);
+		for (j = 0; j < n; j++) {
+			c = [0];
+			for (k = 0; k < n; k++) {
+				c.push(n+1 + n*j + k);
 			}
 			deck.push(c);
 		}
 
 		//  for generating  n * n cards
-		for (i = 1; i <= n; i++) {
-			for (j = 1; j <= n; j++) {
-				r = r + 1;
+		for (i = 0; i < n; i++) {
+			for (j = 0; j < n; j++) {
 				c = [i + 1];
-				for (k = 1; k <= n; k++) {
-					c.push(n + 2 + n * (k - 1) + (((i - 1) * (k - 1) + j - 1) % n));
+				for (k = 0; k < n; k++) {
+					c.push((n + 1 + n * k + (i*k+j)% n));
 				}
 				deck.push(c);
 			}
@@ -52,15 +49,19 @@
 		return cloneA;
 	};
 
-	const generateImageElement = (card, parent, index) => {
+	const generateImageElement = (card, parent, cardIndex, data) => {
 		let imgs = "";
 		for (let q = 0; q < card.length; q++) {
+			let idx = card[q]
+			let { id } = data[idx]
+			// TODO replace id with image
 			imgs += `<button class="custom-button" >
-                        <img id="${card[q]}" value="${card[q]}" data-index="${index}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card[q]}.png />
+                        <img id="${idx}" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png />
                     </button>`;
 		}
 		return imgs;
 	};
+
 	$(document).ready(async function () {
 		console.log("ready!");
 		const state = {
@@ -75,46 +76,60 @@
 		let card1 = []
 		let card2 = []
 		let centralCard = []
+		let deckElementP2 = "";
+		let primeNum = null;
+		state.p1Score = 0;
+		state.p2Score = 0;
+		const data = JSON.parse(document.getElementById('data').textContent);
+		// static numbers to validate against data length
+		// TODO make more dynamic
+		const maxNumReqImages = [
+			{"primeNum":1, "maxImages": 3}
+			,{"primeNum":2, "maxImages": 7}
+			,{"primeNum":3, "maxImages": 13}
+			,{"primeNum":5, "maxImages": 31}
+			,{"primeNum":7, "maxImages": 57}
+		]
 
-		$(document).on('click', '#7-cards', function () {
-			let deckElementP2 = "";
-			deck = shuffle(generateDeckFromPrimeNum(3));
-			// console.log({ deck })
-			state.p1Score = 0;
-			state.p2Score = 0;
-			
-			centralCard = deck[0];
-			card1 = deck[1];
-			card2 = deck[2];
+		// TODO make error page redirect if number images are less than maxImages
+		maxNumReqImages.forEach(ele => {
+			if(data.length=== ele.maxImages){
+				primeNum = ele.primeNum
+			}
+		})
+		deck = shuffle(generateDeckFromPrimeNum(primeNum));
+		
+		centralCard = deck[0];
+		card1 = deck[1];
+		card2 = deck[2];
 
-			let imgsCentral = `
-				<div class="d-flex justify-content-center" id="central-card">
-					<div class="card flex-row"> ${generateImageElement(centralCard, "central", 0)} </div>
-				</div>`;
-			let imgsP1 = generateImageElement(card1, "p1", 1);
-			let cardElement = `<div class="card flex-row"> ${imgsP1} </div>`;
-			let deckElementP1 = `<div id="p1">${cardElement}</div>`;
+		let imgsCentral = `
+			<div class="d-flex justify-content-center" id="central-card">
+				<div class="card flex-row"> ${generateImageElement(centralCard, "central", 0, data)} </div>
+			</div>`;
+		let imgsP1 = generateImageElement(card1, "p1", 1, data);
+		let cardElement = `<div class="card flex-row"> ${imgsP1} </div>`;
+		let deckElementP1 = `<div id="p1">${cardElement}</div>`;
 
-			let imgsP2 = generateImageElement(card2, "p2", 2);
-			deckElementP2 = `<div id="p2"><div class="card flex-row"> ${imgsP2} </div></div>`;
-
-
-			$("#central-card").replaceWith(imgsCentral);
-			$("#p1").replaceWith(deckElementP1);
-			$("#p2").replaceWith(deckElementP2);
-			$("#7-cards").hide()
-			// TODO add real next card button and reset button
-			// $("#7-cards").replaceWith('<button type="button" class="formbtn btn btn-primary mt-2 mb-2" id="7-cards"> Next Card </button>')
-
-		});
+		let imgsP2 = generateImageElement(card2, "p2", 2, data);
+		deckElementP2 = `<div id="p2"><div class="card flex-row"> ${imgsP2} </div></div>`;
 
 
+		$("#central-card").replaceWith(imgsCentral);
+		$("#p1").replaceWith(deckElementP1);
+		$("#p2").replaceWith(deckElementP2);
+		$("#p1Score").replaceWith('<div id="p1Score">Player 1 Score: 0</div>')
+		$("#p2Score").replaceWith('<div id="p2Score">Player 2 Score: 0</div>')
+
+
+		// Event trigger for creating deck and starting game
 		$(document).on("click", "button.custom-button", function (event) {
+			event.preventDefault();
 			const value = $(event.target).attr("value");
 			const parentValue = $(event.target).attr("data-parent");
 			const index = $(event.target).attr("data-index");
 			// TODO COMPARISON AND UPDATE SCORE
-
+			
 			switch (parentValue) {
 				case "p2":
 					currSelected.value = value;
@@ -143,13 +158,13 @@
 					deck.splice(currSelected.centralIndex, 1, '');
 					deck.splice(currSelected.index, 1, '')
 					deck = deck.filter(e => e !== '')
-					console.log("correct match", { deck })
+
 					// todo winner screen
 					if (deck.length <= 1) {
-						$("#7-cards").replaceWith('<button type="button" class="formbtn btn btn-primary mt-2 mb-2" id="7-cards"> New Game </button>')
+						$("#13-cards").replaceWith('<button type="button" class="formbtn btn btn-primary mt-2 mb-2" id="7-cards"> New Game </button>')
 						$("#central-card").replaceWith('<div id="central-card" />');
 						$("#p2").hide();
-						(state.p1Score > state.p2Score) ? $("#p1").replaceWith("<div> Winner! Player 1 </div") : $("#p1").replaceWith("<div>Winner! Player 2</div")
+						(state.p1Score > state.p2Score) ? $("#p1").replaceWith("<div id='p1'> Winner! Player 1 </div") : $("#p1").replaceWith("<div id='p1'>Winner! Player 2</div")
 						return
 					}
 					// replace cards
@@ -159,13 +174,13 @@
 						centralCard = deck[1]
 						let imgsCentral = `
 							<div class="d-flex justify-content-center" id="central-card">
-								<div class="card flex-row"> ${generateImageElement(centralCard, "central", 1)} </div>
+								<div class="card flex-row"> ${generateImageElement(centralCard, "central", 1, data)} </div>
 							</div>`;
-						let imgsP1 = generateImageElement(card1, "p1", 2);
+						let imgsP1 = generateImageElement(card1, "p1", 2, data);
 						let cardElement = `<div class="card flex-row"> ${imgsP1} </div>`;
 						let deckElementP1 = `<div id="p1">${cardElement}</div>`;
 
-						let imgsP2 = generateImageElement(card2, "p2", 0);
+						let imgsP2 = generateImageElement(card2, "p2", 0, data);
 						let deckElementP2 = `<div id="p2"><div class="card flex-row"> ${imgsP2} </div></div>`;
 						$("#central-card").replaceWith(imgsCentral);
 						$("#p1").replaceWith(deckElementP1);
@@ -178,13 +193,13 @@
 						centralCard = deck[1]
 						let imgsCentral = `
 							<div class="d-flex justify-content-center" id="central-card">
-								<div class="card flex-row"> ${generateImageElement(centralCard, "central", 1)} </div>
+								<div class="card flex-row"> ${generateImageElement(centralCard, "central", 1, data)} </div>
 							</div>`;
-						let imgsP1 = generateImageElement(card1, "p1", 0);
+						let imgsP1 = generateImageElement(card1, "p1", 0, data);
 						let cardElement = `<div class="card flex-row"> ${imgsP1} </div>`;
 						let deckElementP1 = `<div id="p1">${cardElement}</div>`;
 
-						let imgsP2 = generateImageElement(card2, "p2", 2);
+						let imgsP2 = generateImageElement(card2, "p2", 2, data);
 						let deckElementP2 = `<div id="p2"><div class="card flex-row"> ${imgsP2} </div></div>`;
 						$("#central-card").replaceWith(imgsCentral);
 						$("#p1").replaceWith(deckElementP1);
