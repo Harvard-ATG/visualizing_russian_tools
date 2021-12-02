@@ -30,3 +30,6 @@ def verb_radar_chart(request):
 
 def similarity(request):
     return render(request, 'parser_tool/similarity.html')
+
+def verb_histograms(request):
+    return render(request, 'parser_tool/verb_histograms.html')
