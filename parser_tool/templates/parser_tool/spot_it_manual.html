@@ -45,7 +45,8 @@
         display: flex;
         overflow: hidden;
         flex-wrap: wrap;
-        border: 1px solid #ddd; 
+        border: 1px solid #ddd;
+        align-content: center;
     }
     .custom-button {
         width: 199px;
@@ -73,47 +74,20 @@
 
 
 {% block content %}
-{% comment %} <div class="simon-container">
-    <div class="simon">
-      <button id="green" class="panel 1" type="button" disabled>1</button>
-      <button id="red" class="panel 2" type="button" disabled>2</button>
-      <button id="blue" class="panel 3" type="button" disabled>3</button>
-      <button id="yellow" class="panel 4" type="button" disabled>4</button>
-    </div>
-  </div> {% endcomment %}
 <a name="top"></a>
 <div class="row" style="background-color: #f7f7f7">
-    {% comment %} <div class="circle">
-        <button class="test-custom-button">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" />
-        </button>
-        <button  class="test-custom-button">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png" />
-        </button>
-        <button class="test-custom-button">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png" />
-        </button>
-        <button class="test-custom-button">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" />
-        </button>
-        <button class="test-custom-button">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png" />
-        </button>
-    </div> {% endcomment %}
     <div class="col-md-10">
-        <div class="form-group">
-            <div id="p1Score">Player 1 Score: 0</div>
-            <div id="p2Score">Player 2 Score: 0</div>
-        </div>
         <div id="central-card"class="mr-4 mb-5">Placeholder central card</div>
         <div class="d-flex justify-content-between">
             <div class="flex-row  mr-4">
                 <label for="p1" class="d-block text-center font-weight-bold">PLAYER 1</label><br>
                 <div id="p1">Player 1 placeholder</div>
+                <button class="next-button" data-parent="p1">Player 1 Claim</button>
             </div>
             <div class="flex-row">
                 <label for="p2" class="d-block text-center font-weight-bold">PLAYER 2</label><br>
                 <div id="p2">Player 2 placeholder</div>
+                <button class="next-button" data-parent="p2">Player 2 Claim</button>
             </div>
         </div>
     </div>

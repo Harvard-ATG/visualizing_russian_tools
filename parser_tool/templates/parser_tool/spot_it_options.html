@@ -17,7 +17,7 @@
 		max-height: 450px;
 		text-align: center;
     } {% endcomment %}
-    .custom-button , .custom-button:focus {
+    .custom-button, .custom-button:focus {
         {% comment %} outline: none;                                                                           {% endcomment %}
         background: transparent;
         border: 1px solid transparent;
@@ -26,6 +26,9 @@
         {% comment %} outline: none; {% endcomment %}
         background: transparent;
         border: 1px solid transparent;
+    }
+    .custom-radio ul {
+        list-style-type: none;
     }
 </style>
 {% endblock %}
@@ -55,10 +58,14 @@
         <input type="file" id="file" name="file" accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
         <input type="button" class="button" value="Upload" id="upload" />
     </form> {% endcomment %}
-    <form method="post" enctype="multipart/form-data">
+    {% comment %} <form method="post" enctype="multipart/form-data"> {% endcomment %}
+    <form method="post">
         {% csrf_token %}
         {% comment %} using txt files for now, blocked on using docx - django reads them differently {% endcomment %}
-            <input type="file" name="upload" accept=".txt">
+            {% comment %} <input type="file" name="upload" accept=".txt"> {% endcomment %}
+            <div class="custom-radio">
+                {{ form }}
+            </div>
             <br>
             <button class="btn btn-dark my-4" type="submit">Submit</button>
     </form>
