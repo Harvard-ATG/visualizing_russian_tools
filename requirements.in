@@ -1,5 +1,6 @@
 django==3.2.7
 requests==2.26.0
+requests_oauthlib
 django-dotenv==1.4.2
 sentry-sdk==1.4.1
 lxml==4.6.3
@@ -11,3 +12,4 @@ pygtrie==2.4.2
 navec==0.10.0
 annoy==1.17.0
 openpyxl==3.0.9
+pip-tools
