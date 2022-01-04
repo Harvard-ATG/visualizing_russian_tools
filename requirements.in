@@ -1,4 +1,4 @@
-django==3.2.7
+django==3.2.10
 requests==2.26.0
 requests_oauthlib
 django-dotenv==1.4.2
