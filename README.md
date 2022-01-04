@@ -77,3 +77,32 @@ To update the coverage badge:
 $ coverage run --source='.' manage.py test
 $ coverage-badge -f -o coverage.svg
 ```
+
+## Fetching icons from the Noun Project
+
+You can fetch icons from the Noun Project for the "dobble" game in the following way:
+
+### Requirements:
+
+- Get a Noun Project API key and secret. Those can be obtained at [https://thenounproject.com/developers/](https://thenounproject.com/developers/).
+- Set the key and secret in the corresponding `NOUN_PROJECT_API_KEY` and `NOUN_PROJECT_API_SECRET` environment variables
+- Steven Clancy's master spreadsheet in CSV format
+
+### Running the script
+
+To successfully run the command, you need to pass the following arguments:
+
+- `--input_file` (the master spreadsheet as a csv)
+- `--output_file` (the name of the file that the command should write to)
+- `--level` (the Clancy classification for word level)
+
+Example:
+
+```sh
+(env)$ ./manage.py fetch_noun_icons --input_file=TheFile.csv --output_file=1E_noun_icons.csv --level=1E 
+```
+
+#### Notes
+
+- The file write has `w+` permissions, meaning it will truncate a file if it already exists. Try not to lose any important work!
+- The Noun Project's free tier is 5,000 requests per month. You can run out of that quickly
