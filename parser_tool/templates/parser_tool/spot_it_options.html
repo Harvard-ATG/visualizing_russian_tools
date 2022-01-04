@@ -63,8 +63,15 @@
         {% csrf_token %}
         {% comment %} using txt files for now, blocked on using docx - django reads them differently {% endcomment %}
             {% comment %} <input type="file" name="upload" accept=".txt"> {% endcomment %}
-            <div class="custom-radio">
-                {{ form }}
+            <div class="custom-radio d-flex flex-column">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <div class="alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                    {{ field.label_tag }} {{ field }}
+                {% endfor %}
             </div>
             <br>
             <button class="btn btn-dark my-4" type="submit">Submit</button>

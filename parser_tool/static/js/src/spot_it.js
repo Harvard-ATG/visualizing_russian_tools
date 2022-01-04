@@ -57,13 +57,13 @@
       // TODO replace id with image
       if (pos) {
         let [right, top] = pos[q];
-        // random size for images
         let size = generateRand(80, 160);
+        //TODO make random size fit on card without overlapping
         imgs += `<button class="test-custom-button" style="position:relative; right:${right}px; top: ${top}px; transform:rotate(${generateRand(
           0,
           360
         )}deg)" >
-							<img id="${idx}" style="width:${size}px;height:${size}px" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png />
+							<img id="${idx}" style="min-width:${size}px;min-height:${size}px" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png />
 						</button>`;
       } else {
         imgs += `<button class="test-custom-button" >
@@ -112,7 +112,7 @@
     const data = JSON.parse(document.getElementById("data").textContent);
     // static numbers to validate against data length
     // image/button element position:[right,top]
-    // TODO make more dynamic
+    // TODO make more dynamic - using static positions for images so they do not overlap
     const maxNumReqImages = [
       { primeNum: 1, maxImages: 3 },
       { primeNum: 2, maxImages: 7 },
@@ -213,10 +213,10 @@
       const parentValue = $(event.target).attr("data-parent");
       const index = $(event.target).attr("data-index");
       const idx = $(event.target).attr("id");
-      var p = $(`#${idx}`).first();
-      var position = p.position();
-      console.log({ position });
-      console.log({ idx });
+      // var p = $(`#${idx}`).first();
+      // var position = p.position();
+      // console.log({ position });
+      // console.log({ idx });
       // TODO COMPARISON AND UPDATE SCORE
 
       switch (parentValue) {
@@ -362,7 +362,7 @@
       event.preventDefault();
       const parentValue = $(event.target).attr("data-parent");
 
-      // TODO COMPARISON AND UPDATE SCORE
+      // TODO COMPARISON, UPDATE SCORE, END OF GAME SCREEN, RESTART GAME
       if (parentValue === "p1") {
         deck.splice(state.centralCard.index, 1, "");
         deck.splice(state.card1.index, 1, "");

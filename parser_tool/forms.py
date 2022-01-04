@@ -1,7 +1,48 @@
+from clancy_database import models
 from django import forms
+from django.core.exceptions import ValidationError
+from utils import list_diff
 
-CHOICES=[('Enable scores','enable'),
-         ('Disable scores','disable')]
-class wordForm(forms.Form):
-    words = forms.CharField(widget=forms.Textarea, label='Enter each word on a new line')
-    like = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect, label='Score Keeper')
+
+# CHOICES=[('Enable scores','enable'),
+#          ('Disable scores','disable')]
+# MAX_WORDS = [('3', 3), ('7', 7), ('13', 13), ('31', 31), ('57', 57)]
+
+class WordListField(forms.Field):
+    default_error_messages = {
+        'invalid': 'The number of words must be at least {min_words} (it has {actual_words}). {missing_words}',
+    }
+
+    def __init__(self, *, min_words=57, **kwargs):
+        """Override constructor to configure the minimum number of words required."""
+        self.min_words = min_words
+        super().__init__(**kwargs)
+
+    def to_python(self, value):
+        """Normalize data to a list of strings."""
+        if not value:
+            return []
+
+        return [s.strip() for s in value.split("\n") if s !='']
+
+    def validate(self, value):
+        """Check if value contains MIN words."""
+        super().validate(value)
+        # Check if words in the database
+        value = [w for w in value if w != '']
+        qs_lemmas = models.Lemma.objects.filter(lemma__in=value).distinct().values_list('lemma', flat=True)
+        print("WordListField validate: ", qs_lemmas, len(qs_lemmas))
+        actual_words = len(qs_lemmas)
+        if actual_words < self.min_words:
+            not_found_words = list_diff(list(qs_lemmas), value)
+            invalid_message = self.error_messages['invalid'].format(
+                    min_words=self.min_words, 
+                    actual_words=actual_words,
+                    missing_words="Missing words: " + ', '.join(not_found_words) if not_found_words else ""
+                    )
+            raise ValidationError(invalid_message, code='invalid')
+        
+class WordListForm(forms.Form):
+    # number_of_words = forms.CharField(label='How many words would you like to use?', widget=forms.Select(choices=MAX_WORDS))
+    words = WordListField(widget=forms.Textarea, label='Enter each word on a new line (minimum 57 words)')
+    # radio = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect, label='Score Keeper')

@@ -60,6 +60,15 @@
         background: transparent;
         border: 1px solid transparent;
     }
+    .next-button {
+        margin-top: 20px;
+        margin-left: 140px;
+    }
+
+    .player-label {
+        font-size: 30px;
+        font-style: italic;
+    }
       
 
 </style>
@@ -76,16 +85,16 @@
 {% block content %}
 <a name="top"></a>
 <div class="row" style="background-color: #f7f7f7">
-    <div class="col-md-10">
+    <div class="col-md-10 mt-5">
         <div id="central-card"class="mr-4 mb-5">Placeholder central card</div>
         <div class="d-flex justify-content-between">
             <div class="flex-row  mr-4">
-                <label for="p1" class="d-block text-center font-weight-bold">PLAYER 1</label><br>
+                <label for="p1" class="player-label d-block text-center font-weight-bold ">PLAYER 1</label><br>
                 <div id="p1">Player 1 placeholder</div>
                 <button class="next-button" data-parent="p1">Player 1 Claim</button>
             </div>
             <div class="flex-row">
-                <label for="p2" class="d-block text-center font-weight-bold">PLAYER 2</label><br>
+                <label for="p2" class="player-label d-block text-center font-weight-bold">PLAYER 2</label><br>
                 <div id="p2">Player 2 placeholder</div>
                 <button class="next-button" data-parent="p2">Player 2 Claim</button>
             </div>
