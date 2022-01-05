@@ -64,3 +64,6 @@ def spot_it_options(request):
     # return render(request, 'parser_tool/spot_it.html', {"data":dumps(dict_lemmas)})
     form = WordListForm()
     return render(request, 'parser_tool/spot_it_options.html', {'form':form})
+
+def verb_histograms(request):
+    return render(request, 'parser_tool/verb_histograms.html')

@@ -25,6 +25,7 @@ urlpatterns = [
     path('similarity', parser_tool.views.similarity,  name='similarity'),
     path('spot-it', parser_tool.views.spot_it,  name='spot_it'),
     path('spot-it-options', parser_tool.views.spot_it_options,  name='spot_it_options'),
+    path('verb_histograms', parser_tool.views.verb_histograms,  name='verb_histograms'),
 
 
     # API endpoints
