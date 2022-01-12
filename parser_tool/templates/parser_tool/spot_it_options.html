@@ -9,32 +9,9 @@
 {{ block.super }}
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
-<style>
-   {% comment %} .card {
-		border: 1px solid #ddd;
-		border-radius: 100%;
-		max-width: 450px;
-		max-height: 450px;
-		text-align: center;
-    } {% endcomment %}
-    .custom-button, .custom-button:focus {
-        {% comment %} outline: none;                                                                           {% endcomment %}
-        background: transparent;
-        border: 1px solid transparent;
-    }
-    .custom-button:active    {
-        {% comment %} outline: none; {% endcomment %}
-        background: transparent;
-        border: 1px solid transparent;
-    }
-    .custom-radio ul {
-        list-style-type: none;
-    }
-</style>
 {% endblock %}
 
 {% block extra_script %}
-{% comment %} <script src="{% static 'js/src/spot_it.js' %}"></script> {% endcomment %}
 {% endblock %}
 
 
@@ -46,23 +23,8 @@
 <div class="row" style="background-color: #f7f7f7">
     <div class="col-md-1"></div>
     <div class="col-md-10">
-    {% comment %} <form id="myNameForm">
-        <label for="deck">Choose how many cards you would like your deck to have:</label>
-        <select id="deck">
-            <option value="7">7 cards</option>
-            <option value="13">13 cards</option>
-            <option value="31">31 cards</option>
-            <option value="57">57 cards</option>
-        </select>
-        <label for="file">Upload a Doc file with the number of words equal to the number of cards you chose:</label>
-        <input type="file" id="file" name="file" accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-        <input type="button" class="button" value="Upload" id="upload" />
-    </form> {% endcomment %}
-    {% comment %} <form method="post" enctype="multipart/form-data"> {% endcomment %}
     <form method="post">
         {% csrf_token %}
-        {% comment %} using txt files for now, blocked on using docx - django reads them differently {% endcomment %}
-            {% comment %} <input type="file" name="upload" accept=".txt"> {% endcomment %}
             <div class="custom-radio d-flex flex-column">
                 {% for field in form %}
                     {% for error in field.errors %}
@@ -76,18 +38,7 @@
             <br>
             <button class="btn btn-dark my-4" type="submit">Submit</button>
     </form>
-        {% comment %} <div class="form-group">
-            <button type="button" class="formbtn btn btn-primary mt-2 mb-2" id="13-cards">
-                Generate 4 images, total 13 cards
-            </button>
-            <div id="p1Score">Player 1 Score: 0</div>
-            <div id="p2Score">Player 2 Score: 0</div>
-        </div>
-        <div id="central-card">Placeholder central card</div>
-        <div class="d-flex justify-content-between">
-            <div id="p1">Player 1 placeholder</div>
-            <div id="p2">Player 2 placeholder</div>
-        </div> {% endcomment %}
+       
     </div>
 </div>
 

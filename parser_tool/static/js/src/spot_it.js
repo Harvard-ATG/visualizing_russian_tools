@@ -59,14 +59,14 @@
         let [right, top] = pos[q];
         let size = generateRand(80, 160);
         //TODO make random size fit on card without overlapping
-        imgs += `<button class="test-custom-button" style="position:relative; right:${right}px; top: ${top}px; transform:rotate(${generateRand(
+        imgs += `<button class="custom-button" style="position:relative; right:${right}px; top: ${top}px; transform:rotate(${generateRand(
           0,
           360
         )}deg)" >
 							<img id="${idx}" style="min-width:${size}px;min-height:${size}px" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png />
 						</button>`;
       } else {
-        imgs += `<button class="test-custom-button" >
+        imgs += `<button class="custom-button" >
 							<img id="${idx}" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png />
 						</button>`;
       }
@@ -207,7 +207,7 @@
     $("#p2Score").replaceWith('<div id="p2Score">Player 2 Score: 0</div>');
 
     // Event trigger for creating deck and starting game
-    $(document).on("click", "button.test-custom-button", function (event) {
+    $(document).on("click", "button.custom-button", function (event) {
       event.preventDefault();
       const value = $(event.target).attr("value");
       const parentValue = $(event.target).attr("data-parent");
