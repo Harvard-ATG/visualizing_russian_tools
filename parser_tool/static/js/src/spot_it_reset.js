@@ -3,7 +3,7 @@
         console.log("ready!");
         $(document).on("click", "button.options", function (event) {
             console.log('click options')
-            window.location.href = 'spot-it-options';
+            window.location.href = 'spot-it';
         })
     })
 })(jQuery);

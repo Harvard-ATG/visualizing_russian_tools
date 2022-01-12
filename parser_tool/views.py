@@ -33,11 +33,8 @@ def verb_radar_chart(request):
 
 def similarity(request):
     return render(request, 'parser_tool/similarity.html')
-    
-def spot_it(request):
-    return render(request, 'parser_tool/spot_it.html')
 
-def spot_it_options(request):
+def spot_it(request):
     if request.method == 'POST':
         form = WordListForm(request.POST)
         if form.is_valid():
