@@ -10,7 +10,7 @@ from utils import list_diff
 
 class WordListField(forms.Field):
     default_error_messages = {
-        'invalid': 'The number of words must be at least {min_words} (it has {actual_words}). {missing_words}',
+        'invalid': 'The number of words must be at least {min_words} (it has {actual_words}). {not_found_words}',
     }
 
     def __init__(self, *, min_words=57, **kwargs):
@@ -38,11 +38,11 @@ class WordListField(forms.Field):
             invalid_message = self.error_messages['invalid'].format(
                     min_words=self.min_words, 
                     actual_words=actual_words,
-                    missing_words="Missing words: " + ', '.join(not_found_words) if not_found_words else ""
+                    not_found_words="Not Found Words: " + ', '.join(not_found_words) if not_found_words else ""
                     )
             raise ValidationError(invalid_message, code='invalid')
         
 class WordListForm(forms.Form):
-    # number_of_words = forms.CharField(label='How many words would you like to use?', widget=forms.Select(choices=MAX_WORDS))
     words = WordListField(widget=forms.Textarea, label='Enter each word on a new line (minimum 57 words)')
+    # number_of_words = forms.CharField(label='How many words would you like to use?', widget=forms.Select(choices=MAX_WORDS))
     # radio = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect, label='Score Keeper')

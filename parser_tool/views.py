@@ -46,24 +46,15 @@ def spot_it_options(request):
             qs_only_lemmas = qs_lemmas.distinct().values_list('lemma', flat=True)
             not_found_words = [w for w in list_diff(qs_only_lemmas, words) if w !='']
             dict_lemmas =  [lemma.to_dict() for lemma in qs_lemmas]
-            return render(request, 'parser_tool/spot_it_manual.html', {"data": dumps(dict_lemmas),"not_found_words": not_found_words})
+            return render(request, 'parser_tool/spot_it_start_game.html', {"data": dumps(dict_lemmas),"not_found_words": not_found_words})
         else:
             print(form.errors)
             return render(request, 'parser_tool/spot_it_options.html', {'form':form})
-        # TODO make options for file upload
-        # if request.method == 'POST' and request.FILES['upload']:
-        # upload = request.FILES['upload']
-        # word_list = upload.read().decode("utf-8").split("\n")
-        # filtered_word_list = list(filter(lambda word: word != '', word_list))
-        # print(f"list of words={filtered_word_list}")
-        # qs_lemmas = models.Lemma.objects.filter(lemma__in=filtered_word_list)
-        # dict_lemmas =  [lemma.to_dict() for lemma in qs_lemmas]
-        # print(f"lemmas={dict_lemmas}")
-        # dumps(dict_lemmas)
-        # return render(request, 'parser_tool/spot_it_options.html',{'form':form})
-    # return render(request, 'parser_tool/spot_it.html', {"data":dumps(dict_lemmas)})
     form = WordListForm()
     return render(request, 'parser_tool/spot_it_options.html', {'form':form})
+
+def spot_it_reset(request):
+    return render(request, 'parser_tool/spot_it_reset.html')
 
 def verb_histograms(request):
     return render(request, 'parser_tool/verb_histograms.html')

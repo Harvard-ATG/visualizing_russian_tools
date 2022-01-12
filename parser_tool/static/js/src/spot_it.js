@@ -357,13 +357,17 @@
         }
       }
     });
-
+    /*
+      Handles game progression when claiming cards to Player one or Player two
+    */ 
     $(document).on("click", "button.next-button", function (event) {
       event.preventDefault();
       const parentValue = $(event.target).attr("data-parent");
-
       // TODO COMPARISON, UPDATE SCORE, END OF GAME SCREEN, RESTART GAME
       if (parentValue === "p1") {
+        if(deck.length === 3){
+          window.location.href = 'spot-it-reset';
+        }
         deck.splice(state.centralCard.index, 1, "");
         deck.splice(state.card1.index, 1, "");
         deck = deck.filter((e) => e !== "");
@@ -419,6 +423,9 @@
         $("#p2").replaceWith(deckElementP2);
       }
       if (parentValue === "p2") {
+        if(deck.length === 3){
+          window.location.href = 'spot-it-reset';
+        }
         deck.splice(state.centralCard.index, 1, "");
         deck.splice(state.card2.index, 1, "");
         deck = deck.filter((e) => e !== "");
