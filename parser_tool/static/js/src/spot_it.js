@@ -53,21 +53,21 @@
     let imgs = "";
     for (let q = 0; q < card.length; q++) {
       let idx = card[q];
-      let { id } = data[idx];
+      let { icon_url } = data[idx];
       // TODO replace id with image
       if (pos) {
         let [right, top] = pos[q];
-        let size = generateRand(80, 160);
+        let size = generateRand(50, 120);
         //TODO make random size fit on card without overlapping
         imgs += `<button class="custom-button" style="position:relative; right:${right}px; top: ${top}px; transform:rotate(${generateRand(
           0,
           360
         )}deg)" >
-							<img id="${idx}" style="min-width:${size}px;min-height:${size}px" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png />
+							<img id="${idx}" style="width:${size}px;height:${size}px" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=${icon_url} />
 						</button>`;
       } else {
         imgs += `<button class="custom-button" >
-							<img id="${idx}" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png />
+							<img id="${idx}" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=${icon_url} />
 						</button>`;
       }
     }
@@ -162,6 +162,7 @@
     });
     state.foundPrimeNum = foundPrimeNum;
     deck = shuffle(generateDeckFromPrimeNum(foundPrimeNum.primeNum));
+    console.log(deck)
     centralCard = deck[0];
     card1 = deck[1];
     card2 = deck[2];

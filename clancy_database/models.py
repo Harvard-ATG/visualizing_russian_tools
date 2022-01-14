@@ -1,5 +1,9 @@
+import csv
 from django.db import models
 import operator
+import os
+from visualizing_russian_tools.settings.base import ROOT_DIR
+
 
 class Lemma(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)
@@ -74,6 +78,23 @@ class Lemma(models.Model):
         }
         if self.pos == "verb":
             data["aspect_pair"] = self.get_aspect_pair()
+        return data
+
+    def get_icons(self):
+        found = ""
+        file =  os.path.join(ROOT_DIR, 'clancy_database/data/icons.csv')
+        with open(file, encoding='utf-8-sig') as csvf:
+            # load csv file data using csv library's dictionary reader
+            csvReader = csv.DictReader(csvf)
+            for row in csvReader:
+                if row["Russian"] == self.lemma:
+                    found = row["icon_url"]
+                    break
+        data = {
+            "id": self.id,
+            "label": self.lemma,
+            "icon_url": found
+        }
         return data
 
     class Meta:
