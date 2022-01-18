@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from clancy_database import models
-from json import dumps
+import json
 from .forms import WordListForm
 from utils import list_diff
 
@@ -43,7 +43,7 @@ def spot_it(request):
             qs_only_lemmas = qs_lemmas.distinct().values_list('lemma', flat=True)
             not_found_words = [w for w in list_diff(qs_only_lemmas, words) if w !='']
             dict_lemmas =  [lemma.to_dict() for lemma in qs_lemmas]
-            return render(request, 'parser_tool/spot_it_start_game.html', {"data": dumps(dict_lemmas),"not_found_words": not_found_words})
+            return render(request, 'parser_tool/spot_it_start_game.html', {"data": json.dumps(dict_lemmas),"not_found_words": not_found_words})
         else:
             print(form.errors)
             return render(request, 'parser_tool/spot_it_options.html', {'form':form})

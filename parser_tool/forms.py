@@ -1,8 +1,10 @@
-from clancy_database import models
+from clancy_database.models import Lemma
 from django import forms
 from django.core.exceptions import ValidationError
+import logging
 from utils import list_diff
 
+logger = logging.getLogger(__name__)
 
 # CHOICES=[('Enable scores','enable'),
 #          ('Disable scores','disable')]
@@ -30,11 +32,11 @@ class WordListField(forms.Field):
         super().validate(value)
         # Check if words in the database
         value = [w for w in value if w != '']
-        qs_lemmas = models.Lemma.objects.filter(lemma__in=value).distinct().values_list('lemma', flat=True)
-        print("WordListField validate: ", qs_lemmas, len(qs_lemmas))
+        qs_lemmas = Lemma.objects.filter(lemma__in=value).distinct().values_list('lemma', flat=True)
+        logger.info(f"WordListField validate: {qs_lemmas} length={len(qs_lemmas)}")
         actual_words = len(qs_lemmas)
         if actual_words < self.min_words:
-            not_found_words = list_diff(list(qs_lemmas), value)
+            not_found_words = list_diff(qs_lemmas, value)
             invalid_message = self.error_messages['invalid'].format(
                     min_words=self.min_words, 
                     actual_words=actual_words,
