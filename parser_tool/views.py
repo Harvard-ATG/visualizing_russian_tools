@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from clancy_database import models
 import json
+import logging
 from .forms import WordListForm
 from utils import list_diff
+
+logger = logging.getLogger(__name__)
 
 def text_parsing_analysis(request):
     return render(request, 'parser_tool/text_parsing_analysis.html')
@@ -45,7 +48,7 @@ def spot_it(request):
             dict_lemmas =  [lemma.to_dict() for lemma in qs_lemmas]
             return render(request, 'parser_tool/spot_it_start_game.html', {"data": json.dumps(dict_lemmas),"not_found_words": not_found_words})
         else:
-            print(form.errors)
+            logger.warning(f"errors: {form.errors}")
             return render(request, 'parser_tool/spot_it_options.html', {'form':form})
     form = WordListForm()
     return render(request, 'parser_tool/spot_it_options.html', {'form':form})
