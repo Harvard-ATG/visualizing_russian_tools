@@ -150,6 +150,10 @@
                         .attr("fill", colorOrdinal(d.data.sort_order));
                 })
                 .attr('font-size', adjustedFontSize);
+            
+            // Fix overall height of the svg element
+            let svgFinalHeight = Math.ceil(svg.node().getBBox().height)
+            svg.attr('height', svgFinalHeight);
 
             return vis;
         }

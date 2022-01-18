@@ -28,7 +28,7 @@ class Command(BaseCommand):
         worksheet = workbook.active
 
         with open(csvfile, 'w', newline="") as f:
-            csvwriter = csv.writer(f, quoting=csv.QUOTE_MINIMAL)
+            csvwriter = csv.writer(f, quoting=csv.QUOTE_ALL) # commas may appear inside fields
             for row in worksheet.values:
                 csvwriter.writerow(row)
 
