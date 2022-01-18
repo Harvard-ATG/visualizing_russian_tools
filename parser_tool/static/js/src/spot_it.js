@@ -162,7 +162,6 @@
     });
     state.foundPrimeNum = foundPrimeNum;
     deck = shuffle(generateDeckFromPrimeNum(foundPrimeNum.primeNum));
-    console.log(deck)
     centralCard = deck[0];
     card1 = deck[1];
     card2 = deck[2];
