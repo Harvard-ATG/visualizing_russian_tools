@@ -14,8 +14,14 @@
         color: #777777
     }
 
+    #main-content {
+        padding-left: 50px;
+        padding-right: 50px;
+        padding-top: 10px;
+        font-size: medium;
+    }
+
     iframe.previewhtml {
-        border: 1px solid #ccc;
         padding: 5px;
         width: 100%;
         min-height: 15px;
@@ -26,19 +32,93 @@
     #contentinput {
         overflow: auto;
         resize: vertical;
-        border-bottom: 5px #ccc;
+        font-size: 18px;
     }
 
     textarea#outputhtml {
         white-space: pre;
         width: 250px;
         min-height: 15px;
-        border: 1px solid #888;
+        /* border: 1px solid #888; */
         padding: 5px;
         outline: none;
         overflow: auto;
         font-size: 20px;
         font-family: Monaco, courier;
+    }
+
+    .legend {
+        font-size: 15px;
+        font-family: sans-serif;
+        font-weight: bold;
+        cursor: pointer
+    }
+
+    .legend:hover {
+        text-decoration: underline;
+    }
+
+    .tooltip {
+        font-size: 15px;
+        font-family: sans-serif;
+    }
+
+    button {
+        margin-right: 45px;
+    }
+
+    svg {
+        display: inline-block;
+    }
+
+    #verb1 {
+        margin-right: 50px;
+    }
+
+    .toggle {
+        display: inline-block;
+        font-size: larger;
+        padding: 5px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    #error {
+        color: tomato;
+        margin-top: 10px;
+        display: none;
+    }
+
+    #output {
+        display: none;
+    }
+
+    .bordered {
+        padding: 5px;
+        border: 1px solid gray;
+    }
+
+    .singular {
+        color: #FFD700;
+    }
+
+    .plural {
+        color: #00BFFF;
+    }
+
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+        transform: scale(.25)
+    }
+
+    #examplediv {
+        max-height: 500px;
+        overflow: scroll
     }
 </style>
 {% endblock %}
@@ -52,46 +132,65 @@
 
 {% block content %}
 <a name="top"></a>
-<div class="row" style="background-color: #f7f7f7">
-    <div class="col-md-1"></div>
+<div class="row">
+    <!-- <div class="col-md-1"></div> -->
     <div class="col-md-10 mt-3">
-        <h2>Case Distribution Tool</h2>
+        <h2>Case Radar Charts</h2>
         <p style="color: gray">
             Word counts collected from the Morphological Standard Russian National Corpus, 2020,
             <a href="https://ruscorpora.ru/new/en/index.html">https://ruscorpora.ru/new/en/index.html</a>.
         </p>
-        <textarea id="contentinput" placeholder="Enter lemma for case breakdown"
-            style="min-height:15px; width: 100%;"></textarea>
+
+        <p id='lemma-text' style='color: gray; white-space: nowrap'>
+            Distribution of word by number and case in the RNC:
+            <span class='singular'>Singular, </span>
+            <span class='plural'>Plural, </span>
+        </p>
+
+        <textarea id="contentinput" placeholder="Enter noun or adjective to generate radar chart"
+            style="min-height:25px; width: 100%;"></textarea>
     </div>
 </div>
-<div class="row" style="background-color: #f7f7f7">
-    <div class="col-md-1"></div>
+<div class="row">
+    <!-- <div class="col-md-1"></div> -->
     <div class="col-md-10">
+        <br>
         <div class="form-group">
-            <button type="button" class="formbtn btn btn-lg btn-primary mt-2 mb-2" id="makechart">Make case distribution
-                chart<i id="processing_indicator" class="spinner-border" role="status"
-                    style="display:none;"></i></button>
+            <button style='display: block' type="button" class="formbtn btn btn-lg btn-primary mt-2 mb-2" id="basic">
+                Generate <span style='font-weight: bold;'>basic</span> chart<i id="processing_indicator"
+                    class="spinner-border" role="status" style="display:none;"></i></button>
+            <button style='display: none' type="button" class="formbtn btn btn-lg btn-primary mt-2 mb-2" id="detailed">
+                Generate <span style='font-weight: bold;'>detailed</span> chart (with prepositions)
+                <i id="processing_indicator" class="spinner-border" role="status" style="display:none;"></i></button>
         </div>
+        <p><span id="error">Word not found in the database. Try the dictionary form (nominative singular) or an
+                alternate spelling.</span></p>
     </div>
 </div>
-<div class="row" style="background-color: white">
-    <div class="col-md-1"></div>
-    <div class="col-md-10 mt-3">
-        <div id="output" style="display: none">
-            <h4>Radar chart of the case distribution of <span id='lemma' style="font-weight: bold"></span>
-                <span style="float: right;">
-                    <span style="color: #FFD700; background-color: black">Singular = yellow</span><span
-                        style="color: #00BFFF"> Plural = blue</span></span></h4>
-            <span style="float: left">
-                <h5 style="color: gray">Singular occurrences: <span id="sg"></span></h5>
-                <h5 style="color: gray">Plural occurrences: <span id="pl"></span></h5>
-            </span>
-            <div id="chart"></div>
+<div class="row" style="background-color: white;">
+    <div class="col-md-5">
+        <div id='output'>
+            <div class='bordered'>
+                <p><span style='font-weight: bold;'>Input word: </span><span id='input-word'></span></p>
+                <p><span style='font-weight: bold;'>Part of speech: </span><span id='pos'></span></p>
+                <p><span style='font-weight: bold;'>Total singular instances in corpus: </span><span id='Sing'></span>
+                </p>
+                <p><span style='font-weight: bold;'>Total plural instances in corpus: </span><span id='Plur'></span></p>
+            </div>
+            <br>
+            <div id='examplediv' class='bordered'>
+                <h4>Example sentences for <span id='vertexSelect' style='color: gray'></span></h4>
+                <h5>
+                    <span> Singular (<span id='Singct'></span>)</span>
+                    <span> Plural (<span id='Plurct'></span>)</span>
+                </h5>
+                <div id='sentences'></div>
+            </div>
+            <br><br><br>
         </div>
-        <div id="error" style="color: gray; display: none">
-            <h5>Word not found in the database.</h5>
-            <h5>Try the dictionary/nominative form of the word or an alternate spelling.</h5>
-        </div>
+    </div>
+    <div class=col-md-6 id="chart">
+        <img id='loading' src='/static/js/src/data/Rainbow.gif' class='center'>
     </div>
 </div>
 {% endblock %}
