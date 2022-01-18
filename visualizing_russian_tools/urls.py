@@ -23,6 +23,8 @@ urlpatterns = [
     path('case-distribution', parser_tool.views.case_distribution,  name='case_distribution'),
     path('verb-radar-chart', parser_tool.views.verb_radar_chart,  name='verb_radar_chart'),
     path('similarity', parser_tool.views.similarity,  name='similarity'),
+    path('spot-it', parser_tool.views.spot_it,  name='spot_it'),
+    path('spot-it-reset', parser_tool.views.spot_it_reset,  name='spot_it_reset'),
     path('verb_histograms', parser_tool.views.verb_histograms,  name='verb_histograms'),
 
 
