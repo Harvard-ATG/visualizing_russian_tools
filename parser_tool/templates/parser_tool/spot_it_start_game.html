@@ -10,16 +10,6 @@
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
 <style>
-   .card {
-        background: white;
-        width: 400px;
-        height: 400px;
-        border-radius: 50%;
-        display: flex;
-        overflow: hidden;
-        flex-wrap: wrap;
-        border: 1px solid #ddd; 
-    }
     
     .circle {
         background: white;
@@ -47,7 +37,22 @@
         font-size: 30px;
         font-style: italic;
     }
-      
+    
+    .img-container .tool-tip-text {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        overflow:visible;
+    }
+    .img-container:hover .tool-tip-text {
+        visibility: visible;
+      }
 
 </style>
 {% endblock %}
