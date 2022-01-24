@@ -42,7 +42,7 @@ def spot_it(request):
             qs_lemmas = models.Lemma.objects.filter(lemma__in=words)
             qs_only_lemmas = qs_lemmas.distinct().values_list('lemma', flat=True)
             not_found_words = [w for w in list_diff(qs_only_lemmas, words) if w !='']
-            dict_lemmas =  [lemma.get_icons() for lemma in qs_lemmas[:57]]
+            dict_lemmas =  [lemma.to_dict() for lemma in qs_lemmas[:57]]
             return render(request, 'parser_tool/spot_it_start_game.html', {"data": dumps(dict_lemmas),"not_found_words": not_found_words})
         else:
             print(form.errors)

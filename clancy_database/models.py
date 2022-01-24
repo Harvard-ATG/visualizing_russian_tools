@@ -26,6 +26,9 @@ class Lemma(models.Model):
     count = models.FloatField(blank=True, null=True)
     rnc_doc_count = models.IntegerField()
     rnc_lemma_count = models.IntegerField()
+    icon_url = models.TextField()
+    icon_license = models.TextField()
+    icon_attribute = models.TextField()
 
     def __str__(self):
         return "%s [%s:%s] " % (self.lemma, self.pos, self.id)
@@ -75,26 +78,12 @@ class Lemma(models.Model):
             "reverse": "",
             "rnc_doc_count": self.rnc_doc_count,
             "rnc_lemma_count": self.rnc_lemma_count,
+            "icon_url": self.icon_url if self.icon_url!= None else "https://static.thenounproject.com/png/3848152-200.png",
+            "icon_license": self.icon_license,
+            "icon_attribute": self.icon_attribute
         }
         if self.pos == "verb":
             data["aspect_pair"] = self.get_aspect_pair()
-        return data
-
-    def get_icons(self):
-        found = ""
-        file =  os.path.join(ROOT_DIR, 'clancy_database/data/icons.csv')
-        with open(file, encoding='utf-8-sig') as csvf:
-            # load csv file data using csv library's dictionary reader
-            csvReader = csv.DictReader(csvf)
-            for row in csvReader:
-                if row["Russian"] == self.lemma:
-                    found = row["icon_url"]
-                    break
-        data = {
-            "id": self.id,
-            "label": self.lemma,
-            "icon_url": found
-        }
         return data
 
     class Meta:

@@ -57,6 +57,10 @@ To import a SQL dump:
 $ ./manage.py import_clancy_sqldump --sqlfile russian.sql
 ```
 
+To update columns in SQL columns with `icon_urls`, `icon_license`, `icon_attribute` with data from `icons.csv` file
+```
+$ ./manage.py load_icon_data --sqlfile additional_columns.sql
+```
 ## Running unit tests
 
 Python/Django:
