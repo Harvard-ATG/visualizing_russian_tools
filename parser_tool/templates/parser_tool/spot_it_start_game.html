@@ -40,7 +40,7 @@
     
     .img-container .tool-tip-text {
         visibility: hidden;
-        width: 120px;
+        max-width: 200px;
         background-color: black;
         color: #fff;
         text-align: center;
@@ -53,6 +53,11 @@
     .img-container:hover .tool-tip-text {
         visibility: visible;
       }
+    .tool-tip-text ul {
+        list-style-type: none;
+        padding-right: 40px;
+        text-align: center;
+    }
 
 </style>
 {% endblock %}

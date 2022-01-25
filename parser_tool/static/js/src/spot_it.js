@@ -53,7 +53,7 @@
     let imgs = "";
     for (let q = 0; q < card.length; q++) {
       let idx = card[q];
-      let { icon_url, translation } = data[idx];
+      let { icon_url, translation, label } = data[idx];
       // TODO replace id with image
       if (pos) {
         let [right, top] = pos[q];
@@ -67,7 +67,12 @@
           )}deg)" >
 						<img id="${idx}" style="width:${size}px;height:${size}px" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=${icon_url} />
 					</button>
-          <span class="tool-tip-text">${translation}</span>
+          <span class="tool-tip-text">
+            <ul>
+              <li>Lemma:${label}</li>
+              <li>Translation:${translation}</li>
+            </ul>
+          </span>
         </div>`;
       } else {
         imgs += `
@@ -75,7 +80,7 @@
             <button class="custom-button" >
             <img id="${idx}" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=${icon_url} />
             </button>
-            <span class="tool-tip-text">${translation}</span>
+            <span class="tool-tip-text">${translation}\n${label}</span>
           </div>`;
       }
     }
