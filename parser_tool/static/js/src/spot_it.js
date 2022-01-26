@@ -422,10 +422,7 @@
 
         let imgsCentral = `
 						<div class="d-flex justify-content-center" id="central-card">
-							<div class="circle" style="transform:rotate(${generateRand(
-                0,
-                360
-              )}deg)"> ${generateImageElement(
+							<div class="circle"> ${generateImageElement(
           centralCard,
           "central",
           1,
