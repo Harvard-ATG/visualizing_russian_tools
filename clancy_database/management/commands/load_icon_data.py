@@ -9,22 +9,19 @@ import time
 
 
 class Command(BaseCommand):
-    help = 'Inserts New Columns into the database via additional_columns.sql file'
+    help = 'Load icons from icons.csv file'
     
     def add_arguments(self, parser):
         icon_file_csv = os.path.join(os.path.dirname(clancy_database.__file__), "data", "icons.csv")
-        parser.add_argument("--sqlfile", required=True, help="Input SQL file")
         parser.add_argument("--csvfile", required=False, help="Input CSV file", default=icon_file_csv)
         parser.add_argument("--dbfile", required=False, help="Output SQLite file created as a result of parsing the CSV.", default=settings.DATABASES['clancy_database']['NAME'])
 
     def handle(self, *args, **options):
-        sql_file = options['sqlfile']
         db_file = options['dbfile']
         icon_file_csv = options['csvfile']
         CONN = sqlite3.connect(db_file)
         cursor = CONN.cursor()
         start = time.time()
-        insert_db_columns.main(self, sql_file, cursor)
         with open(icon_file_csv, encoding='utf-8-sig') as csvf:
             csvReader = csv.DictReader(csvf)
             for row in csvReader:
