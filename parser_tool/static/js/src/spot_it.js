@@ -53,22 +53,35 @@
     let imgs = "";
     for (let q = 0; q < card.length; q++) {
       let idx = card[q];
-      let { id } = data[idx];
+      let { icon_url, translation, label } = data[idx];
       // TODO replace id with image
       if (pos) {
         let [right, top] = pos[q];
-        let size = generateRand(80, 160);
+        let size = generateRand(50, 120);
         //TODO make random size fit on card without overlapping
-        imgs += `<button class="custom-button" style="position:relative; right:${right}px; top: ${top}px; transform:rotate(${generateRand(
-          0,
-          360
-        )}deg)" >
-							<img id="${idx}" style="min-width:${size}px;min-height:${size}px" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png />
-						</button>`;
+        imgs += `
+        <div class="img-container">
+          <button class="custom-button" style="position:relative; right:${right}px; top: ${top}px; transform:rotate(${generateRand(
+            0,
+            360
+          )}deg)" >
+						<img id="${idx}" style="width:${size}px;height:${size}px" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=${icon_url} />
+					</button>
+          <span class="tool-tip-text">
+            <ul>
+              <li>Lemma:${label}</li>
+              <li>Translation:${translation}</li>
+            </ul>
+          </span>
+        </div>`;
       } else {
-        imgs += `<button class="custom-button" >
-							<img id="${idx}" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png />
-						</button>`;
+        imgs += `
+          <div class="img-container">
+            <button class="custom-button" >
+            <img id="${idx}" value="${idx}" data-index="${cardIndex}" data-parent="${parent}" src=${icon_url} />
+            </button>
+            <span class="tool-tip-text">${translation}\n${label}</span>
+          </div>`;
       }
     }
     return imgs;
@@ -176,10 +189,7 @@
 
     let imgsCentral = `
 			<div class="d-flex justify-content-center" id="central-card">
-				<div class="circle" style="transform:rotate(${generateRand(
-          0,
-          0
-        )}deg)"> ${generateImageElement(
+				<div class="circle"> ${generateImageElement(
       centralCard,
       "central",
       0,
@@ -188,17 +198,11 @@
     )} </div>
 			</div>`;
     let imgsP1 = generateImageElement(card1, "p1", 1, data, foundPrimeNum.pos);
-    let cardElement = `<div class="circle" style="transform:rotate(${generateRand(
-      0,
-      360
-    )}deg)"> ${imgsP1} </div>`;
+    let cardElement = `<div class="circle"> ${imgsP1} </div>`;
     let deckElementP1 = `<div id="p1">${cardElement}</div>`;
 
     let imgsP2 = generateImageElement(card2, "p2", 2, data, foundPrimeNum.pos);
-    deckElementP2 = `<div id="p2"><div class="circle" style="transform:rotate(${generateRand(
-      0,
-      360
-    )}deg)"> ${imgsP2} </div></div>`;
+    deckElementP2 = `<div id="p2"><div class="circle"> ${imgsP2} </div></div>`;
 
     $("#central-card").replaceWith(imgsCentral);
     $("#p1").replaceWith(deckElementP1);
@@ -273,10 +277,7 @@
             centralCard = deck[1];
             let imgsCentral = `
 							<div class="d-flex justify-content-center" id="central-card">
-								<div class="circle" style="transform:rotate(${generateRand(
-                  0,
-                  360
-                )}deg)"> ${generateImageElement(
+								<div class="circle"> ${generateImageElement(
               centralCard,
               "central",
               1,
@@ -291,10 +292,7 @@
               data,
               state.foundPrimeNum.pos
             );
-            let cardElement = `<div class="circle" style="transform:rotate(${generateRand(
-              0,
-              360
-            )}deg)"> ${imgsP1} </div>`;
+            let cardElement = `<div class="circle" > ${imgsP1} </div>`;
             let deckElementP1 = `<div id="p1">${cardElement}</div>`;
 
             let imgsP2 = generateImageElement(
@@ -315,10 +313,7 @@
             centralCard = deck[1];
             let imgsCentral = `
 							<div class="d-flex justify-content-center" id="central-card">
-								<div class="circle" style="transform:rotate(${generateRand(
-                  0,
-                  360
-                )}deg)"> ${generateImageElement(
+								<div class="circle"> ${generateImageElement(
               centralCard,
               "central",
               1,
@@ -333,10 +328,7 @@
               data,
               state.foundPrimeNum.pos
             );
-            let cardElement = `<div class="circle" style="transform:rotate(${generateRand(
-              0,
-              360
-            )}deg)"> ${imgsP1} </div>`;
+            let cardElement = `<div class="circle" > ${imgsP1} </div>`;
             let deckElementP1 = `<div id="p1">${cardElement}</div>`;
 
             let imgsP2 = generateImageElement(
@@ -346,10 +338,7 @@
               data,
               state.foundPrimeNum.pos
             );
-            let deckElementP2 = `<div id="p2"><div class="circle" style="transform:rotate(${generateRand(
-              0,
-              360
-            )}deg)"> ${imgsP2} </div></div>`;
+            let deckElementP2 = `<div id="p2"><div class="circle" > ${imgsP2} </div></div>`;
             $("#central-card").replaceWith(imgsCentral);
             $("#p1").replaceWith(deckElementP1);
             $("#p2").replaceWith(deckElementP2);
@@ -384,10 +373,7 @@
 
         let imgsCentral = `
 					<div class="d-flex justify-content-center" id="central-card">
-						<div class="circle" style="transform:rotate(${generateRand(
-              0,
-              360
-            )}deg)"> ${generateImageElement(
+						<div class="circle" > ${generateImageElement(
           centralCard,
           "central",
           1,
@@ -402,10 +388,7 @@
           data,
           state.foundPrimeNum.pos
         );
-        let cardElement = `<div class="circle" style="transform:rotate(${generateRand(
-          0,
-          360
-        )}deg)"> ${imgsP1} </div>`;
+        let cardElement = `<div class="circle" > ${imgsP1} </div>`;
         let deckElementP1 = `<div id="p1">${cardElement}</div>`;
         let imgsP2 = generateImageElement(
           card2,
@@ -414,10 +397,7 @@
           data,
           state.foundPrimeNum.pos
         );
-        let deckElementP2 = `<div id="p2"><div class="circle" style="transform:rotate(${generateRand(
-          0,
-          360
-        )}deg)"> ${imgsP2} </div></div>`;
+        let deckElementP2 = `<div id="p2"><div class="circle" > ${imgsP2} </div></div>`;
         $("#central-card").replaceWith(imgsCentral);
         $("#p1").replaceWith(deckElementP1);
         $("#p2").replaceWith(deckElementP2);
@@ -442,10 +422,7 @@
 
         let imgsCentral = `
 						<div class="d-flex justify-content-center" id="central-card">
-							<div class="circle" style="transform:rotate(${generateRand(
-                0,
-                360
-              )}deg)"> ${generateImageElement(
+							<div class="circle"> ${generateImageElement(
           centralCard,
           "central",
           1,
@@ -469,10 +446,7 @@
           data,
           state.foundPrimeNum.pos
         );
-        let deckElementP2 = `<div id="p2"><div class="circle" style="transform:rotate(${generateRand(
-          0,
-          360
-        )}deg)"> ${imgsP2} </div></div>`;
+        let deckElementP2 = `<div id="p2"><div class="circle" > ${imgsP2} </div></div>`;
         $("#central-card").replaceWith(imgsCentral);
         $("#p1").replaceWith(deckElementP1);
         $("#p2").replaceWith(deckElementP2);

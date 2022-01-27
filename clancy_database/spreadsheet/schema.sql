@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS lemma (
   suffixes              TEXT NOT NULL,
   rnc_doc_count         INTEGER,
   rnc_lemma_count       INTEGER,
+  icon_url              TEXT,
+  icon_license          TEXT,
+  icon_attribute      TEXT,
 
   FOREIGN KEY (pos) REFERENCES pos(key) ON DELETE RESTRICT ON UPDATE CASCADE,
   FOREIGN KEY (level) REFERENCES level(key) ON DELETE RESTRICT ON UPDATE CASCADE,

@@ -41,12 +41,13 @@ Key points:
 - The database is dumped to a SQL file and stored in the repository.
 
 To update the database from the latest version of the spreadsheet:
-
+Note: This also includes updates to `Lemma` table columns with `icon_urls`, `icon_license`, `icon_attribute` with data from `icons.csv` file
 ```
 $ ./manage.py convert_clancy_xls --xlsfile NewVisualizingRussian.xls --csvfile russian.csv
 $ ./manage.py create_clancy_db --csvfile russian.csv --dbfile russian.sqlite3
 $ ./manage.py load_sharoff_data --dbfile russian.sqlite3
 $ ./manage.py load_rnc_data --dbfile russian.sqlite3
+$ ./manage.py load_icon_data --dbfile russian.sqlite3  
 $ sqlite3 russian.sqlite3 .dump > russian.sql
 $ gzip russian.sql && mv russian.sql.gz clancy_database/data/russian.sql.gz
 ```
