@@ -1,16 +1,17 @@
 import csv
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
 import os.path
-import clancy_database
-from clancy_database.spreadsheet import insert_db_columns
 import sqlite3
 import time
+
+from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
+
+import clancy_database
 
 
 class Command(BaseCommand):
     help = 'Load icons from icons.csv file'
-    
+
     def add_arguments(self, parser):
         icon_file_csv = os.path.join(os.path.dirname(clancy_database.__file__), "data", "icons.csv")
         parser.add_argument("--csvfile", required=False, help="Input CSV file", default=icon_file_csv)
@@ -28,8 +29,8 @@ class Command(BaseCommand):
                 sql_statement = '''UPDATE lemma SET icon_url=?, icon_license=?, icon_attribute=? WHERE lemma=?'''
                 lemma = row["Russian"]
                 icon_url = row["icon_url"]
-                license =  row["license_description"]
-                icon_attribute =  row["attribution"]
+                license = row["license_description"]
+                icon_attribute = row["attribution"]
                 values = [icon_url, license, icon_attribute, lemma]
                 try:
                     cursor.execute(sql_statement, values)
@@ -40,4 +41,3 @@ class Command(BaseCommand):
         CONN.commit()
         end = time.time()
         self.stdout.write("=> Completed. Execution time: %f seconds\n" % (end - start))
-        
