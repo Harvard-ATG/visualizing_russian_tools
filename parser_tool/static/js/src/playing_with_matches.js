@@ -355,7 +355,7 @@
       // TODO COMPARISON, UPDATE SCORE, END OF GAME SCREEN, RESTART GAME
       if (parentValue === "p1") {
         if(deck.length === 3){
-          window.location.href = 'spot-it-reset';
+          window.location.href = 'playing-with-matches-reset';
         }
         deck.splice(state.centralCard.index, 1, "");
         deck.splice(state.card1.index, 1, "");
@@ -404,7 +404,7 @@
       }
       if (parentValue === "p2") {
         if(deck.length === 3){
-          window.location.href = 'spot-it-reset';
+          window.location.href = 'playing-with-matches-reset';
         }
         deck.splice(state.centralCard.index, 1, "");
         deck.splice(state.card2.index, 1, "");

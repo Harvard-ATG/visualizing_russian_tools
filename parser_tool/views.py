@@ -37,7 +37,7 @@ def verb_radar_chart(request):
 def similarity(request):
     return render(request, 'parser_tool/similarity.html')
 
-def spot_it(request):
+def playing_with_matches(request):
     if request.method == 'POST':
         form = WordListForm(request.POST)
         if form.is_valid():
@@ -46,15 +46,15 @@ def spot_it(request):
             qs_only_lemmas = qs_lemmas.distinct().values_list('lemma', flat=True)
             not_found_words = [w for w in list_diff(qs_only_lemmas, words) if w !='']
             dict_lemmas =  [lemma.to_dict() for lemma in qs_lemmas[:57]]
-            return render(request, 'parser_tool/spot_it_start_game.html', {"data": json.dumps(dict_lemmas),"not_found_words": not_found_words})
+            return render(request, 'parser_tool/playing_with_matches_start_game.html', {"data": json.dumps(dict_lemmas),"not_found_words": not_found_words})
         else:
             logger.warning(f"errors: {form.errors}")
-            return render(request, 'parser_tool/spot_it_options.html', {'form':form})
+            return render(request, 'parser_tool/playing_with_matches_options.html', {'form':form})
     form = WordListForm()
-    return render(request, 'parser_tool/spot_it_options.html', {'form':form})
+    return render(request, 'parser_tool/playing_with_matches_options.html', {'form':form})
 
-def spot_it_reset(request):
-    return render(request, 'parser_tool/spot_it_reset.html')
+def playing_with_matches_reset(request):
+    return render(request, 'parser_tool/playing_with_matches_reset.html')
 
 def verb_histograms(request):
     return render(request, 'parser_tool/verb_histograms.html')

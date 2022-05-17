@@ -3,7 +3,7 @@
         console.log("ready!");
         $(document).on("click", "button.options", function (event) {
             console.log('click options')
-            window.location.href = 'spot-it';
+            window.location.href = 'playing-with-matches';
         })
     })
 })(jQuery);
