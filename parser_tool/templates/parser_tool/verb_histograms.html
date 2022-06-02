@@ -70,13 +70,6 @@
     rect {
         cursor: pointer
     }
-
-    /* #sentences {
-        height: 750 !important;
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-    } */
-
     .select2-selection__rendered,
     .select2-results,
     .select2-search,
@@ -91,10 +84,19 @@
         padding-top: 0 !important;
         padding-bottom: 0 !important;
     }
+    #complexity {
+        margin-left: 15px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 </style>
 {% endblock %}
 
 {% block extra_script %}
+<script src="https://cdn.jsdelivr.net/npm/d3-color@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-interpolate@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-scale-chromatic@3"></script>
+
 <script src="{% static 'js/src/lib/api.js' %}"></script>
 <script src="{% static 'js/src/verb_histograms.js' %}"></script>
 
@@ -132,6 +134,10 @@
             <span class='verb'>Select verb:</span>
             <select id="verb" style='width: 50%'></select>
             <button type="button" id='randomize'>Randomize verb</button>
+            <select name="complexity" id="complexity">
+                <option value="simple">Simple</option>
+                <option value="detailed">Detailed</option>
+              </select>
     </div>
 </div>
 <div class='row' style='padding-top: 10px'>
