@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/Harvard-ATG/visualizing_russian_tools.svg?branch=master)](https://travis-ci.org/Harvard-ATG/visualizing_russian_tools)
 ![Coverage Status](./coverage.svg)
 
 # Visualizing Russian Tools
@@ -32,17 +31,25 @@ Or with docker-compose:
 docker-compose up
 ```
 
-## Spreadsheet Import
+## Source Data
 
-Given that the lemma and word form data for this project is sourced from Steven Clancy's spreadsheet, the following tools can be used to extract the data from spreadsheet and populate a database. The conversion process produces a SQLite database, which can either be used directly by django, or dumped into a SQL file that can then be loaded into another database.
+The data for this project is primarily sourced from a spreadsheet created and maintained by Steven Clancy. Since the spreadsheet is updated regularly, there is a process to update the database that involves converting the Excel spreadsheet to a CSV and then building a SQL database from scratch. The database is then loaded with related information obtained from the RNC and other sources. Since the data is read-only, a simple SQLite database is sufficient.
 
-To convert a spreadsheet and output a SQL dump:
+Key points:
+- The source data comes from a spreadsheet created and maintained by Steven Clancy.
+- The spreadsheet must be converted and imported into a [SQLite database](https://www.sqlite.org/index.html).
+- The database is dumped to a SQL file and stored in the repository.
 
+To update the database from the latest version of the spreadsheet:
+Note: This also includes updates to `Lemma` table columns with `icon_urls`, `icon_license`, `icon_attribute` with data from `icons.csv` file
 ```
-$ ./manage.py convert_clancy_spreadsheet --csvfile russian.csv --dbfile russian.sqlite3
+$ ./manage.py convert_clancy_xls --xlsfile NewVisualizingRussian.xls --csvfile russian.csv
+$ ./manage.py create_clancy_db --csvfile russian.csv --dbfile russian.sqlite3
 $ ./manage.py load_sharoff_data --dbfile russian.sqlite3
 $ ./manage.py load_rnc_data --dbfile russian.sqlite3
+$ ./manage.py load_icon_data --dbfile russian.sqlite3  
 $ sqlite3 russian.sqlite3 .dump > russian.sql
+$ gzip russian.sql && mv russian.sql.gz clancy_database/data/russian.sql.gz
 ```
 
 To import a SQL dump:
@@ -71,3 +78,32 @@ To update the coverage badge:
 $ coverage run --source='.' manage.py test
 $ coverage-badge -f -o coverage.svg
 ```
+
+## Fetching icons from the Noun Project
+
+You can fetch icons from the Noun Project for the "dobble" game in the following way:
+
+### Requirements:
+
+- Get a Noun Project API key and secret. Those can be obtained at [https://thenounproject.com/developers/](https://thenounproject.com/developers/).
+- Set the key and secret in the corresponding `NOUN_PROJECT_API_KEY` and `NOUN_PROJECT_API_SECRET` environment variables
+- Steven Clancy's master spreadsheet in CSV format
+
+### Running the script
+
+To successfully run the command, you need to pass the following arguments:
+
+- `--input_file` (the master spreadsheet as a csv)
+- `--output_file` (the name of the file that the command should write to)
+- `--level` (the Clancy classification for word level)
+
+Example:
+
+```sh
+(env)$ ./manage.py fetch_noun_icons --input_file=TheFile.csv --output_file=1E_noun_icons.csv --level=1E 
+```
+
+#### Notes
+
+- The file write has `w+` permissions, meaning it will truncate a file if it already exists. Try not to lose any important work!
+- The Noun Project's free tier is 5,000 requests per month. You can run out of that quickly
