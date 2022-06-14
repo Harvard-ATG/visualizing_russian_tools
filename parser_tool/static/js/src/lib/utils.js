@@ -33,7 +33,20 @@
       $([document.documentElement, document.body]).animate({scrollTop: scrollTop}, 1000);
     };
 
+    const shuffle = (a) => {
+      const cloneA = [...a];
+      let j, x;
+      for (let idx = cloneA.length - 1; idx > 0; idx--) {
+        j = Math.floor(Math.random() * (idx + 1));
+        // swap - could use destructure [a[idx], a[j]] = [a[j], a[idx]]
+        x = cloneA[idx];
+        cloneA[idx] = cloneA[j];
+        cloneA[j] = x;
+      }
+      return cloneA;
+    };
+
     // Exports
     global.app = global.app || {};
-    global.app.utils = { debounce, htmlEntities, unique, logEvent, scrollTo };
+    global.app.utils = { debounce, htmlEntities, unique, logEvent, scrollTo, shuffle };
 })(window);
