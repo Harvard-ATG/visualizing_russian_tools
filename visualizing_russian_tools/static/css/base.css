@@ -8,6 +8,7 @@ body {
 }
 main {
     flex: 3;
+    padding-bottom: 30px;
 }
 footer {
     flex: 1;
