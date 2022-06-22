@@ -1,9 +1,12 @@
 from django.shortcuts import render
-from clancy_database import models
+from django.views.generic import View
+from django.db.models import Q
+from django.db.models.functions import Lower
 import json
 import logging
+
+from clancy_database.models import Lemma
 from .forms import WordListForm
-from utils import list_diff
 
 logger = logging.getLogger(__name__)
 
@@ -37,24 +40,39 @@ def verb_radar_chart(request):
 def similarity(request):
     return render(request, 'parser_tool/similarity.html')
 
-def playing_with_matches(request):
-    if request.method == 'POST':
+
+class PlayingWithMatchesView(View):
+
+    def _get_possible_words(self):
+        qs_lemmas = Lemma.objects.filter(level='1E').exclude(Q(icon_url__isnull=True) | Q(icon_url__exact='')).order_by('lemma')
+        return list(qs_lemmas.values_list('lemma', flat=True))
+
+    def get(self, request):
+        form = WordListForm()
+        context = {
+            'form':form,
+            'possible_words': self._get_possible_words(),
+        }
+        return render(request, 'parser_tool/playing_with_matches_options.html', context)
+
+    def post(self, request):
         form = WordListForm(request.POST)
         if form.is_valid():
             words = form.cleaned_data.get("words")
-            qs_lemmas = models.Lemma.objects.filter(lemma__in=words)
+            qs_lemmas = Lemma.objects.filter(lemma__in=words)
             qs_only_lemmas = qs_lemmas.distinct().values_list('lemma', flat=True)
-            not_found_words = [w for w in list_diff(qs_only_lemmas, words) if w !='']
+            not_found_words = set(qs_only_lemmas).symmetric_difference(set(words))
+            not_found_words = [w for w in not_found_words if w != '']
             dict_lemmas =  [lemma.to_dict() for lemma in qs_lemmas[:57]]
             return render(request, 'parser_tool/playing_with_matches_start_game.html', {"data": json.dumps(dict_lemmas),"not_found_words": not_found_words})
         else:
             logger.warning(f"errors: {form.errors}")
             return render(request, 'parser_tool/playing_with_matches_options.html', {'form':form})
-    form = WordListForm()
-    return render(request, 'parser_tool/playing_with_matches_options.html', {'form':form})
+
 
 def playing_with_matches_reset(request):
     return render(request, 'parser_tool/playing_with_matches_reset.html')
+
 
 def verb_histograms(request):
     return render(request, 'parser_tool/verb_histograms.html')

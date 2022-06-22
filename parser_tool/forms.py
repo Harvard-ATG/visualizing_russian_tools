@@ -2,7 +2,6 @@ from clancy_database.models import Lemma
 from django import forms
 from django.core.exceptions import ValidationError
 import logging
-from utils import list_diff
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +35,7 @@ class WordListField(forms.Field):
         logger.info(f"WordListField validate: {qs_lemmas} length={len(qs_lemmas)}")
         actual_words = len(qs_lemmas)
         if actual_words < self.min_words:
-            not_found_words = list_diff(qs_lemmas, value)
+            not_found_words = list(set(qs_lemmas).symmetric_difference(set(value)))
             invalid_message = self.error_messages['invalid'].format(
                     min_words=self.min_words, 
                     actual_words=actual_words,
