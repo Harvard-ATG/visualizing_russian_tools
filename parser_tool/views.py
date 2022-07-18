@@ -44,8 +44,8 @@ def similarity(request):
 class PlayingWithMatchesView(View):
 
     def _get_possible_words(self):
-        qs_lemmas = Lemma.objects.filter(level='1E').exclude(Q(icon_url__isnull=True) | Q(icon_url__exact='')).order_by('lemma')
-        return list(qs_lemmas.values_list('lemma', flat=True))
+        qs_lemmas = Lemma.objects.filter(level='1E').order_by('rank').exclude(Q(icon_url__isnull=True) | Q(icon_url__exact=''))
+        return list(qs_lemmas.values('lemma', 'rank'))
 
     def get(self, request):
         form = WordListForm()

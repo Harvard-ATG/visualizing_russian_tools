@@ -54,7 +54,7 @@
     <p>Select from the following list of {{ possible_words|length }} words to use in <i>Playing with Matches</i>:</p>
     <div style="column-count: 4;">
         {% for word in possible_words %}
-            {{  word }}<br>
+            {{ word.lemma }}<br>
         {% endfor %}
     </div>
     </div>
