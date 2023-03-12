@@ -10,12 +10,48 @@ main {
     flex: 3;
     padding-bottom: 30px;
 }
+
 footer {
     flex: 1;
     background-color: rgba(0, 0, 0, 0.03);
     border-top: 1px solid #ccc;
     padding: 20px 0;
 }
-.container, .container-fluid {
+
+.container,
+.container-fluid {
     font-family: Lato, sans-serif;
+}
+
+.theme-default {
+    /* level colors */
+    --level0-color: black;
+    --level1-color: green; /* Core */
+    --level2-color: blue; /* Foundations */
+    --level3-color: #8000ff; /* Expansions */
+    --level4-color: orange; /* Specializations */
+}
+.theme-colorblind {
+    /* levels in color blind readable categories */
+    --level0-color: rgb(0, 0, 0);
+    --level1-color: rgb(0, 158, 115);   /* Core */
+    --level2-color: rgb(0, 114, 178);   /* Foundations */
+    --level3-color: rgb(204, 121, 167); /* Expansions */
+    --level4-color: rgb(230, 159, 0);   /* Specializations */
+}
+
+.level0, [data-level='0'] {
+    color: var(--level0-color, black);
+}
+.level1, [data-level='1'], [data-level='1E'] {
+    color: var(--level1-color, green);
+}
+.level2, [data-level='2'], [data-level='2I'] {
+    color: var(--level2-color, blue);
+}
+.level3, [data-level='3'], [data-level='3A'], [data-level='3AU'] {
+    color: var(--level3-color, #8000ff);
+}
+.level4, [data-level='4'], [data-level='4S'], [data-level='4SU'] {
+    color: var(--level4-color, orange);
 }

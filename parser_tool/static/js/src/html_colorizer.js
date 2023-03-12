@@ -25,7 +25,7 @@
   }
 
   function after_colorize(output_html) {
-    writeframe('outputpreview', output_html, {cssLink: "/static/css/colorization.css"});
+    writeframe('outputpreview', output_html, {});
     $("#outputhtml").val(output_html);
     $("#results").show();
   }
@@ -51,12 +51,16 @@
     iframe.contentWindow.document.write(html);
     iframe.contentWindow.document.close();
 
-    if(iframe.contentWindow.document.head && options.cssLink) {
-      const link = document.createElement("link");
-      link.href = options.cssLink;
-      link.type = "text/css";
-      link.rel = "stylesheet";
-      iframe.contentWindow.document.head.appendChild(link);
+    const levelColors = window.getLevelColors();
+
+    if(iframe.contentWindow.document.head) {
+      const css = levelColors.map((color, i) => {
+        return `[data-level='${i}'] { color: ${color}; }`;
+      }).join("\n");
+
+      const styleElement = document.createElement("style");
+      styleElement.appendChild(document.createTextNode(css));
+      iframe.contentWindow.document.head.appendChild(styleElement);
     }
   }
 
@@ -80,6 +84,10 @@
 <div class="paragraph_wrapper"><div class="body_copy"><span style="font-size:medium"><span style="font-family:&quot;Times New Roman&quot;, serif"><span style="caret-color:#000000"><span style="color:#000000"><span style="font-style:normal"><span style="font-variant-caps:normal"><span style="font-weight:normal"><span style="letter-spacing:normal"><span style="orphans:auto"><span style="text-transform:none"><span style="white-space:normal"><span style="widows:auto"><span style="word-spacing:0px"><span style="-webkit-text-size-adjust:auto"><span style="text-decoration:none"><span style="line-height:24px"><span lang="RU" style="line-height:24px"><span style="font-family:Cambria, serif">1.&nbsp;&nbsp;&nbsp;Мама, папа, Ва́ся хоро́ший, вот уви́дите! Вы его обяза́тельно ________________________.&nbsp;</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><br><span style="font-size:medium"><span style="font-family:&quot;Times New Roman&quot;, serif"><span style="caret-color:#000000"><span style="color:#000000"><span style="font-style:normal"><span style="font-variant-caps:normal"><span style="font-weight:normal"><span style="letter-spacing:normal"><span style="orphans:auto"><span style="text-transform:none"><span style="white-space:normal"><span style="widows:auto"><span style="word-spacing:0px"><span style="-webkit-text-size-adjust:auto"><span style="text-decoration:none"><span style="line-height:24px"><span lang="RU" style="line-height:24px"><span style="font-family:Cambria, serif">2.&nbsp;&nbsp;&nbsp;После рабо́ты мы не ________________________ говори́ть об университе́тских дела́х, проблема́х педаго́гики и образова́ния.&nbsp;</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><br><span style="font-size:medium"><span style="font-family:&quot;Times New Roman&quot;, serif"><span style="caret-color:#000000"><span style="color:#000000"><span style="font-style:normal"><span style="font-variant-caps:normal"><span style="font-weight:normal"><span style="letter-spacing:normal"><span style="orphans:auto"><span style="text-transform:none"><span style="white-space:normal"><span style="widows:auto"><span style="word-spacing:0px"><span style="-webkit-text-size-adjust:auto"><span style="text-decoration:none"><span style="line-height:24px"><span lang="RU" style="line-height:24px"><span style="font-family:Cambria, serif">3.&nbsp;&nbsp;&nbsp;Они ________________________ друг дру́га по́сле трёх лет знако́мства.&nbsp;</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><br><span style="font-size:medium"><span style="font-family:&quot;Times New Roman&quot;, serif"><span style="caret-color:#000000"><span style="color:#000000"><span style="font-style:normal"><span style="font-variant-caps:normal"><span style="font-weight:normal"><span style="letter-spacing:normal"><span style="orphans:auto"><span style="text-transform:none"><span style="white-space:normal"><span style="widows:auto"><span style="word-spacing:0px"><span style="-webkit-text-size-adjust:auto"><span style="text-decoration:none"><span style="line-height:24px"><span lang="RU" style="line-height:24px"><span style="font-family:Cambria, serif">4.&nbsp;&nbsp;&nbsp;У нас в ко́лледже отли́чников никто́ не ________________________ .&nbsp;</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><br><span style="font-size:medium"><span style="font-family:&quot;Times New Roman&quot;, serif"><span style="caret-color:#000000"><span style="color:#000000"><span style="font-style:normal"><span style="font-variant-caps:normal"><span style="font-weight:normal"><span style="letter-spacing:normal"><span style="orphans:auto"><span style="text-transform:none"><span style="white-space:normal"><span style="widows:auto"><span style="word-spacing:0px"><span style="-webkit-text-size-adjust:auto"><span style="text-decoration:none"><span style="line-height:24px"><span lang="RU" style="line-height:24px"><span style="font-family:Cambria, serif">5.&nbsp;&nbsp;&nbsp;Я не ________________________ ходи́ть на дополни́тельные заня́тия.&nbsp;</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><br><span style="font-size:medium"><span style="font-family:&quot;Times New Roman&quot;, serif"><span style="caret-color:#000000"><span style="color:#000000"><span style="font-style:normal"><span style="font-variant-caps:normal"><span style="font-weight:normal"><span style="letter-spacing:normal"><span style="orphans:auto"><span style="text-transform:none"><span style="white-space:normal"><span style="widows:auto"><span style="word-spacing:0px"><span style="-webkit-text-size-adjust:auto"><span style="text-decoration:none"><span style="line-height:24px"><span lang="RU" style="line-height:24px"><span style="font-family:Cambria, serif">6.&nbsp;&nbsp;&nbsp;В аспиранту́ре Лёня наконе́ц-то ________________________ писа́ть конспе́кты.&nbsp;</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><br></div></div>
 `;
     $("#contentinput").val(html);
+  }
+
+  if(window.location.hash == "#demo") {
+    window.demo();
   }
 
 })(jQuery);
