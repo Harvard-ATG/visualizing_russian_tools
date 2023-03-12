@@ -51,7 +51,7 @@
     iframe.contentWindow.document.write(html);
     iframe.contentWindow.document.close();
 
-    const levelColors = window.getLevelColors();
+    const levelColors = window.app.theme.getLevelColors();
 
     if(iframe.contentWindow.document.head) {
       const css = levelColors.map((color, i) => {

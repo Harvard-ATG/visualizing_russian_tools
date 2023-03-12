@@ -2,28 +2,22 @@
 
     const VALID_THEMES = ['default', 'colorblind'];
 
-    // function to set a given theme/color-scheme
     function setTheme(themeName) {
-        sessionStorage.setItem('theme', themeName);
-        document.body.classList.remove('theme-default');
-        document.body.classList.add(`theme-${themeName}`);
+        if(VALID_THEMES.includes(themeName)) {
+            document.body.classList.remove('theme-default');
+            document.body.classList.add(`theme-${themeName}`);
+        } else {
+            console.log(`Invalid themeName: ${themeName}`);
+        }
     }
 
-    // function to load theme
-    function loadTheme() {
-        const theme = sessionStorage.getItem('theme');
-        if(theme === null) {
-            return;
-        }
-        if(!VALID_THEMES.includes(theme)) {
-            sessionStorage.removeItem('theme');
-
-        }
-
-        setTheme(theme);
+    function setDefaultTheme() {
+        setTheme('default');
     }
 
     function getLevelColors() {
+        // Level colors are defined in CSS vars in base.css.
+        // The current level color depends on the theme applied to the body.
         const style = getComputedStyle(document.body);
         return [
             style.getPropertyValue('--level0-color'),
@@ -34,8 +28,10 @@
         ];
     }
 
-    global.getLevelColors = getLevelColors;
-    global.setTheme = setTheme;
-    global.loadTheme = loadTheme;
-
+    global.app = global.app || {};
+    global.app.theme = {
+        getLevelColors,
+        setTheme,
+        setDefaultTheme
+    };
 })(window);

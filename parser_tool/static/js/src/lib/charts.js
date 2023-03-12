@@ -1,11 +1,13 @@
 (function(global, d3, c3) {
     "use strict";
 
+    const theme = global.app.theme;
+
     class LevelsChart {
         constructor({ counts, bindto, combineLevels }) {
             this.counts = counts;
             this.bindto = bindto;
-            this.levelColors = global.getLevelColors();
+            this.levelColors = theme.getLevelColors();
             this.combineLevels = (combineLevels === true);
             this.formatAsPercent = this.formatAsPercent.bind(this);
             this.toggleMask = this.toggleMask.bind(this);

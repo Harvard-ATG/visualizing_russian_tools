@@ -40,18 +40,85 @@ footer {
     --level4-color: rgb(230, 159, 0);   /* Specializations */
 }
 
-.level0, [data-level='0'] {
-    color: var(--level0-color, black);
+/* Note: we are intentionally specifying each color twice,
+   once using the CSS custom property and again with the
+   actual color value. The reason is that copy&paste (e.g. to a Word doc)
+   does not preserve the color using the CSS custom property alone
+   as of 2023-03-12.
+*/
+.theme-default .level0,
+.theme-default [data-level='0'] {
+    color: var(--level0-color);
+    color: black;
 }
-.level1, [data-level='1'], [data-level='1E'] {
-    color: var(--level1-color, green);
+.theme-default .level1,
+.theme-default [data-level='1'],
+.theme-default [data-level='1E'] {
+    color: var(--level1-color);
+    color: green;
 }
-.level2, [data-level='2'], [data-level='2I'] {
-    color: var(--level2-color, blue);
+.theme-default .level2,
+.theme-default [data-level='2'],
+.theme-default [data-level='2I'] {
+    color: var(--level2-color);
+    color: blue;
 }
-.level3, [data-level='3'], [data-level='3A'], [data-level='3AU'] {
-    color: var(--level3-color, #8000ff);
+.theme-default .level3,
+.theme-default [data-level='3'],
+.theme-default [data-level='3A'],
+.theme-default [data-level='3AU'] {
+    color: var(--level3-color);
+    color: #8000ff;
+
 }
-.level4, [data-level='4'], [data-level='4S'], [data-level='4SU'] {
-    color: var(--level4-color, orange);
+.theme-default .level4,
+.theme-default [data-level='4'],
+.theme-default [data-level='4S'],
+.theme-default [data-level='4SU'] {
+    color: var(--level4-color);
+    color: orange;
+}
+
+.theme-colorblind .level0,
+.theme-colorblind [data-level='0'] {
+    color: var(--level0-color);
+    color: rgb(0, 0, 0);
+}
+.theme-colorblind .level1,
+.theme-colorblind [data-level='1'],
+.theme-colorblind [data-level='1E'] {
+    color: var(--level1-color);
+    color: rgb(0, 158, 115);
+}
+.theme-colorblind .level2,
+.theme-colorblind [data-level='2'],
+.theme-colorblind [data-level='2I'] {
+    color: var(--level2-color);
+    color: rgb(0, 114, 178);
+}
+.theme-colorblind .level3,
+.theme-colorblind [data-level='3'],
+.theme-colorblind [data-level='3A'],
+.theme-colorblind [data-level='3AU'] {
+    color: var(--level3-color);
+    color: rgb(204, 121, 167);
+}
+.theme-colorblind .level4,
+.theme-colorblind [data-level='4'],
+.theme-colorblind [data-level='4S'],
+.theme-colorblind [data-level='4SU'] {
+    color: var(--level4-color);
+    color: rgb(230, 159, 0);
+}
+.theme-colorblind .level1-stop {
+    stop-color: var(--level1-color);
+}
+.theme-colorblind .level2-stop {
+    stop-color: var(--level2-color);
+}
+.theme-colorblind .level3-stop {
+    stop-color: var(--level3-color);
+}
+.theme-colorblind .level4-stop {
+    stop-color: var(--level4-color);
 }
