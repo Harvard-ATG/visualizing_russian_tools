@@ -5,12 +5,6 @@
 {% block body_id %}playing-with-matches-options{% endblock %}
 {% block body_class %}{% endblock %}
 
-{% block extra_style %}
-{{ block.super }}
-<meta charset="utf-8">
-<link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
-{% endblock %}
-
 {% block extra_script %}
     {{ possible_words|json_script:"possible_words_data" }}
     <script src="{% static 'js/src/lib/utils.js' %}"></script>

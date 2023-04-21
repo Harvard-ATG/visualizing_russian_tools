@@ -15,7 +15,7 @@
             this.story_value = ""; // Raw string
             this.story_text = null; // Holds instance of LemmatizedText
             this.option_colorize = false; // Optionally display words in the color dictated by the "level" of the lemma
-            this.option_wordlist= false; // Optionally display a vocabulary word list 
+            this.option_wordlist= false; // Optionally display a vocabulary word list
 
             this.onCheckStory = this.onCheckStory.bind(this);
             this.onPasteMakePlainText = this.onPasteMakePlainText.bind(this);
@@ -68,7 +68,7 @@
             // set options immediately that might affect rendering
             this.option_wordlist = document.getElementById('option_wordlist').checked;
             this.option_colorize = document.getElementById('option_colorize').checked;
-            
+
             // update and render async, since the update may require a roundtrip to the server
             return this._asyncTask(() => {
                 let p1 = this._updateVocab(document.getElementById("storyvocab_input").value.trim());
@@ -103,7 +103,7 @@
                         colorize: this.option_colorize
                     }
                 }),
-                new MiniStoryUniqueWordsComponent({ 
+                new MiniStoryUniqueWordsComponent({
                     selector: "#storytext_vocab",
                     props: {
                         story_text: this.story_text,
@@ -116,7 +116,7 @@
             return this;
         }
 
-        // Executes a function that returns a promise, taking care to show the loading indicator 
+        // Executes a function that returns a promise, taking care to show the loading indicator
         // and report any errors.
         _asyncTask(fn) {
             let before_task = () => {
@@ -140,7 +140,7 @@
         // Lemmatizes the vocabulary if it has changed
         _updateVocab(vocab_value) {
             if(this.vocab_value === vocab_value && this.vocab_text) {
-                return Promise.resolve(this.vocab_text); 
+                return Promise.resolve(this.vocab_text);
             }
             this.vocab_value = vocab_value;
             return LemmatizedText.asyncFromString({ api: this.api, text: vocab_value}).then((vocab_text) => {
@@ -165,7 +165,7 @@
         static demo() {
             const story = `Мы ждали на автобусном остановке. Мы здесь ждем каждый день, потому что мы ездим на работу на автобусе. Вчера я был на работе, а Лена была дома. Я работал весь день, потом поехал домой. Я всегда езжу на автобусе. Лена иногда ходит пешком на работу или ездит на велосипеде.`;
             const vocab = `ждать ездить быть потом работа пешком`;
-    
+
             document.getElementById("storytext_input").innerText = story.trim();
             document.getElementById("storyvocab_input").value = vocab.trim().split(" ").join("\n");
         }
@@ -187,9 +187,9 @@
                     if(this.props.colorize) {
                         let level = this.props.story_text.levelOf(token);
                         if(found) {
-                            output = `<b class="wordlevel${level}">${output}</b>`
+                            output = `<b class="level${level}">${output}</b>`
                         } else {
-                            output = `<span class="wordlevel${level}">${output}</span>`;
+                            output = `<span class="level${level}">${output}</span>`;
                         }
                     } else {
                         if(found) {
@@ -205,7 +205,7 @@
             };
 
             let html = this.props.story_text.mapTokens(token2html).join("");
-            
+
             document.querySelector(this.selector).innerHTML = html;
         }
     }
@@ -228,7 +228,7 @@
                     }
                     return w;
                 }).join(", ");
-                return `<tr class="wordlevel${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td><td>${level}</td></tr>`
+                return `<tr class="level${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td><td>${level}</td></tr>`
             }).join("");
 
             document.querySelector(this.selector).innerHTML = `
@@ -252,14 +252,14 @@
             this.selector = selector;
             this.props = props;
         }
-        // Compares target vocabulary lemmas against lemmas used in the text 
+        // Compares target vocabulary lemmas against lemmas used in the text
         render() {
             let lemmatized_text_compare = new LemmatizedTextCompare(this.props.vocab_text, this.props.story_text);
             let vocab_lemmas = lemmatized_text_compare.compare();
-            
+
             let html = vocab_lemmas.map((item, idx) => {
                 const level = this.props.vocab_text.levelOf(item.word);
-                return `<tr class="wordlevel${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td><td>${item.lemmas.join(", ")}</td></tr>`
+                return `<tr class="level${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${item.intersects?"&#x2705;":"&#x274C;"}</td><td>${item.lemmas.join(", ")}</td></tr>`
             }).join("");
 
             document.querySelector(this.selector).innerHTML = `
@@ -270,7 +270,7 @@
                     ${html}
                 </table>
             `;
-            
+
             if(vocab_lemmas.length > 0) {
                 sorttable.makeSortable(document.querySelector(this.selector + " table"));
             }
@@ -296,9 +296,9 @@
 
             let story_vocab_stats_html = story_vocab_stats.map((item, idx) => {
                 const level = this.props.story_text.levelOf(item.word);
-                return `<tr class="wordlevel${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${item.count}</td><td>${level}</td></tr>`
+                return `<tr class="level${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${item.count}</td><td>${level}</td></tr>`
             }).join("");
-            
+
             containerEl.innerHTML = `
                 <h5>Story words (${story_vocab_stats.length}):</h5>
                 <div class="table-responsive">
