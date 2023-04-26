@@ -94,17 +94,9 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <button type="button" align="left" class="getformbtn btn btn-lg btn-primary mt-2 mb-2"
-                        id="getformsbtn">Generate forms from lemma<i id="processing_indicator" class="spinner-border"
+                        id="getformsbtn">Generate forms from first lemma<i id="processing_indicator" class="spinner-border"
                             role="status" style="display:none;"></i></button>
                 </div>
-            </div>
-            <div class="col-md-2" id="type_dropdown" style="display: none">
-                <label class="dropdown" for="type_dropdown">Word type: </label>
-                <br>
-                <select id="type_dropdown_options" class="dropdown" nfFormame="type_dropdown">
-                    <option value="lemmas">Lemma</option>
-                    <option value="forms">Form/inflection</option>
-                </select>
             </div>
             <div class="col-md-3" id="source_dropdown" style="display: none">
                 <label class="dropdown" for="source_dropdown">Source: </label>
@@ -113,7 +105,15 @@
                     <option value="rnc">Russian National Corpus Counts</option>
                 </select>
             </div>
-            <div class="col-md-2" id="clearbtn_display" style="display:none;">
+            <div class="col-md-3" id="type_dropdown" style="display: none">
+                <label class="dropdown" for="type_dropdown">Convert query to lemma?</label>
+                <br>
+                <select id="type_dropdown_options" class="dropdown" nfFormame="type_dropdown">
+                    <option value="lemmas">Yes</option>
+                    <option value="forms">No (keep inflection)</option>
+                </select>
+            </div>
+            <div class="col-md-1" id="clearbtn_display" style="display:none;">
                 <div class="form-group">
                     <button type="button" align="left" class="clearbtn btn btn-lg btn-primary mt-2 mb-2" id="clearbtn">Clear display</button>
                 </div>
@@ -126,8 +126,20 @@
 <div id="rnc_info" class="row mt-3 bt-5" style='display: none;'>
     <div class="col-md-1"></div>
     <div class="col-md-8">
-        <table style="width:100%; color: gray">Query data is from the <a href='https://ruscorpora.ru/new/en/'>Russian National Corpus</a> (321,712,061
+        <table style="width:100%; color: gray">Frequency data is from the <a href='https://ruscorpora.ru/new/en/'>Russian National Corpus</a> (321,712,061
             words and 124,565 documents total).</table>
+    </div>
+</div>
+<div id="clancy_info" class="row mt-3 bt-5" style='display: none;'>
+    <div class="col-md-1"></div>
+    <div class="col-md-8">
+        <table style="width:100%; color: gray">Frequency data is from the Clancy Visualizing Russian Database.</table>
+    </div>
+</div>
+<div id="sharoff_info" class="row mt-3 bt-5" style='display: none;'>
+    <div class="col-md-1"></div>
+    <div class="col-md-8">
+        <table style="width:100%; color: gray">Frequency data is from Sharoff Frequency Count table.</table>
     </div>
 </div>
 <div id="results" class="row mt-3 bt-5">

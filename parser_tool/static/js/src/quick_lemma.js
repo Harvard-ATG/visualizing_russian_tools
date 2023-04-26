@@ -24,13 +24,12 @@
       // lemma
       if (designator == 'lemma') {
         document.getElementById('type_dropdown_options').value = 'lemmas';
-        document.getElementById('source_dropdown_options').value = 'visrus';
       }
       // form
       else {
         document.getElementById('type_dropdown_options').value = 'forms';
-        document.getElementById('source_dropdown_options').value = 'visrus';
       }
+      document.getElementById('source_dropdown_options').value = 'visrus';
       before_display();
       const jqXhr = api.lemmatizetext(input_text);
       jqXhr.then(function (result, textStatus) {
@@ -90,41 +89,57 @@
   function make_rnc_array(result, word_type) {
     before_display();
     if (word_type == 'forms') { // RNC forms
-      var values = result.data.tokens;
-      console.log('values',values);
-      var form_or_lemma = 'rnc_form_count';
+      var wordDataList = result.data.tokens;
+      var key = 'rnc_form_count';
       var word_label = 'canonical';
     } else { // RNC lemmas
-      var values = Object.values(result.data.lemmas);
-      console.log('values',values);
-      var form_or_lemma = 'rnc_lemma_count';
+      var wordDataList = Object.values(result.data.lemmas);
+      var key = 'rnc_lemma_count';
       var word_label = 'label';
     }
-      var array = [];
-      for (const val of values) {
-        if (val.level != "") {
-          if (!val[form_or_lemma]) {
-            var occurrences = 'None found';
-          } else {
-            var occurrences = val[form_or_lemma];
-          }
-          if (!val.rnc_doc_count) {
-            var docs = 'None found';
-          } else {
-            var docs = val.rnc_doc_count;
-          }
-          array.push({
-            'word': val[word_label], 'occurrences': occurrences,
-            'docs': docs, 'level': val.level
-          });
+    var array = [];
+    for (const w of wordDataList) {
+      if (w.level != "") {
+        if (!w[key]) {
+          var occurrences = 'None found';
+        } else {
+          var occurrences = w[key];
         }
+        if (!w.rnc_doc_count) {
+          var docs = 'None found';
+        } else {
+          var docs = w.rnc_doc_count;
+        }
+        array.push({
+          'word': w[word_label], 'occurrences': occurrences,
+          'docs': docs, 'level': w.level
+        });
       }
-      array.sort((a, b) => (a.occurrences < b.occurrences) ? 1 : -1);
-      console.log('array',array);
-      return array;
+    }
+    find_leftout_words(result).forEach(function (d) {
+      array.push({ 'word': d, 'occurrences': 'N/A', 'docs': 'N/A', 'level': 'N/A' })
+    })
+    array.sort((a, b) => (a.occurrences < b.occurrences) ? 1 : -1);
+    return array;
   };
 
+  function find_leftout_words(result) {
+    var separatorsEtc = ` .,;"'*/:_-&!@#$%^*()[]{}|\<>\n\t`
+    if (!(result.data.tokens == undefined)) {
+      var tokenStrings = result.data.tokens.filter(d => !separatorsEtc.includes(d.token)).map(function (d) {
+        if (d.label) {
+          return d.label
+        } else { return d.token }
+      })
+      var lemmaStrings = Object.values(result.data.lemmas).map(d => d.label)
+      return tokenStrings.filter(x => !lemmaStrings.includes(x))
+    } else {
+      return []
+    }
+  }
+
   function make_array(result, designator) {
+    console.log('result.data',result.data)
     if (designator == 'lemma') {
       var values = Object.values(result.data.lemmas);
     }
@@ -134,6 +149,8 @@
     if (designator == 'lemma_to_forms') {
       var values = Object.values(result.data);
     }
+    console.log('designator', designator)
+    console.log('values', values)
     var array = [];
     let unique_words = new Set();
     for (const val of values) {
@@ -156,13 +173,19 @@
         var level = result['level'];
         var rank = val.sharoff_rank;
       }
+
       if (level != "") {
+        // get rid of repeat words
         if (!unique_words.has(word_label)) {
           array.push({ 'word': word_label, 'freq': frequency, 'level': level, 'rank': rank });
           unique_words.add(word_label);
         }
       }
     }
+    // add any words lost to the void
+    find_leftout_words(result).forEach(function (d) {
+      array.push({ 'word': d, 'freq': 'N/A', 'level': 'N/A', 'rank': 'N/A' })
+    })
     array.sort((a, b) => (a.freq < b.freq) ? 1 : -1);
     return array;
   }
@@ -170,6 +193,8 @@
   function before_display() {
     $("#outputtable").empty();
     $("#rnc_info").hide();
+    $("#sharoff_info").hide();
+    $("#clancy_info").hide();
     $("#ngramtitle").empty();
     $("#ngramviewer").empty();
     $("#results").hide();
@@ -181,6 +206,7 @@
     document.getElementById("source_dropdown").style.display = "none";
     $("#results").show();
     if (designator == 'form' || designator == 'lemma_to_forms') {
+      $("#sharoff_info").hide().fadeIn(200).show();
       var col1 = 'Form  Frequency';
       var col2 = 'Form  Rank';
       document.getElementById("type_dropdown").style.display = "block";
@@ -194,6 +220,7 @@
       document.getElementById("source_dropdown").style.display = "block";
     }
     else {
+      $("#clancy_info").hide().fadeIn(200).show();
       var col1 = 'Lemma  Frequency';
       var col2 = 'Lemma  Rank';
       document.getElementById("type_dropdown").style.display = "block";
@@ -211,7 +238,6 @@
     if (array.length == 0) {
       $("#outputtable").text('No input data found or word not found in database.');
     }
-
     var direct_url = 't1%3B%2C';
     var content = '';
     var index = 0;
@@ -224,6 +250,10 @@
         var col1val = token.freq;
         var col2val = token.rank;
       }
+      // standardized null/undefined values
+      if (col1val == null) { col1val = 'N/A' }
+      if (col2val == null) { col2val = 'N/A' }
+
       $("#outputtable").append('<tr><th data-level=' + token.level + '>'
         + token.word + '</th><th>' + col1val + '</th><th>' + col2val + '</th></tr>');
       // for ngram viewer
@@ -250,9 +280,12 @@
   $(document).ready(async function () {
     console.log("ready!");
     $("#rnc_info").hide();
+    $("#sharoff_info").hide();
+    $("#clancy_info").hide();
     $("#clearbtn").on("click", clear); // clear view
     $("#sortedlemmabtn").on("click", sorted_lemmas); // basic lemma button
     $("#getformsbtn").on("click", get_forms); // generate forms
+
     // when type is changed between lemma/forms
     $("#type_dropdown").change(function () {
       var word_type = $("#type_dropdown option:selected").val();
