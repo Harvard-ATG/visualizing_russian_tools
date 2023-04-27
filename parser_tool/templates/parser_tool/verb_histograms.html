@@ -92,6 +92,17 @@
         margin-top: 10px;
         margin-bottom: 10px;
     }
+
+    .white {
+        background-color: white;
+        border: solid lightgray;
+        border-width: 1px;
+        padding-left: 25px
+    }
+
+    #sentences {
+        padding: 12px
+    }
 </style>
 {% endblock %}
 
@@ -129,10 +140,24 @@
             Word counts collected from the Morphological Standard Russian National Corpus, 2020,
             <a href="https://ruscorpora.ru/new/en/index.html">https://ruscorpora.ru/new/en/index.html</a>.
         </p>
-        <p style='color: gray'>Counts of different constructions beginning at different distances from the verb.
-            "Simple" view includes constructions with 5 or more occurrences in the Russian National Corpus, 
-            meaning that it shows only the more common verb constructions. 
-            "Detailed" view includes all constructions found with the verb, including those with fewer than 5 occurrences.
+        <p>The <b>Verb Histogram Tool</b> presents counts (and examples) of a verb's grammatical constructions at
+            differing locations in a sentence.
+            Constructions are prepositions, infinitive, ", что", etc. used along with a verb in the sentence.
+            Learning verb constructions is a helpful practice for understanding a verb's usage with prepositions and
+            cased words (and other kinds of words),
+            pointing towards a practical knowledge of the language.
+        </p>
+        <p>
+            "Simple" view includes constructions with 5 or more occurrences in the Russian National Corpus,
+            meaning that it shows only the more common verb constructions.
+            "Detailed" view includes all constructions found with the verb, including those with fewer than 5
+            occurrences.
+        </p>
+        <p>Example of construction: The sentence <i>"Он живёт в Вашингтоне со своей семьёй."</i> follows the
+            construction
+            which we denote as
+            <b>[Nominative case] + жить + [в + Locative case] + [с + Instrumental case]</b>
+            or more briefly as <b>[NOM] + жить + [в/во + LOC] + [с/со + INSTR]</b>.
         </p>
     </div>
     <!-- <div class='row'>
@@ -175,7 +200,7 @@
                             Common constructions (separated):
                         </button>
                     </h2>
-                    <div id="collapse2" class="accordion-collapse collapse show" aria-labelledby="headingTwo">
+                    <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="headingTwo">
                         <div class="accordion-body">
                             <p id='use0'></p>
                             <p id='use1'></p>
@@ -206,19 +231,22 @@
                     </div>
                 </div>
             </div>
-            <svg id="chart" width="750" height="500"></svg>
-
+            <br>
+            <h5>Graph of distribution of constructions with <span class="theverb"></span> in the corpus</h5>
+            <p>Click a colored bar on the graph to see examples (on right) with specific construction.</p>
+            <svg id="chart" width="750" height="570"></svg>
             <input type="checkbox" id="sort" style='display: none;'>
-            <!-- Toggle sort -->
-
         </div>
         <div class='col-md-1'>
             <div id='#legend'></div>
         </div>
-        <div class='col-md-4' style='padding-left:25px;'>
+        <div class='col-md-4 white'>
+            <br>
             <h5>Real sentences from the Russian National Corpus</h5>
-            <h5><span id="theverb"></span> + [<span class='cx'>...</span>] at position <span id='windowsize'>...</span></h5>
-            <div id='sentences' style='color: #777777;  height: 825px; overflow: auto'></div>
+            <h5>with <span class="theverb"></span> + [<span class='cx'>...</span>] at position <span
+                    id='windowsize'>...</span></h5>
+            <hr>
+            <div id='sentences' style='height: 825px; overflow: auto'></div>
         </div>
     </div>
     <div class='row' style='height: 150px'> </div>
