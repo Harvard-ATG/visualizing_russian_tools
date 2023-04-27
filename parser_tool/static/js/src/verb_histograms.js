@@ -1,5 +1,3 @@
-
-
 function chart(csv) {
     // Define the div for the tooltip
     const div = d3
@@ -9,11 +7,13 @@ function chart(csv) {
         .style('opacity', 0);
     // cx labels
     var keys = csv.columns.slice(2);
+
     // set of all verbs
     var verb = [...new Set(csv.map(d => d.Verb))]
     verb.sort(function (a, b) {
         return a.localeCompare(b);
     })
+
     // window sizes
     var states = [...new Set(csv.map(d => d.WindowSize))]
     // break down each case set into parts for color distribution
@@ -309,6 +309,7 @@ function chart(csv) {
             })
 
             function displaySents(cx, windowSize) {
+                d3.select('#theverb').text(d3.select('#verb').property('value'))
                 d3.select('.cx').text(cx)
                 d3.select('#windowsize').text(windowSize)
                 d3.selectAll('.sentence').remove()
