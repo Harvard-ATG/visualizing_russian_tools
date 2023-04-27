@@ -91,9 +91,9 @@ class HtmlColorizer(DocumentColorizer):
                     element = soup.new_tag("span")
                     element.string = token['token']
                     if color_attribute == COLOR_ATTR_DATA:
-                        element['data-level'] = token_level
+                        element['data-level'] = str(token_level_int)
                     elif color_attribute == COLOR_ATTR_CLASS:
-                        element['class'] = 'wordlevel' + str(token_level_int)
+                        element['class'] = 'level' + str(token_level_int)
                     elif color_attribute == COLOR_ATTR_STYLE:
                         element['style'] = 'color:' + COLOR_LIST[token_level_int]
                 else:

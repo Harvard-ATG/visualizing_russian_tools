@@ -1,0 +1,58 @@
+{% extends "site_base.html" %}
+{% load static %}
+
+{% block head_title %}Playing With Matches Options{% endblock %}
+{% block body_id %}playing-with-matches-options{% endblock %}
+{% block body_class %}{% endblock %}
+
+{% block extra_script %}
+    {{ possible_words|json_script:"possible_words_data" }}
+    <script src="{% static 'js/src/lib/utils.js' %}"></script>
+    <script src="{% static 'js/src/playing_with_matches_options.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+<a name="top"></a>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10 mt-3">
+        <h2>Playing With Matches</h2>
+    </div>
+</div>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+    <form method="post">
+        {% csrf_token %}
+            <div class="custom-radio d-flex flex-column">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <div class="alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                    {{ field.label_tag }} {{ field }}
+                {% endfor %}
+            </div>
+            <div>Words entered: <span id="wordcount">0</span></div>
+            <button class="btn btn-primary" type="submit">Start Game</button>
+            <button class="btn btn-secondary my-4" id="generate-words">Generate Words</button>
+    </form>
+    </div>
+</div>
+<div class="row mt-4 mb-4">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+    <h3>Word Bank</h3>
+    <p>Select from the following list of {{ possible_words|length }} words to use in <i>Playing with Matches</i>:</p>
+    <div style="column-count: 4;">
+        {% for word in possible_words %}
+            {{ word.lemma }}<br>
+        {% endfor %}
+    </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,5 +1,9 @@
+import csv
 from django.db import models
 import operator
+import os
+from visualizing_russian_tools.settings.base import ROOT_DIR
+
 
 class Lemma(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)
@@ -22,6 +26,9 @@ class Lemma(models.Model):
     count = models.FloatField(blank=True, null=True)
     rnc_doc_count = models.IntegerField()
     rnc_lemma_count = models.IntegerField()
+    icon_url = models.TextField()
+    icon_license = models.TextField()
+    icon_attribute = models.TextField()
 
     def __str__(self):
         return "%s [%s:%s] " % (self.lemma, self.pos, self.id)
@@ -71,6 +78,9 @@ class Lemma(models.Model):
             "reverse": "",
             "rnc_doc_count": self.rnc_doc_count,
             "rnc_lemma_count": self.rnc_lemma_count,
+            "icon_url": self.icon_url if self.icon_url!= None else "https://static.thenounproject.com/png/3848152-200.png",
+            "icon_license": self.icon_license,
+            "icon_attribute": self.icon_attribute
         }
         if self.pos == "verb":
             data["aspect_pair"] = self.get_aspect_pair()

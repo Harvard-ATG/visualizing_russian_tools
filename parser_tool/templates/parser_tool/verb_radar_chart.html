@@ -7,8 +7,6 @@
 
 {% block extra_style %}
 {{ block.super }}
-<meta charset="utf-8">
-<link rel="stylesheet" type="text/css" href="{% static 'css/colorization.css' %}" />
 <style>
     h2 {
         color: #777777
@@ -88,7 +86,7 @@
                 <h5 class='gray'>Present: <span id='present'></span></h5>
                 <h5 class='gray'>Future: <span id='future'></span></h5>
             </span>
-           
+
         </div>
         <div id="error" style="color: gray; display: none">
             <h5>Word not found in the database.</h5>

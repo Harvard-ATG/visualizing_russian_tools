@@ -8,13 +8,117 @@ body {
 }
 main {
     flex: 3;
+    padding-bottom: 30px;
 }
+
 footer {
     flex: 1;
     background-color: rgba(0, 0, 0, 0.03);
     border-top: 1px solid #ccc;
     padding: 20px 0;
 }
-.container, .container-fluid {
+
+.container,
+.container-fluid {
     font-family: Lato, sans-serif;
+}
+
+.theme-default {
+    /* level colors */
+    --level0-color: black;
+    --level1-color: green; /* Core */
+    --level2-color: blue; /* Foundations */
+    --level3-color: #8000ff; /* Expansions */
+    --level4-color: orange; /* Specializations */
+}
+.theme-colorblind {
+    /* levels in color blind readable categories */
+    --level0-color: rgb(0, 0, 0);
+    --level1-color: rgb(0, 158, 115);   /* Core */
+    --level2-color: rgb(0, 114, 178);   /* Foundations */
+    --level3-color: rgb(204, 121, 167); /* Expansions */
+    --level4-color: rgb(230, 159, 0);   /* Specializations */
+}
+
+/* Note: we are intentionally specifying each color twice,
+   once using the CSS custom property and again with the
+   actual color value. The reason is that copy&paste (e.g. to a Word doc)
+   does not preserve the color using the CSS custom property alone
+   as of 2023-03-12.
+*/
+.theme-default .level0,
+.theme-default [data-level='0'] {
+    color: var(--level0-color);
+    color: black;
+}
+.theme-default .level1,
+.theme-default [data-level='1'],
+.theme-default [data-level='1E'] {
+    color: var(--level1-color);
+    color: green;
+}
+.theme-default .level2,
+.theme-default [data-level='2'],
+.theme-default [data-level='2I'] {
+    color: var(--level2-color);
+    color: blue;
+}
+.theme-default .level3,
+.theme-default [data-level='3'],
+.theme-default [data-level='3A'],
+.theme-default [data-level='3AU'] {
+    color: var(--level3-color);
+    color: #8000ff;
+
+}
+.theme-default .level4,
+.theme-default [data-level='4'],
+.theme-default [data-level='4S'],
+.theme-default [data-level='4SU'] {
+    color: var(--level4-color);
+    color: orange;
+}
+
+.theme-colorblind .level0,
+.theme-colorblind [data-level='0'] {
+    color: var(--level0-color);
+    color: rgb(0, 0, 0);
+}
+.theme-colorblind .level1,
+.theme-colorblind [data-level='1'],
+.theme-colorblind [data-level='1E'] {
+    color: var(--level1-color);
+    color: rgb(0, 158, 115);
+}
+.theme-colorblind .level2,
+.theme-colorblind [data-level='2'],
+.theme-colorblind [data-level='2I'] {
+    color: var(--level2-color);
+    color: rgb(0, 114, 178);
+}
+.theme-colorblind .level3,
+.theme-colorblind [data-level='3'],
+.theme-colorblind [data-level='3A'],
+.theme-colorblind [data-level='3AU'] {
+    color: var(--level3-color);
+    color: rgb(204, 121, 167);
+}
+.theme-colorblind .level4,
+.theme-colorblind [data-level='4'],
+.theme-colorblind [data-level='4S'],
+.theme-colorblind [data-level='4SU'] {
+    color: var(--level4-color);
+    color: rgb(230, 159, 0);
+}
+.theme-colorblind .level1-stop {
+    stop-color: var(--level1-color);
+}
+.theme-colorblind .level2-stop {
+    stop-color: var(--level2-color);
+}
+.theme-colorblind .level3-stop {
+    stop-color: var(--level3-color);
+}
+.theme-colorblind .level4-stop {
+    stop-color: var(--level4-color);
 }

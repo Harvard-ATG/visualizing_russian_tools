@@ -1,11 +1,20 @@
-FROM python:3.8-slim
+FROM python:3.11-slim
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONFAULTHANDLER=1
 
 COPY . /app
 WORKDIR /app
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install build-essential python3-dev curl gzip sqlite3 libsqlite3-dev && apt-get clean
+RUN apt-get update && \
+	DEBIAN_FRONTEND=noninteractive apt-get -y install \
+	build-essential \
+	python3-dev \
+	libxml2-dev \
+	libxslt-dev \
+	curl \
+	gzip \
+	sqlite3 && \
+	apt-get clean
 
 # NOTE: the below compiler flags are specifically targeted at the https://pypi.org/project/annoy/ library
 # which is a dependency used for testing cosine similarity. The annoy library is optimized with C/C++ 
@@ -13,8 +22,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install build-es
 # deploying (Fargate). The problem is that the build CPU includes AVX extensions (instructions) that 
 # are not present in Fargate, which ultimately results in a "Fatal Python error: Illegal instruction".
 # To that end, we are disabling the AVX1/AVX2 and AVX512 extensions.
-RUN CFLAGS="-mno-avx -mno-avx512f" CXXFLAGS="-mno-avx -mno-avx512f" \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+	CFLAGS="-mno-avx -mno-avx512f" CXXFLAGS="-mno-avx -mno-avx512f" \
+	pip install --no-cache-dir -r requirements.txt
 
 RUN ./manage.py migrate \
     && ./manage.py import_clancy_sqldump

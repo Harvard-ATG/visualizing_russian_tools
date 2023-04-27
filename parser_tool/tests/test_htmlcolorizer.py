@@ -11,7 +11,7 @@ def tokenize_and_tag_with_levels(text, levels=None):
     tokens = tokenizer.tokenize_and_tag(text)
     for token in tokens:
         if token['tokentype'] == 'RUS':
-            token['level'] = levels.get(token['canonical'], '1E')
+            token['level'] = levels.get(token['canonical'], '1')
         else:
             token['level'] = ''
     return tokens
@@ -38,8 +38,8 @@ class TestHtmlColorizer(unittest.TestCase):
         expected_tokens = tokenize_and_tag_with_levels(input_html)
         tests = [
             ('style', '<span style="color:green">Это</span> <span style="color:green">моя</span> <span style="color:green">семья</span>.'),
-            ('data', '<span data-level="1E">Это</span> <span data-level="1E">моя</span> <span data-level="1E">семья</span>.'),
-            ('class', '<span class="wordlevel1">Это</span> <span class="wordlevel1">моя</span> <span class="wordlevel1">семья</span>.'),
+            ('data', '<span data-level="1">Это</span> <span data-level="1">моя</span> <span data-level="1">семья</span>.'),
+            ('class', '<span class="level1">Это</span> <span class="level1">моя</span> <span class="level1">семья</span>.'),
         ]
 
         for test in tests:
@@ -52,7 +52,7 @@ class TestHtmlColorizer(unittest.TestCase):
         input_html = '<p><strong>В</strong> <b><em>этом</em></b> <span style="font-weight:bold">году.</span></p>'
         input_text = htmlcolorizer.SCRUB_HTML_PATTERN.sub('', input_html)
         expected_tokens = tokenize_and_tag_with_levels(input_text)
-        expected_html = '<p><strong><span data-level="1E">В</span></strong> <b><em><span data-level="1E">этом</span></em></b> <span style="font-weight:bold"><span data-level="1E">году</span>.</span></p>'
+        expected_html = '<p><strong><span data-level="1">В</span></strong> <b><em><span data-level="1">этом</span></em></b> <span style="font-weight:bold"><span data-level="1">году</span>.</span></p>'
 
         colorizer = htmlcolorizer.HtmlColorizer(input_html, color_attribute='data', levels={t['canonical']: t['level'] for t in expected_tokens})
         actual_html = colorizer.colorize()
@@ -80,9 +80,9 @@ class TestHtmlElementsColorizer(unittest.TestCase):
         }
         expected_tokens = tokenize_and_tag_with_levels(" ".join(elements.values()))
         expected_result = {
-            "8da35250": "<span data-level=\"1E\">Глава</span> 1",
-            "f7464298": "— <span data-level=\"1E\">Приве́т</span>! <span data-level=\"1E\">Как</span> <span data-level=\"1E\">тебя</span> <span data-level=\"1E\">зову́т</span>?",
-            "2ff91b9b": "— <span data-level=\"1E\">Ле́на</span>. <span data-level=\"1E\">А</span> <span data-level=\"1E\">тебя</span>?",
+            "8da35250": "<span data-level=\"1\">Глава</span> 1",
+            "f7464298": "— <span data-level=\"1\">Приве́т</span>! <span data-level=\"1\">Как</span> <span data-level=\"1\">тебя</span> <span data-level=\"1\">зову́т</span>?",
+            "2ff91b9b": "— <span data-level=\"1\">Ле́на</span>. <span data-level=\"1\">А</span> <span data-level=\"1\">тебя</span>?",
         }
         colorizer = htmlcolorizer.HtmlElementsColorizer(elements, color_attribute='data', levels={t['canonical']: t['level'] for t in expected_tokens})
         actual_result = colorizer.colorize()

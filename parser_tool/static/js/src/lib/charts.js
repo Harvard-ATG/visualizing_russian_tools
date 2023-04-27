@@ -1,32 +1,28 @@
 (function(global, d3, c3) {
     "use strict";
 
-    const BLACK = "#333333";
-    const GREEN = "#008000";
-    const BLUE = "#0000ff";
-    const PURPLE = "#8000ff";
-    const ORANGE = "#ffa500";
-    const BLUEGREEN = "#0d98ba";
-
-    const CHART_COLORS = {
-        'L_': BLACK, 
-        'L1': GREEN, 
-        'L1-2': 'url(#stripe-L1-2)', 
-        'L2': BLUE, 
-        'L3': PURPLE, 
-        'L4': ORANGE, 
-        'L5': ORANGE
-    };
-
+    const theme = global.app.theme;
 
     class LevelsChart {
         constructor({ counts, bindto, combineLevels }) {
             this.counts = counts;
             this.bindto = bindto;
-            this.colors = CHART_COLORS;
+            this.levelColors = theme.getLevelColors();
             this.combineLevels = (combineLevels === true);
             this.formatAsPercent = this.formatAsPercent.bind(this);
             this.toggleMask = this.toggleMask.bind(this);
+        }
+
+        getColors() {
+            return {
+                'L_': this.levelColors[0],
+                'L1': this.levelColors[1],
+                'L1-2': 'url(#stripe-L1-2)',
+                'L2': this.levelColors[2],
+                'L3': this.levelColors[3],
+                'L4': this.levelColors[4],
+                'L5': this.levelColors[5],
+            };
         }
 
         getColumns() {
@@ -59,7 +55,7 @@
 
         formatAsPercent(v, id, i, j) {
             const result = v / this.counts.total;
-            return d3.format('.1%')(Number.isNaN(result) ? 0 : result) 
+            return d3.format('.1%')(Number.isNaN(result) ? 0 : result)
         }
 
         orderByLevel(a, b) {
@@ -87,7 +83,7 @@
                 .attr('width', 24)
                 .attr('height', 24)
                 .attr('transform', 'translate(0,0)')
-                .attr('fill', gradient); 
+                .attr('fill', gradient);
         }
 
         addGradientGreenToBlue(bindto, id) {
@@ -99,10 +95,10 @@
                 .attr('y1', '0')
                 .attr('x2', '0')
                 .attr('y2', '100%');
-            linearGradient.append('stop').attr('offset', '0').attr('stop-color', '#0F7001');
-            linearGradient.append('stop').attr('offset', '50%').attr('stop-color', '#606dbc');
-            linearGradient.append('stop').attr('offset', '50%').attr('stop-color', '#0000FF');
-            linearGradient.append('stop').attr('offset', '100%').attr('stop-color', '#0000FF');
+            linearGradient.append('stop').attr('offset', '0').attr('stop-color', this.levelColors[1]);
+            linearGradient.append('stop').attr('offset', '50%').attr('stop-color', this.levelColors[1]);
+            linearGradient.append('stop').attr('offset', '50%').attr('stop-color', this.levelColors[2]);
+            linearGradient.append('stop').attr('offset', '100%').attr('stop-color', this.levelColors[2]);
         }
 
         addPatterns() {
@@ -120,7 +116,7 @@
                 data: {
                     type: 'pie',
                     columns: this.getColumns(),
-                    colors: this.colors,
+                    colors: this.getColors(),
                     order: this.orderByLevel,
                     labels: {format: this.formatAsPercent},
                     onclick: this.toggleMask,
@@ -130,7 +126,7 @@
         }
     }
 
-    
+
     class LevelsBarChart extends LevelsChart {
         generate() {
             c3.generate({
@@ -138,7 +134,7 @@
                 data: {
                     type: 'bar',
                     columns: this.getColumns(),
-                    colors: this.colors,
+                    colors: this.getColors(),
                     order: this.orderByLevel,
                     labels: {format: this.formatAsPercent},
                     onclick: this.toggleMask,

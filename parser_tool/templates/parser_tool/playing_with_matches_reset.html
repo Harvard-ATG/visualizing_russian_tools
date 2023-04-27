@@ -1,0 +1,26 @@
+{% extends "site_base.html" %}
+{% load static %}
+
+{% block head_title %}Playing with Matches Options{% endblock %}
+{% block body_id %}playing-with-matches-options{% endblock %}
+{% block body_class %}{% endblock %}
+
+{% block extra_script %}
+    <script src="{% static 'js/src/playing_with_matches_reset.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+<a name="top"></a>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+</div>
+<div class="row" style="background-color: #f7f7f7">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <button class="restart" onclick="history.back();" >Restart</button>
+        <button class="options">Options</button>
+    </div>
+</div>
+
+{% endblock %}

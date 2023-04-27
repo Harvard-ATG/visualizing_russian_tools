@@ -3,6 +3,7 @@
 
   // Imports
   const utils = window.app.utils;
+  const theme = window.app.theme;
   const ApiClient = window.app.ApiClient;
   const FrequencyGauge = window.app.FrequencyGauge;
   const LevelsPieChart = window.app.LevelsPieChart;
@@ -11,7 +12,7 @@
 
   /**
    * Parse Service
-   * 
+   *
    * Responsible for submitting parse requests to the backend, storing data,
    * and querying the returned data.
    */
@@ -81,7 +82,7 @@
 
   /**
    * Parsed Text Controller
-   * 
+   *
    * Responsible for rendering and manipulating the parsed text.
    */
   var parsedTextCtrl = {
@@ -106,7 +107,7 @@
         self.showLemmas = false;
       }
       self.showLemmas = !self.showLemmas;
-  
+
       $(".word.parsed").each(function(idx, el) {
         var form_ids = self.getElementDataFormIds(el);
         var word_info = parseService.getWordInfo(form_ids);
@@ -138,7 +139,7 @@
 
   /**
    * Word Info Controller
-   * 
+   *
    * Responsible for rendering word information alongside the parsed text.
    */
   var wordInfoCtrl = {
@@ -149,7 +150,7 @@
       } else {
         this.reset();
       }
-      
+
     },
     reset: function() {
       $("#worddetails").html("Click on a word.");
@@ -252,7 +253,7 @@
 
   /**
    * Text Info Controller
-   * 
+   *
    * Responsible for displaying and manipulating statistics about the parsed text.
    */
   var textInfoCtrl = {
@@ -308,7 +309,7 @@
       html += '<div id="textinfocsv" style="display:none;">';
       html += ['Word Count', 'Unparsed', 'L1', 'L2', 'L3', 'L4'].join(",") + "<br>";
       html += [counts.total, counts[0], counts[1], counts[2], counts[3], counts[4]].join(",") + "\n";
-      html += '</div>'; 
+      html += '</div>';
       $('#textinfo').html(html);
     },
     copyToClipboard: function() {
@@ -329,7 +330,7 @@
 
   /**
    * Input Text Controller
-   * 
+   *
    * Responsible for managing the input text and showing error messages.
    */
   var inputTextCtrl = {
@@ -372,8 +373,8 @@
 
   /**
    * Main Controller
-   * 
-   * Responsible for handling page-level actions/events and delegating to controllers 
+   *
+   * Responsible for handling page-level actions/events and delegating to controllers
    * for further processing and rendering as appropriate.
    */
   var mainCtrl = {
@@ -384,7 +385,8 @@
 
       mainCtrl.clearAnalysis();
       inputTextCtrl.clearError();
-      inputTextCtrl.showLoadingIndicator();      
+      inputTextCtrl.showLoadingIndicator();
+      mainCtrl.colorReadability()
 
       parseService.parse(text).then(function() {
         parsedTextCtrl.render(parseService.data);
@@ -435,16 +437,24 @@
       wordInfoCtrl.reset();
       $("#analysis").addClass("d-none");
       return this;
+    },
+    colorReadability: function() {
+      const checked = document.getElementById("increaseColorReadability").checked;
+      if(checked) {
+        theme.setTheme('colorblind');
+      } else {
+        theme.setDefaultTheme();
+      }
     }
   };
 
-  
+
   // Page-level event handlers registered here
   $(document).ready(function() {
     $(document).on('click', '#parsebtn', utils.logEvent(mainCtrl.onClickParse));
     $(document).on('click', '#clearbtn', utils.logEvent(mainCtrl.onClickClear));
     $(document).on('click', '.underline-toggle', utils.logEvent(mainCtrl.onClickUnderlineToggle));
-    $(document).on('click', '.word.parsed', utils.logEvent(mainCtrl.onClickWord));  
+    $(document).on('click', '.word.parsed', utils.logEvent(mainCtrl.onClickWord));
     $(document).on('click', '.lemma-toggle', utils.logEvent(mainCtrl.onClickLemmaToggle));
     $(document).on('click', '#textinfocopy', utils.logEvent(mainCtrl.onClickCopyTextInfo));
     $(document).on('click', '#toggle-chart-levels', utils.logEvent(mainCtrl.onClickToggleChartLevels));
