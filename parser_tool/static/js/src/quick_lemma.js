@@ -126,7 +126,7 @@
   function find_leftout_words(result) {
     var separatorsEtc = ` .,;"'*/:_-&!@#$%^*()[]{}|\<>\n\t`
     if (!(result.data.tokens == undefined)) {
-      var tokenStrings = result.data.tokens.filter(d => !separatorsEtc.includes(d.token)).map(function (d) {
+      var tokenStrings = result.data.tokens.filter(d => !separatorsEtc.includes(d.token.trim())).map(function (d) {
         if (d.label) {
           return d.label
         } else { return d.token }
@@ -236,7 +236,7 @@
     $("#outputtable").append('<tr style="color:gray"><th> ' + lexeme + ' </th><th>' + col1 + '</th><th>' + col2 + '</th></tr>').hide().fadeIn(200);
 
     if (array.length == 0) {
-      $("#outputtable").text('No input data found or word not found in database.');
+      $("#outputtable").text('No input data found or word not found in Clancy Visualizing Russian database.');
     }
     var direct_url = 't1%3B%2C';
     var content = '';
