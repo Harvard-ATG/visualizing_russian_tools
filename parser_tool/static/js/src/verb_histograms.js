@@ -1,5 +1,3 @@
-
-
 function chart(csv) {
     // Define the div for the tooltip
     const div = d3
@@ -9,11 +7,13 @@ function chart(csv) {
         .style('opacity', 0);
     // cx labels
     var keys = csv.columns.slice(2);
+
     // set of all verbs
     var verb = [...new Set(csv.map(d => d.Verb))]
     verb.sort(function (a, b) {
         return a.localeCompare(b);
     })
+
     // window sizes
     var states = [...new Set(csv.map(d => d.WindowSize))]
     // break down each case set into parts for color distribution
@@ -79,13 +79,13 @@ function chart(csv) {
         .text(d => d)
 
     var svg = d3.select("#chart"),
-        margin = { top: 35, left: 35, bottom: 0, right: 70 },
+        margin = { top: 35, left: 35, bottom: 50, right: 70 },
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
 
     var x = d3.scaleBand()
         .range([margin.left, width - 100 - margin.right])
-        .padding(0.1)
+        .padding(0.2)
 
     var y = d3.scaleLinear()
         .rangeRound([height - margin.bottom, margin.top])
@@ -99,13 +99,15 @@ function chart(csv) {
         .attr("class", "y-axis")
 
     var startingverb = 'работать'
-    d3.select('#verb').property('value', startingverb);
+    d3.select('#verb').property('value', startingverb)
+    d3.selectAll('.theverb').text(startingverb)
 
     // write the graph!!!
     var cValue = d3.select('#complexity').property('value')
     update(startingverb, 0, false, cValue)
 
     $('#verb').on('select2:select', function (e) {
+        d3.selectAll('.theverb').text(d3.select('#verb').property('value'))
         var cValue = d3.select('#complexity').property('value')
         update(this.value, 750, false, cValue)
     });
@@ -169,7 +171,7 @@ function chart(csv) {
         }
 
         function withSentences(sentencedata, complexity) {
-            d3.selectAll('.verblabel').text(input)
+            // d3.selectAll('.verblabel').text(input)
             d3.selectAll('.destroyonupdate').remove()
 
             var newcsv = JSON.parse(JSON.stringify(csv))
@@ -309,6 +311,7 @@ function chart(csv) {
             })
 
             function displaySents(cx, windowSize) {
+                // d3.select('.theverb').text(d3.select('#verb').property('value'))
                 d3.select('.cx').text(cx)
                 d3.select('#windowsize').text(windowSize)
                 d3.selectAll('.sentence').remove()
@@ -382,13 +385,10 @@ function chart(csv) {
                     }
                 })
                 .text(function (d, i) {
-                    if (i != 3) {
-                        return d.total
-                    } else {
+                    if (i == 3) {
                         return input
                     }
                 })
-
             d3.selectAll('.legend').remove()
 
             // Add one dot in the legend for each name.

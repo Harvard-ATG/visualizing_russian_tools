@@ -9,7 +9,9 @@
 {{ block.super }}
 <style>
     h2,
-    h3, h4, .accordion-body {
+    h3,
+    h4,
+    .accordion-body {
         color: #777777
     }
 
@@ -68,6 +70,7 @@
     rect {
         cursor: pointer
     }
+
     .select2-selection__rendered,
     .select2-results,
     .select2-search,
@@ -78,14 +81,27 @@
     select {
         width: 200
     }
+
     .accordion-body {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
     }
+
     #complexity {
         margin-left: 15px;
         margin-top: 10px;
         margin-bottom: 10px;
+    }
+
+    .white {
+        background-color: white;
+        border: solid lightgray;
+        border-width: 1px;
+        padding-left: 25px
+    }
+
+    #sentences {
+        padding: 12px
     }
 </style>
 {% endblock %}
@@ -124,92 +140,114 @@
             Word counts collected from the Morphological Standard Russian National Corpus, 2020,
             <a href="https://ruscorpora.ru/new/en/index.html">https://ruscorpora.ru/new/en/index.html</a>.
         </p>
-        <p style='color: gray'>Counts of different constructions beginning at different distances from the verb</p>
+        <p>The <b>Verb Histogram Tool</b> presents counts (and examples) of a verb's grammatical constructions at
+            differing locations in a sentence.
+            Constructions are prepositions, infinitive, ", что", etc. used along with a verb in the sentence.
+            Learning verb constructions is a helpful practice for understanding a verb's usage with prepositions and
+            cased words (and other kinds of words),
+            pointing towards a practical knowledge of the language.
+        </p>
+        <p>
+            "Simple" view includes constructions with 5 or more occurrences in the Russian National Corpus,
+            meaning that it shows only the more common verb constructions.
+            "Detailed" view includes all constructions found with the verb, including those with fewer than 5
+            occurrences.
+        </p>
+        <p>Example of construction: The sentence <i>"Он живёт в Вашингтоне со своей семьёй."</i> follows the
+            construction
+            which we denote as
+            <b>[Nominative case] + жить + [в + Locative case] + [с + Instrumental case]</b>
+            or more briefly as <b>[NOM] + жить + [в/во + LOC] + [с/со + INSTR]</b>.
+        </p>
     </div>
-    <div class='row'>
+    <!-- <div class='row'>
         <div class='col-md-1'></div>
+        <div class='col-md-6'>
+
+        </div>
+    </div> -->
+    <div class='row' style='padding-top: 10px'>
+        <div class="col-md-1"></div>
         <div class='col-md-6'>
             <span class='verb'>Select verb:</span>
             <select id="verb" style='width: 50%'></select>
             <button type="button" id='randomize'>Randomize verb</button>
             <select name="complexity" id="complexity">
-                <option value="simple">Simple</option>
                 <option value="detailed">Detailed</option>
-              </select>
-    </div>
-</div>
-<div class='row' style='padding-top: 10px'>
-    <div class="col-md-1"></div>
-    <div class='col-md-6'>
-        <div class="accordion .accordion-flush" id="accordionExample">
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" style='font-weight: bold;' type="button"
-                        data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false"
-                        aria-controls="collapse1">
-                        Most common construction (aggregate):
-                    </button>
-                </h2>
-                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="headingTwo">
-                    <div class="accordion-body">
-                        <p id='aggregate'></p>
+                <option value="simple">Simple</option>
+            </select>
+            <div class="accordion .accordion-flush" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" style='font-weight: bold;' type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false"
+                            aria-controls="collapse1">
+                            Most common construction (aggregate):
+                        </button>
+                    </h2>
+                    <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="headingTwo">
+                        <div class="accordion-body">
+                            <p id='aggregate'></p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" style='font-weight: bold;' type="button"
-                        data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false"
-                        aria-controls="collapse2">
-                        Common constructions (separated):
-                    </button>
-                </h2>
-                <div id="collapse2" class="accordion-collapse collapse show" aria-labelledby="headingTwo">
-                    <div class="accordion-body">
-                        <p id='use0'></p>
-                        <p id='use1'></p>
-                        <p id='use2'></p>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" style='font-weight: bold;' type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false"
+                            aria-controls="collapse2">
+                            Common constructions (separated):
+                        </button>
+                    </h2>
+                    <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+                        <div class="accordion-body">
+                            <p id='use0'></p>
+                            <p id='use1'></p>
+                            <p id='use2'></p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" style='font-weight: bold;' type="button"
-                        data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false"
-                        aria-controls="collapse3">
-                        Related Words
-                    </button>
-                </h2>
-                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="headingTwo">
-                    <div class="accordion-body">
-                        <div class='row'>
-                            <div class='col-md-6' id='wordcol0'>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" style='font-weight: bold;' type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false"
+                            aria-controls="collapse3">
+                            Related Words
+                        </button>
+                    </h2>
+                    <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+                        <div class="accordion-body">
+                            <div class='row'>
+                                <div class='col-md-6' id='wordcol0'>
 
-                            </div>
-                            <div class='col-md-6' id='wordcol1'>
+                                </div>
+                                <div class='col-md-6' id='wordcol1'>
 
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <br>
+            <h5>Graph of distribution of constructions with <span class="theverb"></span> in the corpus</h5>
+            <p>Click a colored bar on the graph to see examples (on right) with specific construction.</p>
+            <svg id="chart" width="750" height="570"></svg>
+            <input type="checkbox" id="sort" style='display: none;'>
         </div>
-        <svg id="chart" width="750" height="500"></svg>
-
-        <input type="checkbox" id="sort" style='display: none;'>
-        <!-- Toggle sort -->
-
+        <div class='col-md-1'>
+            <div id='#legend'></div>
+        </div>
+        <div class='col-md-4 white'>
+            <br>
+            <h5>Real sentences from the Russian National Corpus</h5>
+            <h5>with <span class="theverb"></span> + [<span class='cx'>...</span>] at position <span
+                    id='windowsize'>...</span></h5>
+            <hr>
+            <div id='sentences' style='height: 825px; overflow: auto'></div>
+        </div>
     </div>
-    <div class='col-md-1'>
-        <div id='#legend'></div>
-    </div>
-    <div class='col-md-4' style='padding-left:25px; height: 825px; overflow: auto'>
-        <h4>Sentences with <span class='cx'>...</span> at <span
-                id='windowsize'>...</span></h4>
-        <div id='sentences' style='color: #777777;'></div>
-    </div>
-</div>
-<div class='row' style='height: 150px'> </div>
-{% endblock %}
+    <div class='row' style='height: 150px'> </div>
+    {% endblock %}
