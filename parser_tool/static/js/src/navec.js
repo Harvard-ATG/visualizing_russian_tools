@@ -169,13 +169,6 @@
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // Define the zoom behavior
-        var zoomBehavior = d3.zoom()
-            .scaleExtent([0.5, 20]) // Set the minimum and maximum zoom scale
-            .on("zoom", zoomed);
-        // Apply the zoom behavior to the svg
-        svg.call(zoomBehavior);
-
 
         var clip = svg.append("defs").append("svg:clipPath")
             .attr("id", "clip")
@@ -193,7 +186,6 @@
             .data(data)
             .enter()
             .append('g')
-            .style('cursor','pointer')
 
         circle = node.append("circle")
             .attr("class", "dot")
@@ -251,24 +243,56 @@
             .attr('id', "axis--y")
             .call(yAxis);
 
+
+        // Define the zoom behavior
+        var zoomBehavior = d3.zoom()
+            .scaleExtent([0.5, 20]) // Set the minimum and maximum zoom scale
+            .on("zoom", zoomed);
+        // Apply the zoom behavior to the svg
+        svg.call(zoomBehavior);
+
+        const zoomGroup = svg.append("g")
+            .attr("class", "zoom-group")
+            .call(zoomBehavior);
+
+        zoomGroup.append("rect")
+            .attr("class", "zoom-overlay")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("fill", "none")
+            .attr("pointer-events", "all");
+
+
+
+
+        let isZooming = false;
+
         // Define the zoom function that will be called when the zoom event occurs
         function zoomed() {
+            isZooming = true;
             // Get the current zoom transform
             const transform = d3.event.transform;
-
+        
+            // Rescale the x and y scales
+            const newXScale = transform.rescaleX(x);
+            const newYScale = transform.rescaleY(y);
+        
             // Update the positions of the circles and labels based on the updated scales
-            circle.attr("cx", d => transform.applyX(x(d.x)))
-                .attr("cy", d => transform.applyY(y(d.y)));
-
-            label.attr("x", d => transform.applyX(x(d.x)) + 7)
-                .attr("y", d => transform.applyY(y(d.y)) + 7);
-
+            circle.attr("cx", d => newXScale(d.x))
+                .attr("cy", d => newYScale(d.y));
+        
+            label.attr("x", d => newXScale(d.x) + 7)
+                .attr("y", d => newYScale(d.y) + 7);
+        
             // Update the axes with the new scales
-            svg.select(".x.axis").call(xAxis.scale(transform.rescaleX(x)));
-            svg.select(".y.axis").call(yAxis.scale(transform.rescaleY(y)));
+            svg.select(".x.axis").call(xAxis.scale(newXScale));
+            svg.select(".y.axis").call(yAxis.scale(newYScale));
+            zoomGroup.attr("transform", transform);
         }
 
         function dragged() {
+            if (isZooming) return;
+
             const dx = d3.event.dx;
             const dy = d3.event.dy;
 
@@ -287,9 +311,12 @@
         document.getElementById('reset-button').addEventListener('click', resetZoomAndDrag);
 
         function resetZoomAndDrag() {
+            xTranslate = 0;
+            yTranslate = 0;
             svg.transition()
                 .duration(750)
                 .call(zoomBehavior.transform, d3.zoomIdentity);
+            isZooming = false;
         }
 
 
