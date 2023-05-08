@@ -187,6 +187,11 @@
             .enter()
             .append('g')
 
+        node.each(function (d) {
+            d.initialX = d.x;
+            d.initialY = d.y;
+        });
+
         circle = node.append("circle")
             .attr("class", "dot")
             .attr('data-rank', (d, i) => i)
@@ -227,7 +232,9 @@
                 }
             })
         }).on('mouseout', function () {
-            node.transition().style('opacity', 1)
+            node.each(function () {
+                d3.select(this).transition().style('opacity', 1)
+            });
         })
 
         // x axis
@@ -272,18 +279,18 @@
             isZooming = true;
             // Get the current zoom transform
             const transform = d3.event.transform;
-        
+
             // Rescale the x and y scales
             const newXScale = transform.rescaleX(x);
             const newYScale = transform.rescaleY(y);
-        
+
             // Update the positions of the circles and labels based on the updated scales
             circle.attr("cx", d => newXScale(d.x))
                 .attr("cy", d => newYScale(d.y));
-        
+
             label.attr("x", d => newXScale(d.x) + 7)
                 .attr("y", d => newYScale(d.y) + 7);
-        
+
             // Update the axes with the new scales
             svg.select(".x.axis").call(xAxis.scale(newXScale));
             svg.select(".y.axis").call(yAxis.scale(newYScale));
@@ -311,8 +318,8 @@
         document.getElementById('reset-button').addEventListener('click', resetZoomAndDrag);
 
         function resetZoomAndDrag() {
-            xTranslate = 0;
-            yTranslate = 0;
+            xTranslateCurrent = 0;
+            yTranslateCurrent = 0;
             svg.transition()
                 .duration(750)
                 .call(zoomBehavior.transform, d3.zoomIdentity);
