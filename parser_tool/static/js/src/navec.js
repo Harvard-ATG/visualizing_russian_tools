@@ -167,7 +167,8 @@
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .style('cursor','pointer')
 
 
         var clip = svg.append("defs").append("svg:clipPath")
@@ -176,11 +177,13 @@
             .attr("width", width)
             .attr("height", height)
             .attr("x", 0)
-            .attr("y", 0);
+            .attr("y", 0)
+            .style('cursor','pointer')
 
         var scatter = svg.append("g")
             .attr("id", "scatterplot")
-            .attr("clip-path", "url(#clip)");
+            .attr("clip-path", "url(#clip)")
+            .style('cursor','pointer')
 
         var node = scatter.selectAll(".dot")
             .data(data)
@@ -253,7 +256,7 @@
 
         // Define the zoom behavior
         var zoomBehavior = d3.zoom()
-            .scaleExtent([0.5, 20]) // Set the minimum and maximum zoom scale
+            .scaleExtent([1, 20]) // Set the minimum and maximum zoom scale
             .on("zoom", zoomed);
         // Apply the zoom behavior to the svg
         svg.call(zoomBehavior);
@@ -267,35 +270,45 @@
             .attr("width", width)
             .attr("height", height)
             .attr("fill", "none")
-            .attr("pointer-events", "all");
-
-
-
+            .attr("pointer-events", "all")
+            .style('pointer','cursor')
 
         let isZooming = false;
 
         // Define the zoom function that will be called when the zoom event occurs
         function zoomed() {
             isZooming = true;
-            // Get the current zoom transform
-            const transform = d3.event.transform;
 
+            // Get the current zoom transform
+            let transform = d3.event.transform;
+
+            const speed = 1.15; // You can adjust this value to get the desired effect
+
+            // Speed up panning based on zoom level
+            transform.x -= (d3.event.sourceEvent.movementX * transform.k * speed - d3.event.sourceEvent.movementX);
+            transform.y -= (d3.event.sourceEvent.movementY * transform.k * speed - d3.event.sourceEvent.movementY);
+            
+    
+            // Use D3's zoomIdentity to ensure correct positioning of elements
+            transform = d3.zoomIdentity.translate(transform.x, transform.y).scale(transform.k);
+            
             // Rescale the x and y scales
             const newXScale = transform.rescaleX(x);
             const newYScale = transform.rescaleY(y);
-
+        
             // Update the positions of the circles and labels based on the updated scales
             circle.attr("cx", d => newXScale(d.x))
                 .attr("cy", d => newYScale(d.y));
-
+        
             label.attr("x", d => newXScale(d.x) + 7)
                 .attr("y", d => newYScale(d.y) + 7);
-
+        
             // Update the axes with the new scales
             svg.select(".x.axis").call(xAxis.scale(newXScale));
             svg.select(".y.axis").call(yAxis.scale(newYScale));
             zoomGroup.attr("transform", transform);
         }
+        
 
         function dragged() {
             if (isZooming) return;
@@ -315,16 +328,20 @@
             .on("drag", dragged);
         svg.call(drag);
 
-        document.getElementById('reset-button').addEventListener('click', resetZoomAndDrag);
 
-        function resetZoomAndDrag() {
-            xTranslateCurrent = 0;
-            yTranslateCurrent = 0;
-            svg.transition()
-                .duration(750)
-                .call(zoomBehavior.transform, d3.zoomIdentity);
-            isZooming = false;
-        }
+        //  
+
+        
+        // document.getElementById('reset-button').addEventListener('click', resetZoomAndDrag);
+
+        // function resetZoomAndDrag() {
+        //     xTranslateCurrent = 0;
+        //     yTranslateCurrent = 0;
+        //     svg.transition()
+        //         .duration(750)
+        //         .call(zoomBehavior.transform, d3.zoomIdentity);
+        //     isZooming = false;
+        // }
 
 
         // scatter.append("g")
