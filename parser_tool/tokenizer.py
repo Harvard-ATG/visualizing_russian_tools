@@ -287,6 +287,7 @@ def tag(tokens):
             "canonical": canonical(token.strip())
         })
         offset += len(token)
+    print('tagged', tagged)
     return tagged
 
 
