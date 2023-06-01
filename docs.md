@@ -24,3 +24,9 @@ Nearest neighbors, locality sensitive hashing, word embeddings, principal compon
 
 #### Relevant Python libraries: [Navec](https://github.com/natasha/navec) (Russian NLP library), [annoy](https://github.com/spotify/annoy) (Approximate Nearest Neighbors). 
 
+### Quick Lemma Tool
+
+- `parser_tool/static/js/src/quick_lemma.js`: 
+
+- `parser_tool/static/templates/parser_tool/quick_lemma.html`: HTML page for rendering Quick Lemma
+
