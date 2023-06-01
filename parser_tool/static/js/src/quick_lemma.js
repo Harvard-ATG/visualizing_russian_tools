@@ -1,31 +1,43 @@
 (function ($) {
   const ApiClient = window.app.ApiClient;
+
+  // Function to display sorted lemmas
   async function sorted_lemmas() {
     display('lemma');
   }
+
+  // Function to display sorted forms
   async function sorted_forms() {
     display('form');
   }
+
+  // Function to get forms
   async function get_forms() {
     display('lemma_to_forms');
   }
+
+  // Function to get RNC data
   async function get_rnc_data() {
     display('rnc');
   }
+
+  // Function to clear the display
   async function clear() {
     before_display();
   }
 
+  // Function to handle the display based on the designator
   function display(designator) {
     const api = new ApiClient();
     var input_text = $("#contentinput").val();
-    // handling lemma or form
+
+    // Handling lemma or form
     if ((designator == 'lemma') || designator == 'form') {
-      // lemma
+      // Lemma
       if (designator == 'lemma') {
         document.getElementById('type_dropdown_options').value = 'lemmas';
       }
-      // form
+      // Form
       else {
         document.getElementById('type_dropdown_options').value = 'forms';
       }
@@ -37,7 +49,8 @@
         after_display(array, designator);
       })
     }
-    // generating forms from lemma (button)
+
+    // Generating forms from lemma (button)
     if (designator == 'lemma_to_forms') {
       document.getElementById('type_dropdown_options').value = 'forms';
       before_display();
@@ -57,16 +70,17 @@
             after_display(rnc_array, 'rnc');
           });
         }
-        // non-RNC lemma to forms
+        // Non-RNC lemma to forms
         else {
           after_display(array, designator);
         }
       });
     }
+
     // RNC dropdown
     if (designator == 'rnc') {
       var word_type = $("#type_dropdown option:selected").val();
-      // // RNC forms
+      // RNC forms
       if (word_type == 'forms') {
         before_display();
         const jqXhr = api.lemmatizetext(input_text);
@@ -86,6 +100,7 @@
     }
   };
 
+  // Function to create an array for RNC data
   function make_rnc_array(result, word_type) {
     before_display();
     if (word_type == 'forms') { // RNC forms
@@ -123,6 +138,7 @@
     return array;
   };
 
+  // Function to find left-out words
   function find_leftout_words(result) {
     var separatorsEtc = ` .,;"'*/:_-&!@#$%^*()[]{}|\<>\n\t`
     if (!(result.data.tokens == undefined)) {
@@ -138,8 +154,9 @@
     }
   }
 
+  // Function to create an array for lemmas or forms
   function make_array(result, designator) {
-    console.log('result.data',result.data)
+    console.log('result.data', result.data)
     if (designator == 'lemma') {
       var values = Object.values(result.data.lemmas);
     }
@@ -175,14 +192,14 @@
       }
 
       if (level != "") {
-        // get rid of repeat words
+        // Get rid of repeat words
         if (!unique_words.has(word_label)) {
           array.push({ 'word': word_label, 'freq': frequency, 'level': level, 'rank': rank });
           unique_words.add(word_label);
         }
       }
     }
-    // add any words lost to the void
+    // Add any words lost to the void
     find_leftout_words(result).forEach(function (d) {
       array.push({ 'word': d, 'freq': 'N/A', 'level': 'N/A', 'rank': 'N/A' })
     })
@@ -190,6 +207,7 @@
     return array;
   }
 
+  // Function to clear the display
   function before_display() {
     $("#outputtable").empty();
     $("#rnc_info").hide();
@@ -200,6 +218,7 @@
     $("#results").hide();
   }
 
+  // Function to display the output after processing
   function after_display(array, designator) {
     document.getElementById("clearbtn_display").style.display = "block";
     document.getElementById("type_dropdown").style.display = "none";
@@ -250,43 +269,43 @@
         var col1val = token.freq;
         var col2val = token.rank;
       }
-      // standardized null/undefined values
+      // Standardized null/undefined values
       if (col1val == null) { col1val = 'N/A' }
       if (col2val == null) { col2val = 'N/A' }
 
       $("#outputtable").append('<tr><th data-level=' + token.level + '>'
         + token.word + '</th><th>' + col1val + '</th><th>' + col2val + '</th></tr>');
-      // for ngram viewer
+      // For ngram viewer
       if (index != (array.length - 1)) {
         direct_url = direct_url + token.word + '%3B%2Cc0%3B.t1%3B%2C';
         content = content + token.word + '%2C+'
       }
       else {
-        // deal with last element in array (differenr url endings)
+        // Deal with the last element in the array (different URL endings)
         direct_url = direct_url + token.word + '%3B%2Cc0';
         content = content + token.word;
       }
       index += 1;
     }
 
-    // add ngram
+    // Add ngram viewer
     $("#ngramtitle").append('<tr style="color:gray"><th> Google N-Gram Viewer</th><th>');
     $("#ngramviewer").append('<iframe name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?smoothing=3&direct_url=' + direct_url
       + '&corpus=36&year_start=1800&content=' + content
       + '&year_end=2010" width=750 height=800 marginwidth=0 marginheight=0 hspace=0 vspace=0 frameborder=0 scrolling=no></iframe>');
   };
 
-  // ready
+  // Ready function
   $(document).ready(async function () {
     console.log("ready!");
     $("#rnc_info").hide();
     $("#sharoff_info").hide();
     $("#clancy_info").hide();
-    $("#clearbtn").on("click", clear); // clear view
-    $("#sortedlemmabtn").on("click", sorted_lemmas); // basic lemma button
-    $("#getformsbtn").on("click", get_forms); // generate forms
+    $("#clearbtn").on("click", clear); // Clear view
+    $("#sortedlemmabtn").on("click", sorted_lemmas); // Basic lemma button
+    $("#getformsbtn").on("click", get_forms); // Generate forms
 
-    // when type is changed between lemma/forms
+    // When type is changed between lemma/forms
     $("#type_dropdown").change(function () {
       var word_type = $("#type_dropdown option:selected").val();
       var source_type = $("#source_dropdown option:selected").val();
@@ -304,7 +323,8 @@
         }
       }
     });
-    // when source is changed between visualizing russian / RNC
+
+    // When source is changed between visualizing Russian / RNC
     $("#source_dropdown").change(function () {
       var source_type = $("#source_dropdown option:selected").val();
       if (source_type == 'rnc') {
@@ -323,4 +343,4 @@
 
 })(jQuery);
 
-// простая, простой, простые, простое, простом, простого 
+// простая, простой, простые, простое, простом, простого
