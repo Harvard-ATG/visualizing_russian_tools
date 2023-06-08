@@ -18,7 +18,7 @@
 
 pre.words {
     color: black;
-    font-family: inherit; /* Note: should inherit Lato from the body, overriding default mono font */
+    font-family: Lato, sans-serif; /* Must be set here, otherwise copy&paste to MSWord doesn't work */
     font-size: 12pt; /* Note: sclancy requested 12pt */
     tab-size: 8; /* tab entities - &x9; or &tab; - only render in "pre" elements */
     white-space: pre-wrap; /* css-3 */
