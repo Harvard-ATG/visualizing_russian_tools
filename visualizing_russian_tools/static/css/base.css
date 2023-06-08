@@ -5,6 +5,7 @@ body {
     display: flex;
     min-height: 100vh;
     flex-direction: column;
+    font-family: Lato, sans-serif;
 }
 main {
     flex: 3;
@@ -16,11 +17,6 @@ footer {
     background-color: rgba(0, 0, 0, 0.03);
     border-top: 1px solid #ccc;
     padding: 20px 0;
-}
-
-.container,
-.container-fluid {
-    font-family: Lato, sans-serif;
 }
 
 .theme-default {

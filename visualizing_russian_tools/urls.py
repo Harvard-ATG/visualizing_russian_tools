@@ -16,6 +16,7 @@ urlpatterns = [
 
     # Tool pages
     path('text-parsing-analysis', parser_tool.views.text_parsing_analysis,  name='text_parsing_analysis'),
+    path('text-parsing-analysis-textbook', parser_tool.views.text_parsing_analysis,  name='text_parsing_analysis_textbook', kwargs={'textbook_mode': True}),
     path('html-colorizer', parser_tool.views.html_colorizer,  name='html_colorizer'),
     path('mini-story-creator', parser_tool.views.mini_story_creator,  name='mini_story_creator'),
     path('quick-lemma', parser_tool.views.quick_lemma,  name='quick_lemma'),

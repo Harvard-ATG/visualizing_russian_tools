@@ -10,8 +10,11 @@ from .forms import WordListForm
 
 logger = logging.getLogger(__name__)
 
-def text_parsing_analysis(request):
-    return render(request, 'parser_tool/text_parsing_analysis.html')
+def text_parsing_analysis(request, **kwargs):
+    context = {
+        "textbook_mode": kwargs.get("textbook_mode"),
+    }
+    return render(request, 'parser_tool/text_parsing_analysis.html', context)
 
 
 def mini_story_creator(request):
