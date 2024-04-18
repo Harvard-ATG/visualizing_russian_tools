@@ -28,7 +28,7 @@ django-dotenv==1.4.2
     # via -r requirements.in
 et-xmlfile==1.1.0
     # via openpyxl
-gunicorn==21.2.0
+gunicorn==22.0.0
     # via -r requirements.in
 idna==3.3
     # via requests
