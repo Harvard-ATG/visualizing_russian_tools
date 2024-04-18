@@ -6,7 +6,7 @@ sentry-sdk==1.39.1
 lxml==4.9.2
 beautifulsoup4==4.12.2
 django-cors-headers==3.14.0
-gunicorn==21.2.0
+gunicorn==22.0.0
 whitenoise==6.6.0
 pygtrie==2.5.0
 navec==0.10.0
