@@ -52,7 +52,7 @@ pygtrie==2.5.0
     # via -r requirements.in
 pytz==2022.1
     # via django
-requests==2.31.0
+requests==2.32.0
     # via
     #   -r requirements.in
     #   requests-oauthlib
