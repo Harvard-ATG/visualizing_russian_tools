@@ -67,7 +67,7 @@ COMBINING_BREVE_CHAR = '\u0306'     # Diacritic used with the eleventh letter of
 # Word beginning with по- should also be privileged.
 HYPHENATED_WORDS = (
     'Санкт-Петербург',
-    'всё-таки',
+    'всё-таки',
     'все-таки',
     'из-за',
     'из-под',
@@ -109,6 +109,7 @@ MWES = (
     'во время',
     'вряд ли',
     'все равно',
+    'всё равно',
     'до сих пор',
     'до того как',
     'до того, как',
@@ -343,12 +344,12 @@ def canonical(token):
     # normalizing text case and hyphenation
     token = token.lower()
     token = normalize_hyphens(token)
-    
+
     # remove diacritics in 2 passes, first removing standalone diacritics such as acute accents
     # indicating end-stress, and then decomposing to remove any combining diacritics
-    token = strip_diacritics(token) 
+    token = strip_diacritics(token)
     token = unicode_compose(strip_diacritics(unicode_decompose(token)))
-    
+
     return token
 
 
