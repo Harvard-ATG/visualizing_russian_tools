@@ -15,12 +15,10 @@ class Command(BaseCommand):
             "--xlsfile", required=True, help="Input XLS file with the russian spreadsheet data.", default="NewVisualizingRussian.xlsx"
         )
         parser.add_argument("--csvfile", required=False, help="Output CSV file.", default="russian.csv")
-        parser.add_argument("--verbose", help="Increase output verbosity.", action="store_true")
 
     def handle(self, *args, **options):
         xlsfile = options["xlsfile"]
         csvfile = options["csvfile"]
-        verbose = options["verbose"]
 
         if not os.path.exists(xlsfile):
             raise CommandError("Input XLS file %s does not exist!" % xlsfile)

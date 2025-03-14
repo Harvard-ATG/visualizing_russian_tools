@@ -84,6 +84,7 @@ def get_word_forms(text):
     ids = [lemma["id"] for lemma in lemmas]
     try:
         lemma_level = [lemma["level"] for lemma in lemmas][0]
-    except:
+    except (IndexError, KeyError) as e:
+        logger.debug(f"Could not get lemma level: {e}")
         lemma_level = "0"
     return (queries.getforms(ids), lemma_level)

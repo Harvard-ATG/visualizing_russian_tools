@@ -43,7 +43,10 @@ is more efficient than a series of UPDATE queries (e.g. UPDATE x WHERE y = ?).
         self.cursor = connection.cursor()
 
         self.create_table()
-        tsv_reader = lambda f: csv.DictReader(f, dialect=None, delimiter="\t", quoting=csv.QUOTE_NONE)
+        
+        def tsv_reader(f):
+            return csv.DictReader(f, dialect=None, delimiter="\t", quoting=csv.QUOTE_NONE)
+            
         for record in tsv_reader(tsv_file):
             total_records += 1
             self.insert_form(record["WordForm"], record["Rank"], record["Freq"])

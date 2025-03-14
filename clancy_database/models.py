@@ -76,7 +76,7 @@ class Lemma(models.Model):
             "reverse": "",
             "rnc_doc_count": self.rnc_doc_count,
             "rnc_lemma_count": self.rnc_lemma_count,
-            "icon_url": self.icon_url if self.icon_url != None else "https://static.thenounproject.com/png/3848152-200.png",
+            "icon_url": self.icon_url if self.icon_url is not None else "https://static.thenounproject.com/png/3848152-200.png",
             "icon_license": self.icon_license,
             "icon_attribute": self.icon_attribute,
         }

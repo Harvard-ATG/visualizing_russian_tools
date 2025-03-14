@@ -74,12 +74,12 @@ def makelookup(forms=None):
     table = {"forms": {}, "lemmas": {}, "lookup": {}}
 
     # Batch the DB queries to work around "sqlite3.OperationalError: too many SQL variables"
-    for idx, forms in enumerate(batch(forms, n=BATCH_SIZE)):
-        logger.debug("makelookup(): batch=%s forms=%s" % (idx, len(forms)))
+    for idx, batch_forms in enumerate(batch(forms, n=BATCH_SIZE)):
+        logger.debug("makelookup(): batch=%s forms=%s" % (idx, len(batch_forms)))
         lemma_ids = set()
 
         # Find database entries for inflections matching the forms
-        for inflection in query_multiple(forms):
+        for inflection in query_multiple(batch_forms):
             table["lookup"].setdefault(inflection.form.lower(), []).append(inflection.id)
             table["forms"][inflection.id] = inflection.to_dict()
             lemma_ids.add(inflection.lemma_id)

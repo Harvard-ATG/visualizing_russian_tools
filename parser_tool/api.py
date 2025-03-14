@@ -28,8 +28,8 @@ class BaseAPIView(View):
             raise JsonBadRequest("Expected JSON content type header")
         try:
             body = json.loads(request.body.decode("utf-8"))
-        except ValueError:
-            raise JsonBadRequest("Invalid JSON")
+        except ValueError as err:
+            raise JsonBadRequest("Invalid JSON") from err
         return body
 
 

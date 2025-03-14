@@ -60,7 +60,9 @@ using an UPDATE/SELECT. This is more efficient than submitting a series of UPDAT
         connection.close()
 
     def load_data(self, formfile, lemmafile, verbosity=0):
-        tsv_reader = lambda f: csv.DictReader(f, dialect=None, delimiter="\t", quoting=csv.QUOTE_NONE)
+        def tsv_reader(f):
+            return csv.DictReader(f, dialect=None, delimiter="\t", quoting=csv.QUOTE_NONE)
+            
         self.create_load_table()
 
         self.stdout.write(f"Loading: {formfile.name}")
