@@ -11,6 +11,8 @@ https://visualizingrussian.fas.harvard.edu/
 ## Getting Started
 
 ```
+python -m venv .venv # Uses python 3.11 from .python-version
+source .venv/bin/activate
 pip install -r requirements.txt
 ./manage.py migrate
 ./manage.py import_clancy_sqldump
@@ -25,10 +27,10 @@ docker build . -t visualizing_russian_tools
 docker run -p 8000:8000 visualizing_russian_tools
 ```
 
-Or with docker-compose:
+Or with Docker Compose:
 
 ```
-docker-compose up
+docker compose up
 ```
 
 ## Source Data
