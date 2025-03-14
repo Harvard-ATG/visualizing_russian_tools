@@ -3,30 +3,35 @@ import os.path
 import sqlite3
 import time
 
-from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from django.core.management.base import BaseCommand
 
 import clancy_database
 
 
 class Command(BaseCommand):
-    help = 'Load icons from icons.csv file'
+    help = "Load icons from icons.csv file"
 
     def add_arguments(self, parser):
         icon_file_csv = os.path.join(os.path.dirname(clancy_database.__file__), "data", "icons.csv")
         parser.add_argument("--csvfile", required=False, help="Input CSV file", default=icon_file_csv)
-        parser.add_argument("--dbfile", required=False, help="Output SQLite file created as a result of parsing the CSV.", default=settings.DATABASES['clancy_database']['NAME'])
+        parser.add_argument(
+            "--dbfile",
+            required=False,
+            help="Output SQLite file created as a result of parsing the CSV.",
+            default=settings.DATABASES["clancy_database"]["NAME"],
+        )
 
     def handle(self, *args, **options):
-        db_file = options['dbfile']
-        icon_file_csv = options['csvfile']
+        db_file = options["dbfile"]
+        icon_file_csv = options["csvfile"]
         CONN = sqlite3.connect(db_file)
         cursor = CONN.cursor()
         start = time.time()
-        with open(icon_file_csv, encoding='utf-8-sig') as csvf:
+        with open(icon_file_csv, encoding="utf-8-sig") as csvf:
             csvReader = csv.DictReader(csvf)
             for row in csvReader:
-                sql_statement = '''UPDATE lemma SET icon_url=?, icon_license=?, icon_attribute=? WHERE lemma=?'''
+                sql_statement = """UPDATE lemma SET icon_url=?, icon_license=?, icon_attribute=? WHERE lemma=?"""
                 lemma = row["Russian"]
                 icon_url = row["icon_url"]
                 license = row["license_description"]

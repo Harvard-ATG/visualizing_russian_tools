@@ -1,8 +1,6 @@
-import csv
-from django.db import models
 import operator
-import os
-from visualizing_russian_tools.settings.base import ROOT_DIR
+
+from django.db import models
 
 
 class Lemma(models.Model):
@@ -34,7 +32,7 @@ class Lemma(models.Model):
         return "%s [%s:%s] " % (self.lemma, self.pos, self.id)
 
     def get_aspect_pair(self):
-        '''
+        """
         Returns a 2-element list containing the first matching aspect pair for this lemma, or an empty list
         if no aspect pairs were found with the lemma.
 
@@ -46,16 +44,16 @@ class Lemma(models.Model):
 
         In this case, the pairs are assigned an index according to how they appear in the source data (e.g. Steven's
         spreadsheet). We can use that ordering to select one.
-        '''
-        aspect_pairs_qs = AspectPair.objects.filter(lemma_id=self.id).order_by('pair_index').values('pair_id')
+        """
+        aspect_pairs_qs = AspectPair.objects.filter(lemma_id=self.id).order_by("pair_index").values("pair_id")
         try:
             pair = aspect_pairs_qs[0]
         except IndexError:
             return []
 
-        aspect_pair_qs = AspectPair.objects.filter(pair_id=pair['pair_id'])
+        aspect_pair_qs = AspectPair.objects.filter(pair_id=pair["pair_id"])
         if len(aspect_pair_qs) == 2:
-            return [aspect_pair.to_dict() for aspect_pair in sorted(aspect_pair_qs, key=operator.attrgetter('aspect'))]
+            return [aspect_pair.to_dict() for aspect_pair in sorted(aspect_pair_qs, key=operator.attrgetter("aspect"))]
         return []
 
     def to_dict(self):
@@ -78,9 +76,9 @@ class Lemma(models.Model):
             "reverse": "",
             "rnc_doc_count": self.rnc_doc_count,
             "rnc_lemma_count": self.rnc_lemma_count,
-            "icon_url": self.icon_url if self.icon_url!= None else "https://static.thenounproject.com/png/3848152-200.png",
+            "icon_url": self.icon_url if self.icon_url != None else "https://static.thenounproject.com/png/3848152-200.png",
             "icon_license": self.icon_license,
-            "icon_attribute": self.icon_attribute
+            "icon_attribute": self.icon_attribute,
         }
         if self.pos == "verb":
             data["aspect_pair"] = self.get_aspect_pair()
@@ -88,11 +86,11 @@ class Lemma(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'lemma'
+        db_table = "lemma"
         indexes = [
-            models.Index(fields=['lemma'], name='lemma_lemma_index'),
+            models.Index(fields=["lemma"], name="lemma_lemma_index"),
         ]
-        ordering = ['level', 'rank'] # Order by hand-picked levels and then by more frequently occurring lemma
+        ordering = ["level", "rank"]  # Order by hand-picked levels and then by more frequently occurring lemma
 
 
 class AspectPair(models.Model):
@@ -100,7 +98,7 @@ class AspectPair(models.Model):
     pair_id = models.IntegerField()
     pair_name = models.TextField()
     pair_index = models.IntegerField()
-    lemma = models.ForeignKey('Lemma', related_name='+', on_delete=models.CASCADE)
+    lemma = models.ForeignKey("Lemma", related_name="+", on_delete=models.CASCADE)
     lemma_label = models.TextField()
     lemma_count = models.FloatField(blank=True, null=True)
     aspect = models.TextField()
@@ -123,13 +121,13 @@ class AspectPair(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'aspect_pair'
-        ordering = ['pair_id', 'aspect', 'lemma']
+        db_table = "aspect_pair"
+        ordering = ["pair_id", "aspect", "lemma"]
 
 
 class Inflection(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False)
-    lemma = models.ForeignKey('Lemma', on_delete=models.PROTECT)
+    lemma = models.ForeignKey("Lemma", on_delete=models.PROTECT)
     form = models.TextField()
     stressed = models.TextField()
     type = models.TextField()
@@ -161,7 +159,7 @@ class Inflection(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'inflection'
+        db_table = "inflection"
         indexes = [
-            models.Index(fields=['form'], name='inflection_form_index'),
+            models.Index(fields=["form"], name="inflection_form_index"),
         ]

@@ -22,19 +22,19 @@ def tokens2html(tokens, **options):
 
     # Add tokens to element tree
     # Note: intentionally using "pre" so that tab characters can be rendered properly
-    container_el = ET.Element('pre', attrib={"class": options.get("containerCls", "words")})
+    container_el = ET.Element("pre", attrib={"class": options.get("containerCls", "words")})
     prev_el = container_el
 
     for token in tokens:
         rendered = render_token(token)
-        if rendered['node_type'] == ELEMENT_NODE:
-            container_el.append(rendered['element'])
-            prev_el = rendered['element']
-        elif rendered['node_type'] == TEXT_NODE:
+        if rendered["node_type"] == ELEMENT_NODE:
+            container_el.append(rendered["element"])
+            prev_el = rendered["element"]
+        elif rendered["node_type"] == TEXT_NODE:
             if prev_el is container_el:
-                prev_el.text = (prev_el.text or '') + rendered['text']
+                prev_el.text = (prev_el.text or "") + rendered["text"]
             else:
-                prev_el.tail = (prev_el.tail or '') + rendered['text']
+                prev_el.tail = (prev_el.tail or "") + rendered["text"]
 
     # Serialize element tree to HTML string
     html = serialize(container_el)
@@ -45,7 +45,7 @@ def tokens2html(tokens, **options):
 
 def serialize(root_el):
     textstream = io.BytesIO()
-    ET.ElementTree(root_el).write(textstream, encoding="utf-8", method='html')
+    ET.ElementTree(root_el).write(textstream, encoding="utf-8", method="html")
     html = textstream.getvalue().decode("utf-8")
     return html
 
@@ -55,27 +55,27 @@ def newline2br(text):
 
 
 def render_token(token):
-    token_text = token['token']
-    if token['tokentype'] in (tokenizer.TOKEN_PUNCT, tokenizer.TOKEN_SPACE):
+    token_text = token["token"]
+    if token["tokentype"] in (tokenizer.TOKEN_PUNCT, tokenizer.TOKEN_SPACE):
         token_text = token_text.replace("\r", "\n")  # normalize returns as newlines
         token_text = token_text.replace("\t", "\u0009")  # render tab entities
-        token_text = token_text.replace("  ", "\u00A0\u00A0")  # render 2 consecutive spaces as nbsp
-        return {'node_type': TEXT_NODE, 'text': token_text}
+        token_text = token_text.replace("  ", "\u00a0\u00a0")  # render 2 consecutive spaces as nbsp
+        return {"node_type": TEXT_NODE, "text": token_text}
 
     attrib = {}
     attribCls = []
-    if token['tokentype'] in (tokenizer.TOKEN_WORD, tokenizer.TOKEN_RUS):
+    if token["tokentype"] in (tokenizer.TOKEN_WORD, tokenizer.TOKEN_RUS):
         attribCls.append("word")
-    if len(token['form_ids']) > 0:
+    if len(token["form_ids"]) > 0:
         attribCls.append("parsed")
-        attrib['data-form-ids'] = ",".join([str(x) for x in token['form_ids']])
-    if token['level']:
-        attribCls.append("level%s" % token['level'][0])
-        attrib['data-level'] = token['level']
+        attrib["data-form-ids"] = ",".join([str(x) for x in token["form_ids"]])
+    if token["level"]:
+        attribCls.append("level%s" % token["level"][0])
+        attrib["data-level"] = token["level"]
     if len(attribCls) > 0:
-        attrib['class'] = " ".join(attribCls)
+        attrib["class"] = " ".join(attribCls)
 
-    el = ET.Element('span', attrib=attrib)
+    el = ET.Element("span", attrib=attrib)
     el.text = token_text
 
-    return {'node_type': ELEMENT_NODE, 'element': el}
+    return {"node_type": ELEMENT_NODE, "element": el}
