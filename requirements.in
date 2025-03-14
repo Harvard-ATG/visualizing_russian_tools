@@ -13,3 +13,4 @@ navec==0.10.0
 annoy==1.17.3
 openpyxl==3.1.2
 pip-tools
+flake8
