@@ -1,4 +1,7 @@
-from .base import *
+import os
+
+from .base import *  # noqa: F403
+from .base import DATABASES
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
