@@ -2,7 +2,7 @@
 
 # Visualizing Russian Tools
 
-Visualizing Russian is a suite of web-based tools for language learners, researchers, and teachers. 
+Visualizing Russian is a suite of web-based tools for language learners, researchers, and teachers.
 
 https://visualizingrussian.fas.harvard.edu/
 
@@ -18,6 +18,12 @@ pip install -r requirements.txt
 ./manage.py import_clancy_sqldump
 ./manage.py build_annoy_forest
 ./manage.py runserver --nostatic
+```
+
+Install pre-commit hooks (`.pre-commit-config.yaml`):
+
+```
+pre-commit install
 ```
 
 Using docker:
@@ -49,7 +55,7 @@ $ ./manage.py convert_clancy_xls --xlsfile NewVisualizingRussian.xls --csvfile r
 $ ./manage.py create_clancy_db --csvfile russian.csv --dbfile russian.sqlite3
 $ ./manage.py load_sharoff_data --dbfile russian.sqlite3
 $ ./manage.py load_rnc_data --dbfile russian.sqlite3
-$ ./manage.py load_icon_data --dbfile russian.sqlite3  
+$ ./manage.py load_icon_data --dbfile russian.sqlite3
 $ sqlite3 russian.sqlite3 .dump > russian.sql
 $ gzip russian.sql && mv russian.sql.gz clancy_database/data/russian.sql.gz
 ```
@@ -102,7 +108,7 @@ To successfully run the command, you need to pass the following arguments:
 Example:
 
 ```sh
-(env)$ ./manage.py fetch_noun_icons --input_file=TheFile.csv --output_file=1E_noun_icons.csv --level=1E 
+(env)$ ./manage.py fetch_noun_icons --input_file=TheFile.csv --output_file=1E_noun_icons.csv --level=1E
 ```
 
 #### Notes
