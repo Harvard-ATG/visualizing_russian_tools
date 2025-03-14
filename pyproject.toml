@@ -1,0 +1,23 @@
+[tool.ruff]
+select = ["E", "F", "B", "I"]
+
+exclude = [
+    ".git",
+    ".ruff_cache",
+    "__pycache__",
+    "*/migrations/*",
+    ".venv",
+    "venv",
+    "env",
+]
+
+line-length = 140
+
+[tool.ruff.isort]
+known-first-party = ["clancy_database"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto" 

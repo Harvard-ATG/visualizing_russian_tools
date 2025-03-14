@@ -12,5 +12,5 @@ pygtrie==2.5.0
 navec==0.10.0
 annoy==1.17.3
 openpyxl==3.1.2
-pip-tools
-flake8
+pip-tools>=7.0.0
+ruff==0.11.0
