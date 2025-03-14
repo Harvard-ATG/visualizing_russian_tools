@@ -1,6 +1,5 @@
 [tool.ruff]
-select = ["E", "F", "B", "I"]
-
+line-length = 140
 exclude = [
     ".git",
     ".ruff_cache",
@@ -11,9 +10,10 @@ exclude = [
     "env",
 ]
 
-line-length = 140
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["clancy_database"]
 
 [tool.ruff.format]
