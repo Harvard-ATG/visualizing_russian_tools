@@ -52,7 +52,11 @@ class TestHtmlColorizer(unittest.TestCase):
         input_html = '<p><strong>В</strong> <b><em>этом</em></b> <span style="font-weight:bold">году.</span></p>'
         input_text = htmlcolorizer.SCRUB_HTML_PATTERN.sub("", input_html)
         expected_tokens = tokenize_and_tag_with_levels(input_text)
-        expected_html = '<p><strong><span data-level="1">В</span></strong> <b><em><span data-level="1">этом</span></em></b> <span style="font-weight:bold"><span data-level="1">году</span>.</span></p>'
+        expected_html = (
+            '<p><strong><span data-level="1">В</span></strong> '
+            '<b><em><span data-level="1">этом</span></em></b> '
+            '<span style="font-weight:bold"><span data-level="1">году</span>.</span></p>'
+        )
 
         colorizer = htmlcolorizer.HtmlColorizer(
             input_html, color_attribute="data", levels={t["canonical"]: t["level"] for t in expected_tokens}
@@ -84,7 +88,11 @@ class TestHtmlElementsColorizer(unittest.TestCase):
         expected_tokens = tokenize_and_tag_with_levels(" ".join(elements.values()))
         expected_result = {
             "8da35250": '<span data-level="1">Глава</span> 1',
-            "f7464298": '— <span data-level="1">Приве́т</span>! <span data-level="1">Как</span> <span data-level="1">тебя</span> <span data-level="1">зову́т</span>?',
+            "f7464298": (
+                '— <span data-level="1">Приве́т</span>! '
+                '<span data-level="1">Как</span> <span data-level="1">тебя</span> '
+                '<span data-level="1">зову́т</span>?'
+            ),
             "2ff91b9b": '— <span data-level="1">Ле́на</span>. <span data-level="1">А</span> <span data-level="1">тебя</span>?',
         }
         colorizer = htmlcolorizer.HtmlElementsColorizer(

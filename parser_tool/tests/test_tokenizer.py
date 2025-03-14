@@ -178,7 +178,10 @@ class TestTokenizer(unittest.TestCase):
             self.assertEqual(expected_occurrences, len([t for t in actual_tokens if t == mwe]))
 
     def test_tokenizer_sentence_with_mixed_english_and_punctuation(self):
-        text = "A typical seventeen-year-old первоку́рсник | первоку́рсница (first-year student) in the филологи́ческий факульте́т (филфа́к) (Philology Faculty) has 23 па́ры"
+        text = (
+            "A typical seventeen-year-old первоку́рсник | первоку́рсница (first-year student) "
+            "in the филологи́ческий факульте́т (филфа́к) (Philology Faculty) has 23 па́ры"
+        )
         expected_tokens = [
             "A",
             " ",
@@ -326,7 +329,7 @@ class TestTokenizerHelpers(unittest.TestCase):
 
     def test_tokentype(self):
         tests = [
-            ("найти", tokenizer.TOKEN_RUS),
+            ("найти", tokenizer.TOKEN_RUS),
             ("не́которых", tokenizer.TOKEN_RUS),
             ("по-русски", tokenizer.TOKEN_RUS),
             ("english", tokenizer.TOKEN_WORD),

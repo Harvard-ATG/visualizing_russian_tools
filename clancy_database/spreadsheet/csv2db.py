@@ -501,7 +501,11 @@ def insert_missing_inflections(cursor):
         cursor.execute("SELECT 1 FROM inflection WHERE form = ? AND NOT EXISTS (SELECT 1 FROM inflection WHERE form = ?)", [lemma, form])
         row = cursor.fetchone()
         if row is None:
-            sql = "INSERT INTO inflection (lemma_id, form, stressed, type, frequency) SELECT lemma_id, ?, stressed, type, frequency FROM inflection WHERE form = ?"
+            sql = """
+                INSERT INTO inflection (lemma_id, form, stressed, type, frequency)
+                SELECT lemma_id, ?, stressed, type, frequency FROM inflection 
+                WHERE form = ?
+            """
             cursor.execute(sql, [form, lemma])
 
 
@@ -525,7 +529,11 @@ def insert_aspect_counterpart(cursor, inserted_lemma, row):
     if VALUE_SEPARATOR in second_russian:
         counterparts = [s.strip() for s in second_russian.split(VALUE_SEPARATOR) if s.strip() != lemma]
 
-    sql = "INSERT INTO aspect_counterpart (lemma_id, lemma_label, lemma_count, aspect, counterpart, counterpart_index) VALUES (?, ?, ?, ?, ?, ?)"
+    sql = """
+        INSERT INTO aspect_counterpart 
+        (lemma_id, lemma_label, lemma_count, aspect, counterpart, counterpart_index) 
+        VALUES (?, ?, ?, ?, ?, ?)
+    """
     inserts = []
     for index, counterpart in enumerate(counterparts):
         inserts.append([lemma_pk, lemma, count, aspect, counterpart, index])
@@ -556,9 +564,12 @@ def insert_aspect_pairs(cursor):
     """
 
     # partition verbs into buckets according to aspect
-    cursor.execute(
-        "SELECT id, lemma_id, lemma_label, lemma_count, aspect, counterpart, counterpart_index FROM aspect_counterpart ORDER BY lemma_id, counterpart_index"
-    )
+    sql = """
+        SELECT id, lemma_id, lemma_label, lemma_count, aspect, counterpart, counterpart_index 
+        FROM aspect_counterpart 
+        ORDER BY lemma_id, counterpart_index
+    """
+    cursor.execute(sql)
     aspect_counterpart_rows = cursor.fetchall()
     aspects = {"imperfective": {}, "perfective": {}, "biaspectual": {}}
     for row in aspect_counterpart_rows:
