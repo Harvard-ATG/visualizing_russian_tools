@@ -15,20 +15,20 @@ on:
 
 jobs:
   lint:
-    runs-on: arc-runner-set-com
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11' # From Dockerfile
-          
+
       - name: Install ruff
         # No need for all the dependencies
         run: |
           pip install ruff
-          
+
       - name: Run ruff for Python formatting check
         run: ruff format --check .
 
