@@ -1,8 +1,6 @@
 name: Publish Docker Image
 
 on:
-  # TODO remove pull_request trigger after testing
-  pull_request:
   release:
     types: [published]
   workflow_dispatch:
@@ -55,7 +53,7 @@ jobs:
         id: push
         with:
           context: .
-          # TODO: Re-enable multi-platform support when we need to support arm64
+          # TODO: Re-enable multi-platform support when Dockerfile supports arm64
           # platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

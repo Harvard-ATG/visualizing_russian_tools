@@ -32,4 +32,6 @@ jobs:
         run: |
           python manage.py test
 
-      # TODO also run the Jasmine JS tests
+      # TODO run the Jasmine JS tests
+
+      # TODO update coverage badge if merging into main

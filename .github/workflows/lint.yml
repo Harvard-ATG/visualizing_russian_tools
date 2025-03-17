@@ -34,3 +34,5 @@ jobs:
 
       - name: Run ruff for Python linting check
         run: ruff check .
+
+    # TODO linting for JS and CSS
