@@ -46,7 +46,7 @@ jobs:
             # Use short SHA
             type=sha,format=short
             # Only use latest tag on actual releases
-            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
+            type=raw,value=latest
 
       - name: Build Docker image
         uses: docker/build-push-action@v6
