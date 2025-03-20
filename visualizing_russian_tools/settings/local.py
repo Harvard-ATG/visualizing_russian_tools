@@ -1,6 +1,8 @@
-from .base import *
+import os
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'VUBevwwnHxXKG3UaGpxac795KpWhsPmCqhZMztCVb6hAZJfRNGhKrFrUd4YPbuYD')
+from .base import *  # noqa: F403
+
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "VUBevwwnHxXKG3UaGpxac795KpWhsPmCqhZMztCVb6hAZJfRNGhKrFrUd4YPbuYD")
 
 DEBUG = True
 
@@ -11,7 +13,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # Cache
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    "default": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
     }
 }

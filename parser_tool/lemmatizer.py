@@ -26,7 +26,7 @@ def lemmatize_text(text):
     """
     tokens = tokenizer.tokenize_and_tag(text)
     data = lemmatize_tokens(tokens)
-    assert(tokenizer.is_equal(text, "".join([d["token"] for d in data["tokens"]])))  # should be able to detokenize
+    assert tokenizer.is_equal(text, "".join([d["token"] for d in data["tokens"]]))  # should be able to detokenize
     return data
 
 
@@ -35,7 +35,7 @@ def lemmatize_tokens(tokens):
     Lemmatizes a list of tokens.
     Returns a dictionary with entries for forms, lemmas, and tokens.
     """
-    unique_canonical_tokens = list(set([t['canonical'] for t in tokens if t['tokentype'] == tokenizer.TOKEN_RUS]))
+    unique_canonical_tokens = list(set([t["canonical"] for t in tokens if t["tokentype"] == tokenizer.TOKEN_RUS]))
     logger.debug(unique_canonical_tokens)
     lemmatized = queries.makelookup(forms=unique_canonical_tokens)
 
@@ -77,12 +77,14 @@ def lemmatize_tokens(tokens):
 
     return data
 
+
 def get_word_forms(text):
     tokens = tokenizer.tokenize(text)
     lemmas = [queries.lemmatize(tokens[0]) for token in tokens][0]
     ids = [lemma["id"] for lemma in lemmas]
     try:
-        lemma_level = [lemma['level'] for lemma in lemmas][0]
-    except:
-        lemma_level = '0'
+        lemma_level = [lemma["level"] for lemma in lemmas][0]
+    except (IndexError, KeyError) as e:
+        logger.debug(f"Could not get lemma level: {e}")
+        lemma_level = "0"
     return (queries.getforms(ids), lemma_level)

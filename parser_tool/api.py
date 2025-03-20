@@ -1,27 +1,19 @@
-from django.core.cache import cache
-from django.utils.decorators import method_decorator
-from django.http import JsonResponse, HttpResponse
-from django.views import View
-from django.views.decorators.csrf import csrf_exempt
-
-
 import json
 import logging
 
-from visualizing_russian_tools.exceptions import JsonBadRequest
-from . import apicache
-from . import tokenizer
-from . import lemmatizer
-from . import htmlcolorizer
-from . import htmlgenerator
-from . import navec
+from django.http import HttpResponse, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 
+from visualizing_russian_tools.exceptions import JsonBadRequest
+
+from . import apicache, htmlcolorizer, htmlgenerator, lemmatizer, navec, tokenizer
 
 logger = logging.getLogger(__name__)
 
 
 class BaseAPIView(View):
-
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(BaseAPIView, self).dispatch(request, *args, **kwargs)
@@ -29,25 +21,22 @@ class BaseAPIView(View):
     def get_request_body_html(self, request):
         if not request.content_type.startswith("text/html"):
             raise JsonBadRequest("Expected HTML content type header")
-        return request.body.decode('utf-8')
+        return request.body.decode("utf-8")
 
     def get_request_body_json(self, request):
         if request.content_type != "application/json":
             raise JsonBadRequest("Expected JSON content type header")
         try:
-            body = json.loads(request.body.decode('utf-8'))
-        except ValueError:
-            raise JsonBadRequest('Invalid JSON')
+            body = json.loads(request.body.decode("utf-8"))
+        except ValueError as err:
+            raise JsonBadRequest("Invalid JSON") from err
         return body
 
 
 class LemmaAPIView(BaseAPIView):
     def get(self, request):
         status = "success"
-        message_for_status = {
-            "fail": "Missing 'word' or 'id' query parameter",
-            "error": "Internal server error"
-        }
+        message_for_status = {"fail": "Missing 'word' or 'id' query parameter", "error": "Internal server error"}
 
         data = []
         try:
@@ -79,9 +68,7 @@ class TokenizeAPIView(BaseAPIView):
     def post(self, request):
         body = self.get_request_body_json(request)
         status = "success"
-        message_for_status = {
-            "error": "Internal server error"
-        }
+        message_for_status = {"error": "Internal server error"}
         tokens = []
         try:
             text = body.get("text", "")
@@ -99,7 +86,7 @@ class TokenizeAPIView(BaseAPIView):
         logger.debug("tokenized response data=%s" % result)
 
         return JsonResponse(result, safe=False)
-    
+
     def tokenize_and_tag(self, text):
         return apicache.tokenize_and_tag(text)
 
@@ -107,10 +94,7 @@ class TokenizeAPIView(BaseAPIView):
 class LemmatizeAPIView(BaseAPIView):
     def get(self, request):
         status = "success"
-        message_for_status = {
-            "fail": "Missing 'word' query parameter",
-            "error": "Internal server error"
-        }
+        message_for_status = {"fail": "Missing 'word' query parameter", "error": "Internal server error"}
 
         word = request.GET.get("word", "").strip()
         try:
@@ -137,9 +121,7 @@ class LemmatizeAPIView(BaseAPIView):
     def post(self, request):
         body = self.get_request_body_json(request)
         status = "success"
-        message_for_status = {
-            "error": "Internal server error"
-        }
+        message_for_status = {"error": "Internal server error"}
         try:
             text = body.get("text", "")
             lemmatized_data = self.lemmatize_text(text)
@@ -160,7 +142,7 @@ class LemmatizeAPIView(BaseAPIView):
         logger.debug("lemmatize response data=%s" % result)
 
         return JsonResponse(result, safe=False)
-    
+
     def lemmatize_text(self, text):
         return apicache.lemmatize_text(text)
 
@@ -170,7 +152,7 @@ class TextParserAPIView(BaseAPIView):
         body = self.get_request_body_json(request)
         text = body.get("text", "")
         lemmatized_data = self.lemmatize_text(text)
-        render_html = request.GET.get('html', 'n') != 'n'
+        render_html = request.GET.get("html", "n") != "n"
         if render_html:
             lemmatized_data["html"] = htmlgenerator.tokens2html(tokens=lemmatized_data["tokens"])
         return JsonResponse(lemmatized_data, safe=False)
@@ -181,7 +163,7 @@ class TextParserAPIView(BaseAPIView):
 
 class DocumentColorizerAPIView(BaseAPIView):
     def post(self, request):
-        content_type = request.META.get('CONTENT_TYPE', '')
+        content_type = request.META.get("CONTENT_TYPE", "")
         color_attribute = self.request.GET.get("attribute", htmlcolorizer.DEFAULT_COLOR_ATTR).strip()
         if content_type.startswith("text/html"):
             input_html = self.get_request_body_html(request)
@@ -205,19 +187,11 @@ class ElementsColorizerAPIView(BaseAPIView):
         body = self.get_request_body_json(request)
         (valid, errors) = self.validate_body(body)
         if not valid:
-            result = {
-                "status": "invalid",
-                "error": errors
-            }
+            result = {"status": "invalid", "error": errors}
             return JsonResponse(result, status=400)
 
         output = self.colorize_elements(body["elements"], color_attribute)
-        result = {
-            "status": "success",
-            "data": {
-                "elements": output
-            }
-        }
+        result = {"status": "success", "data": {"elements": output}}
         return JsonResponse(result)
 
     def validate_body(self, body):
@@ -241,14 +215,13 @@ class ElementsColorizerAPIView(BaseAPIView):
     def colorize_elements(self, elements, color_attribute):
         return apicache.colorize_elements(elements, color_attribute)
 
+
 class GetFormsAPIView(BaseAPIView):
     def post(self, request):
         body = self.get_request_body_json(request)
 
         status = "success"
-        message_for_status = {
-            "error": "Internal server error"
-        }
+        message_for_status = {"error": "Internal server error"}
         try:
             text = body.get("text", "")
             lemma_data, lemma_level = lemmatizer.get_word_forms(text)
@@ -271,13 +244,12 @@ class GetFormsAPIView(BaseAPIView):
 class GetSimilarLSH(BaseAPIView):
     """Retrieves closest neighbors of an input word using locality
     sensitive hashing and the ANNOY tree in parser_tool/data"""
+
     def post(self, request):
         body = self.get_request_body_json(request)
 
         status = "success"
-        message_for_status = {
-            "error": "Internal server error"
-        }
+        message_for_status = {"error": "Internal server error"}
         try:
             text = body.get("text", "")
             output, timing = navec.getSimilarLSH(text)
@@ -287,9 +259,9 @@ class GetSimilarLSH(BaseAPIView):
 
         result = {"status": status}
         if status == "success":
-            result['text'] = text
-            result['output'] =  output
-            result['timing'] = timing
+            result["text"] = text
+            result["output"] = output
+            result["timing"] = timing
         if status in message_for_status:
             result["message"] = message_for_status[status]
 
@@ -301,13 +273,12 @@ class GetSimilarLSH(BaseAPIView):
 class GetSimilarBruteForce(BaseAPIView):
     """Retrieves closest neighbors of an input word using
     the brute force cosine similarity comparison method"""
+
     def post(self, request):
         body = self.get_request_body_json(request)
 
         status = "success"
-        message_for_status = {
-            "error": "Internal server error"
-        }
+        message_for_status = {"error": "Internal server error"}
         try:
             text = body.get("text", "")
             output, timing = navec.getSimilarBruteForce(text)
@@ -316,9 +287,9 @@ class GetSimilarBruteForce(BaseAPIView):
             status = "error"
         result = {"status": status}
         if status == "success":
-            result['text'] = text
-            result['output'] = output
-            result['timing'] = timing
+            result["text"] = text
+            result["output"] = output
+            result["timing"] = timing
         if status in message_for_status:
             result["message"] = message_for_status[status]
 

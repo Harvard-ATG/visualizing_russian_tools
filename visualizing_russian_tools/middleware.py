@@ -2,11 +2,9 @@ import json
 import logging
 import traceback
 
-from sentry_sdk import capture_exception
-
 from django.conf import settings
 from django.http import HttpResponseServerError
-
+from sentry_sdk import capture_exception
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +30,9 @@ class JsonExceptionMiddleware:
         if self.is_api_call(request):
             data = dict(reason=str(exception))
             if settings.DEBUG:
-                data['traceback'] = traceback.format_exc()
+                data["traceback"] = traceback.format_exc()
             capture_exception(exception)
-            response = HttpResponseServerError(json.dumps({"error": data}, indent=4), content_type='application/json')
+            response = HttpResponseServerError(json.dumps({"error": data}, indent=4), content_type="application/json")
         return response
 
     def is_api_call(self, request):

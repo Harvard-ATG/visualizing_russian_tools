@@ -1,6 +1,5 @@
 import logging
 from operator import itemgetter
-from django.db.models.query import EmptyQuerySet
 
 from .models import Inflection, Lemma
 
@@ -8,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 300
 
-CYRILLIC_SMALL_LETTER_IE = '\u0435' # е
-CYRILLIC_SMALL_LETTER_IO = '\u0451' # ё
+CYRILLIC_SMALL_LETTER_IE = "\u0435"  # е
+CYRILLIC_SMALL_LETTER_IO = "\u0451"  # ё
 
 
 def lookup_lemma(word=None, lemma_id=None):
@@ -40,8 +39,8 @@ def variant_forms(form):
         variant_forms.append(disguised_io_as_ie_form)
 
     # check multi-word expressions with or without comma
-    if ' ' in form and ',' in form:
-        variant_forms.append(form.replace(',', ''))
+    if " " in form and "," in form:
+        variant_forms.append(form.replace(",", ""))
 
     return variant_forms
 
@@ -75,12 +74,12 @@ def makelookup(forms=None):
     table = {"forms": {}, "lemmas": {}, "lookup": {}}
 
     # Batch the DB queries to work around "sqlite3.OperationalError: too many SQL variables"
-    for idx, forms in enumerate(batch(forms, n=BATCH_SIZE)):
-        logger.debug("makelookup(): batch=%s forms=%s" % (idx, len(forms)))
+    for idx, batch_forms in enumerate(batch(forms, n=BATCH_SIZE)):
+        logger.debug("makelookup(): batch=%s forms=%s" % (idx, len(batch_forms)))
         lemma_ids = set()
 
         # Find database entries for inflections matching the forms
-        for inflection in query_multiple(forms):
+        for inflection in query_multiple(batch_forms):
             table["lookup"].setdefault(inflection.form.lower(), []).append(inflection.id)
             table["forms"][inflection.id] = inflection.to_dict()
             lemma_ids.add(inflection.lemma_id)
@@ -120,7 +119,7 @@ def lemmatize(form):
     Returns the lemma or set of lemmas (if ambiguous) that matches a given form.
     """
     queryset = query_multiple([form])
-    queryset = queryset.select_related('lemma').order_by('lemma__level', 'lemma__rank')
+    queryset = queryset.select_related("lemma").order_by("lemma__level", "lemma__rank")
     lemmas = []
     seen = set()
     for inflection in queryset:
@@ -129,6 +128,7 @@ def lemmatize(form):
             seen.add(lemma_id)
             lemmas.append(inflection.lemma.to_dict())
     return lemmas
+
 
 def getforms(lemma_ids):
     """
@@ -144,4 +144,4 @@ def batch(iterable, n=1):
     """
     size = len(iterable)
     for i in range(0, size, n):
-        yield iterable[i:min(i + n, size)]
+        yield iterable[i : min(i + n, size)]

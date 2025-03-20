@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class ParserToolConfig(AppConfig):
-    name = 'parser_tool'
+    name = "parser_tool"

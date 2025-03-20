@@ -1,11 +1,9 @@
-from django.core.cache import cache
-
 import hashlib
 import json
 
-from . import tokenizer
-from . import lemmatizer
-from . import htmlcolorizer
+from django.core.cache import cache
+
+from . import htmlcolorizer, lemmatizer, tokenizer
 
 
 def lemmatize_text(text):
