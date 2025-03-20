@@ -15,9 +15,7 @@ beautifulsoup4==4.13.3
 build==1.2.2.post1
     # via pip-tools
 certifi==2023.7.22
-    # via
-    #   requests
-    #   sentry-sdk
+    # via requests
 cfgv==3.4.0
     # via pre-commit
 charset-normalizer==2.0.12
@@ -82,8 +80,6 @@ requests-oauthlib==2.0.0
     # via -r requirements.in
 ruff==0.11.0
     # via -r requirements.in
-sentry-sdk==1.39.1
-    # via -r requirements.in
 soupsieve==2.3.2.post1
     # via beautifulsoup4
 sqlparse==0.4.4
@@ -91,9 +87,7 @@ sqlparse==0.4.4
 typing-extensions==4.12.2
     # via beautifulsoup4
 urllib3==1.26.18
-    # via
-    #   requests
-    #   sentry-sdk
+    # via requests
 virtualenv==20.29.3
     # via pre-commit
 wheel==0.38.1
