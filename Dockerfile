@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12.9-slim-bookworm
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONFAULTHANDLER=1
 
