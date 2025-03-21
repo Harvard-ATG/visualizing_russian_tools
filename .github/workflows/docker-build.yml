@@ -1,6 +1,9 @@
-name: Publish Docker Image
+name: Docker Build and Deploy
 
 on:
+  push:
+    branches:
+      - master
   release:
     types: [published]
   workflow_dispatch:
@@ -68,3 +71,36 @@ jobs:
           subject-name: ghcr.io/${{ github.repository }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+
+  deploy-to-gcloud:
+    needs: build-and-push
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GCP_SERVICE_NAME: visualizing-russian-tools
+      GCP_REGION: us-east4
+      GCP_PROJECT_ID: ${{ secrets.SUNSETTING_GCP_PROJECT_ID }}
+
+    steps:
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.SUNSETTING_GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SUNSETTING_GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Google Cloud
+        run: |
+          # Construct the image path in the run step where variable substitution works
+          IMAGE_REPO="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/github-upstream/visualizing-russian-tools/visualizing-russian-tools"
+
+          gcloud run deploy ${{ env.GCP_SERVICE_NAME }} \
+            --image ${IMAGE_REPO}:${{ github.event.release.tag_name }} \
+            --region ${{ env.GCP_REGION }}
+          echo "Deployed version ${{ github.event.release.tag_name }} to Google Cloud Run service ${{ env.GCP_SERVICE_NAME }} in region ${{ env.GCP_REGION }}"
