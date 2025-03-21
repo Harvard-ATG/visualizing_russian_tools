@@ -6,7 +6,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "VUBevwwnHxXKG3UaGpxac795KpWhsP
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(" ")
 
 # Cors headers
 CORS_ORIGIN_ALLOW_ALL = True

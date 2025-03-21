@@ -4,8 +4,6 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-  pull_request:
-
 
 jobs:
   build-and-push:
@@ -20,9 +18,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # TODO: Re-enable QEMU setup when we need to support arm64
-    #   - name: Set up QEMU
-    #     uses: docker/setup-qemu-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -48,15 +45,14 @@ jobs:
             # Use short SHA
             type=sha,format=short
             # Only use latest tag on actual releases
-            type=raw,value=latest
+            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
 
       - name: Build Docker image
         uses: docker/build-push-action@v6
         id: push
         with:
           context: .
-          # TODO: Re-enable multi-platform support when Dockerfile supports arm64
-          # platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
