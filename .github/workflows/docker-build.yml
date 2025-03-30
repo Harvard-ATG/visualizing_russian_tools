@@ -97,7 +97,7 @@ jobs:
       - name: Deploy to Google Cloud
         run: |
           # Construct the image path in the run step where variable substitution works
-          IMAGE_REPO="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/github-upstream/harvard-atg/visualizing-russian-tools"
+          IMAGE_REPO="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/github-upstream/harvard-atg/visualizing_russian_tools"
           # IMAGE_TAG="${{ github.event.release.tag_name }}" failing - only latest tag is appearing in Artifact Registry
           IMAGE_TAG="latest"
 
