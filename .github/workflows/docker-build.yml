@@ -93,6 +93,27 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.SUNSETTING_GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SUNSETTING_GCP_SERVICE_ACCOUNT }}
+          token_format: "access_token"
+          create_credentials_file: true
+
+      - name: Print authentication info
+        run: |
+          echo "Current authentication:"
+          gcloud auth list
+          # Print service account IAM bindings
+          echo "Service account IAM bindings:"
+          gcloud iam service-accounts get-iam-policy ${{ secrets.SUNSETTING_GCP_SERVICE_ACCOUNT }}
+
+      - name: Impersonate service account
+        run: |
+          # Get the service account email
+          SA_EMAIL="${{ secrets.SUNSETTING_GCP_SERVICE_ACCOUNT }}"
+
+          echo "Impersonating service account: $SA_EMAIL"
+          gcloud config set auth/impersonate_service_account $SA_EMAIL
+
+          echo "Authentication after impersonation:"
+          gcloud auth list
 
       - name: Deploy to Google Cloud
         run: |
@@ -101,8 +122,13 @@ jobs:
           # IMAGE_TAG="${{ github.event.release.tag_name }}" failing - only latest tag is appearing in Artifact Registry
           IMAGE_TAG="latest"
 
+          echo "Deploying image: ${IMAGE_REPO}:${IMAGE_TAG}"
+          echo "Using service account: ${{ secrets.SUNSETTING_GCP_SERVICE_ACCOUNT }}"
+
           gcloud run deploy ${{ env.GCP_SERVICE_NAME }} \
             --image ${IMAGE_REPO}:${IMAGE_TAG} \
             --region ${{ env.GCP_REGION }}
+            --service-account ${{ secrets.SUNSETTING_GCP_SERVICE_ACCOUNT }} \
+            --verbosity=debug
           echo "Deployed version `latest` (should be same as ${{ github.event.release.tag_name }}) to Google Cloud Run \
           service ${{ env.GCP_SERVICE_NAME }} in region ${{ env.GCP_REGION }}"
