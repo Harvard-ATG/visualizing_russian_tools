@@ -84,38 +84,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-
       - name: Google Auth
         id: auth
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.SUNSETTING_GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SUNSETTING_GCP_SERVICE_ACCOUNT }}
-          token_format: "access_token"
-          create_credentials_file: true
 
-      - name: Activate service account credentials
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.GCP_SERVICE_NAME }}
+          image: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/github-upstream/harvard-atg/visualizing_russian_tools:latest
+          region: ${{ env.GCP_REGION }}
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Show deployment output
         run: |
-          echo "Activating service account credentials"
-          gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
-
-          echo "Verifying authentication:"
-          gcloud auth list
-
-      - name: Deploy to Google Cloud
-        run: |
-          # Construct the image path in the run step where variable substitution works
-          IMAGE_REPO="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/github-upstream/harvard-atg/visualizing_russian_tools"
-          # IMAGE_TAG="${{ github.event.release.tag_name }}" failing - only latest tag is appearing in Artifact Registry
-          IMAGE_TAG="latest"
-
-          echo "Deploying image: ${IMAGE_REPO}:${IMAGE_TAG}"
-          echo "Using service account: ${{ secrets.SUNSETTING_GCP_SERVICE_ACCOUNT }}"
-
-          gcloud run deploy ${{ env.GCP_SERVICE_NAME }} \
-            --image ${IMAGE_REPO}:${IMAGE_TAG} \
-            --region ${{ env.GCP_REGION }}
-            --service-account ${{ secrets.SUNSETTING_GCP_SERVICE_ACCOUNT }} \
-          echo "Deployed version `latest` (should be same as ${{ github.event.release.tag_name }}) to Google Cloud Run service ${{ env.GCP_SERVICE_NAME }} in region ${{ env.GCP_REGION }}"
+          echo "Deployed to Cloud Run service ${{ env.GCP_SERVICE_NAME }}"
+          echo "Service URL: ${{ steps.deploy.outputs.url }}"
