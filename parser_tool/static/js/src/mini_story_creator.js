@@ -222,11 +222,7 @@
 
             let story_lemma_stats_html = story_lemma_stats.map((item, idx) => {
                 let level = this.props.story_text.levelOf(item.word);
-                if(!level || level === 0) {
-                    level = 5; // unknown or uncategorized vocabulary should be level 5
-                }
                 let className = this.props.colorize ? `level${level}` : "";
-
                 const words = Object.keys(item.words).map(w => {
                     if(item.words[w] > 1) {
                         return w + `(×${item.words[w]})`;
