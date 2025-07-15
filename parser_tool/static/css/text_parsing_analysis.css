@@ -41,7 +41,8 @@ pre.words.mask.level2-3 .word:not(.level2):not(.level3),
 pre.words.mask.level2-4 .word:not(.level2):not(.level3):not(.level4),
 pre.words.mask.level3 .word:not(.level3),
 pre.words.mask.level3-4 .word:not(.level3):not(.level4),
-pre.words.mask.level4 .word:not(.level4) {
+pre.words.mask.level4 .word:not(.level4),
+pre.words.mask.level5 .word:not(.level5) {
     color: inherit !important; /* mask the color of words for particular levels*/
 }
 
