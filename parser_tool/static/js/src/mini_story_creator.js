@@ -221,14 +221,15 @@
             let story_lemma_stats = this.props.story_text.lemma_stats();
 
             let story_lemma_stats_html = story_lemma_stats.map((item, idx) => {
-                const level = this.props.story_text.levelOf(item.word);
+                let level = this.props.story_text.levelOf(item.word);
+                let className = this.props.colorize ? `level${level}` : "";
                 const words = Object.keys(item.words).map(w => {
                     if(item.words[w] > 1) {
                         return w + `(×${item.words[w]})`;
                     }
                     return w;
                 }).join(", ");
-                return `<tr class="level${this.props.colorize ? level : 0}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td><td>${level}</td></tr>`
+                return `<tr class="${className}"><td>${item.word}</td><td>${words}</td><td>${item.count}</td><td>${level}</td></tr>`
             }).join("");
 
             document.querySelector(this.selector).innerHTML = `

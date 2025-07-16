@@ -26,6 +26,7 @@ footer {
     --level2-color: blue; /* Foundations */
     --level3-color: #8000ff; /* Expansions */
     --level4-color: orange; /* Specializations */
+    --level5-color: black; /* Uncategorized or undefined vocabulary */
 }
 .theme-colorblind {
     /* levels in color blind readable categories */
@@ -34,6 +35,7 @@ footer {
     --level2-color: rgb(0, 114, 178);   /* Foundations */
     --level3-color: rgb(204, 121, 167); /* Expansions */
     --level4-color: rgb(230, 159, 0);   /* Specializations */
+    --level5-color: rgb(0, 0, 0);       /* Uncategorized or undefined vocabulary */
 }
 
 /* Note: we are intentionally specifying each color twice,
@@ -74,6 +76,11 @@ footer {
     color: var(--level4-color);
     color: orange;
 }
+.theme-default .level5,
+.theme-default [data-level='5'] {
+    color: var(--level5-color);
+    color: black;
+}
 
 .theme-colorblind .level0,
 .theme-colorblind [data-level='0'] {
@@ -106,6 +113,11 @@ footer {
     color: var(--level4-color);
     color: rgb(230, 159, 0);
 }
+.theme-colorblind .level5,
+.theme-colorblind [data-level='5'] {
+    color: var(--level5-color);
+    color: rgb(0, 0, 0);
+}
 .theme-colorblind .level1-stop {
     stop-color: var(--level1-color);
 }
@@ -117,4 +129,7 @@ footer {
 }
 .theme-colorblind .level4-stop {
     stop-color: var(--level4-color);
+}
+.theme-colorblind .level5-stop {
+    stop-color: var(--level5-color);
 }

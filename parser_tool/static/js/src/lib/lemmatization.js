@@ -29,6 +29,7 @@
             this._cache_forms_of = {}
             this._cache_lemmas_of = {};
             this._trie = null;
+            this._defaultLevel = 5; // default level for uncategorized or undefined vocabulary
             this.init();
         }
 
@@ -38,7 +39,7 @@
             if(!text) {
                 return Promise.resolve(new LemmatizedText());
             }
-            // async request to lemmatize the text using the API client 
+            // async request to lemmatize the text using the API client
             return api.lemmatizetext(text).then((res) => {
                 return new LemmatizedText(text, res.data);
             });
@@ -46,7 +47,7 @@
 
         init() {
             let trie = new LemmaTrie();
-            
+
             let _forms = Object.values(this._forms);
             for(let i = 0; i < _forms.length; i++) {
                 let form = _forms[i];
@@ -63,7 +64,7 @@
             for(let i = 0; i < _lemmas.length; i++) {
                 let lemma = _lemmas[i];
                 let data = {
-                    type: "lemma", 
+                    type: "lemma",
                     id: lemma.id,
                     capitalized: (lemma.label.charAt(0) == lemma.label.charAt(0).toUpperCase())
                 };
@@ -331,7 +332,7 @@
 
         // returns a non-zero integer reprsenting the difficulty level associated with the word, or zero if no level could be assigned
         levelOf(word) {
-            let level_num = 0; // using zero to represent an "unknown" level
+            let level_num;
             let lemma_records = this.lemmasOf(word, {sort: "level"});
             let lemma = (lemma_records.length > 0 ? lemma_records[0] : false);
             if(lemma) {
@@ -339,6 +340,9 @@
                 if(!Number.isNaN(parsed_level_num)) {
                     level_num = parsed_level_num;
                 }
+            } else {
+                // if no lemma was found, then assign default level
+                level_num = this._defaultLevel;
             }
             return level_num;
         }
@@ -424,7 +428,7 @@
                 }
 
                 let text_a_lemmas = this.text_a.lemmasOf(word_a);
-                
+
                 // no lemmas were found for word A, so we can't compare it to lemmas in text B
                 if(text_a_lemmas.length == 0) {
                     return;
@@ -441,7 +445,7 @@
                         text_a_lemmas = matching_lemmas;
                     }
                 }
-                
+
                 // iterate over TextA lemmas
                 for(let i = 0, len_a = text_a_lemmas.length; i < len_a; i++) {
                     let lemma_a = text_a_lemmas[i].label;
@@ -493,7 +497,7 @@
         compare() {
             let intersect = this.intersect_lemmas();
             let intersect_vocab = this.intersect_vocab();
-            
+
             for(let w in intersect_vocab) {
                 if(!intersect.hasOwnProperty(w)) {
                     intersect[w] = {word: w, intersects: false, lemma: false};
