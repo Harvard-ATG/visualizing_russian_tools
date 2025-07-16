@@ -1,5 +1,5 @@
 django==5.1.7
-requests==2.32.3
+requests==2.32.4
 requests_oauthlib==2.0.0
 django-dotenv==1.4.2
 lxml==5.3.1
