@@ -282,9 +282,7 @@ def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_
     new_tokens = []
     for token in tokens:
         # split hyphenated unless it's a special case like "по-" words (DB entries for those)
-        if (hyphen_char in token and
-            not token.lower().startswith("по-") and
-            canonical(token) not in canonical_reserved_words):
+        if hyphen_char in token and not token.lower().startswith("по-") and canonical(token) not in canonical_reserved_words:
             for t in re.split(r"(%s)" % hyphen_char, token):
                 if t != "":
                     new_tokens.append(t)
