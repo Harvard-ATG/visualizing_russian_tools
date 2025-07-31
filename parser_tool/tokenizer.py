@@ -276,10 +276,15 @@ def split_hyphenated(tokens, hyphen_char=HYPHEN_CHAR, reserved_words=HYPHENATED_
     """
     Splits hyphenated tokens, handling special cases like "по-" words, which should not be split.
     """
+    # Create a set of canonical forms of reserved words for faster lookup
+    canonical_reserved_words = {canonical(word) for word in reserved_words}
+
     new_tokens = []
     for token in tokens:
         # split hyphenated unless it's a special case like "по-" words (DB entries for those)
-        if hyphen_char in token and not token.startswith("по-") and token not in reserved_words:
+        if (hyphen_char in token and
+            not token.lower().startswith("по-") and
+            canonical(token) not in canonical_reserved_words):
             for t in re.split(r"(%s)" % hyphen_char, token):
                 if t != "":
                     new_tokens.append(t)

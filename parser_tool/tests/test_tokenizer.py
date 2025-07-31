@@ -167,6 +167,36 @@ class TestTokenizer(unittest.TestCase):
                 "text": "Во время встречи он встал и вышел в коридор. В это время мы еще не поняли, в чем дело.",
                 "occurrences": 1,
             },
+            {
+                "mwe": "Во-первых",
+                "text": "Во-первых, нужно понять суть проблемы.",
+                "occurrences": 1,
+            },
+            {
+                "mwe": "Во-вторых",
+                "text": "Во-вторых, следует найти решение.",
+                "occurrences": 1,
+            },
+            {
+                "mwe": "В-третьих",
+                "text": "В-третьих, нужно проверить результат.",
+                "occurrences": 1,
+            },
+            {
+                "mwe": "Во-первы́х",
+                "text": "Во-первы́х, это очень важно.",
+                "occurrences": 1,
+            },
+            {
+                "mwe": "Во-вторы́х",
+                "text": "Во-вторы́х, нужно быть осторожным.",
+                "occurrences": 1,
+            },
+            {
+                "mwe": "В-тре́тьих",
+                "text": "В-тре́тьих, это последний пункт.",
+                "occurrences": 1,
+            },
         ]
         for test in tests:
             (mwe, text, expected_occurrences) = test["mwe"], test["text"], test["occurrences"]
