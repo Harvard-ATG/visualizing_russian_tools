@@ -31,7 +31,7 @@ def variant_forms(form):
     Used to match against the database such as when ё is disguised as е.
     For example, зачёт may be written as зачет, in which case it's understood that the е is really ё.
     """
-    variant_forms = [form.capitalize(), form.lower()]
+    variant_forms = [form.capitalize(), form.lower(), form.title()]
 
     # check ё/е alternate spelling
     if CYRILLIC_SMALL_LETTER_IO in form:

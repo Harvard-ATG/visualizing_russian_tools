@@ -110,6 +110,10 @@ COMBINING_BREVE_CHAR = "\u0306"  # Diacritic used with the eleventh letter of th
 # Word beginning with по- should also be privileged.
 HYPHENATED_WORDS = (
     "Санкт-Петербург",
+    "Санкт-Петербурга",
+    "Санкт-Петербургу",
+    "Санкт-Петербургом",
+    "Санкт-Петербурге",
     "всё-таки",
     "все-таки",
     "из-за",
