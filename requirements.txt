@@ -60,6 +60,7 @@ packaging==24.2
     # via
     #   build
     #   gunicorn
+    #   wheel
 pip-tools==7.4.1
     # via -r requirements.in
 platformdirs==4.3.7
@@ -92,7 +93,7 @@ urllib3==2.5.0
     # via requests
 virtualenv==20.29.3
     # via pre-commit
-wheel==0.45.1
+wheel==0.46.2
     # via pip-tools
 whitenoise==6.9.0
     # via -r requirements.in
